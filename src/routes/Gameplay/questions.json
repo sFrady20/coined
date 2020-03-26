@@ -1,0 +1,152 @@
+[
+  {
+    "text": "Question 1",
+    "answers": [
+      {
+        "text": "Karl Marx died in England"
+      },
+      {
+        "text": "Leon Trotsky died in Mexico"
+      },
+      {
+        "text": "Che Guevara died in Cuba",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "text": "Question 2",
+    "answers": [
+      {
+        "text": "The sound barrier was first broken in 1953",
+        "isCorrect": true
+      },
+      {
+        "text": "The first human spaceflight was in 1961"
+      },
+      {
+        "text": "The first powered flight was in 1903"
+      }
+    ]
+  },
+  {
+    "text": "Question 3",
+    "answers": [
+      {
+        "text": "Silvio Berlusconi was Prime Minister of Italy"
+      },
+      {
+        "text": "Alexander Hamilton was President of the United States",
+        "isCorrect": true
+      },
+      {
+        "text": "Clement Attlee was Prime Minister of the United Kingdom"
+      }
+    ]
+  },
+  {
+    "text": "Question 4",
+    "answers": [
+      {
+        "text": "James Polk died in office",
+        "isCorrect": true
+      },
+      {
+        "text": "James Garfield was assassinated"
+      },
+      {
+        "text": "James Buchanan never married"
+      }
+    ]
+  },
+  {
+    "text": "Question 5",
+    "answers": [
+      {
+        "text": "Martin Luther was excommunicated by the Catholic Church"
+      },
+      {
+        "text": "Fidel Castro was excommunicated by the Catholic Church"
+      },
+      {
+        "text": "Galileo was excommunicated by the Catholic Church",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "text": "Question 6",
+    "answers": [
+      {
+        "text": "Steven Chu was born in Taiwan",
+        "isCorrect": true
+      },
+      {
+        "text": "John McCain was born in Panama"
+      },
+      {
+        "text": "Madeleine Albright was born in Czechoslovakia"
+      }
+    ]
+  },
+  {
+    "text": "Question 7",
+    "answers": [
+      {
+        "text": "The Hundred Years' War lasted 116 years"
+      },
+      {
+        "text": "The Korean War lasted four years",
+        "isCorrect": true
+      },
+      {
+        "text": "The Spanish Civil War lasted three years"
+      }
+    ]
+  },
+  {
+    "text": "Question 8",
+    "answers": [
+      {
+        "text": "Belgium was once ruled by Austria"
+      },
+      {
+        "text": "Suriname was once ruled by the Netherlands"
+      },
+      {
+        "text": "Mozambique was once ruled by France",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "text": "Question 9",
+    "answers": [
+      {
+        "text": "Henry Fonda served in World War II"
+      },
+      {
+        "text": "John Wayne served in World War II",
+        "isCorrect": true
+      },
+      {
+        "text": "Jimmy Stewart served in World War II"
+      }
+    ]
+  },
+  {
+    "text": "Question 10",
+    "answers": [
+      {
+        "text": "Alan Shepard walked on the Moon"
+      },
+      {
+        "text": "Buzz Aldrin walked on the Moon"
+      },
+      {
+        "text": "James Lovell walked on the Moon",
+        "isCorrect": true
+      }
+    ]
+  }
+]

@@ -1,0 +1,27 @@
+.root {
+  background: white;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
+  margin: 20px;
+  padding: 12px;
+  border-radius: 4px;
+  width: calc(100vw - 40px);
+}
+
+.answer {
+  width: 100%;
+  text-align: center;
+  background: #eee;
+  margin-bottom: 8px;
+  cursor: pointer;
+  padding: 8px 12px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+
+  &--correct {
+    background: rgba(100, 255, 100, 0.4);
+  }
+
+  &--incorrect {
+    background: rgba(255, 100, 100, 0.7);
+  }
+}

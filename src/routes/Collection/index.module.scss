@@ -1,0 +1,30 @@
+.root {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.item {
+  width: 30%;
+  float: left;
+  height: 100px;
+  background: #eee;
+  margin: 1.5%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &--collected {
+    background: rgba(100, 255, 100, 0.4);
+  }
+
+  &--highlighted {
+    background: rgba(255, 255, 100, 0.6);
+  }
+}
