@@ -29,9 +29,12 @@ export default (props: {
       if (!!selectedAnswer) return;
       selectAnswer(answer);
       if (answer.isCorrect) {
-        setScore(s => s + 100);
+        setScore((s) => s + 100);
+        window.navigator.vibrate(10);
+      } else {
+        window.navigator.vibrate(50);
       }
-      await new Promise(resolve => setTimeout(resolve, 400));
+      await new Promise((resolve) => setTimeout(resolve, 400));
       onComplete(!!answer.isCorrect);
     },
     [onComplete, selectedAnswer, selectAnswer, setScore]

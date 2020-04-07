@@ -7,7 +7,14 @@ export default (props: { actions: { [key: string]: () => void } }) => {
   return (
     <div className={styles.root}>
       {_.map(actions, (action, title) => (
-        <div className={styles.button} onClick={action}>
+        <div
+          className={styles.button}
+          key={title}
+          onClick={() => {
+            window.navigator.vibrate(10);
+            action();
+          }}
+        >
           {title}
         </div>
       ))}

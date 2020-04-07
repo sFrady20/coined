@@ -22,7 +22,7 @@ export default (props: { children: React.ReactNode }) => {
       setRequestingAccess(true);
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: "environment" },
-        audio: false
+        audio: false,
       });
       setStream(stream);
       setRequestingAccess(false);
