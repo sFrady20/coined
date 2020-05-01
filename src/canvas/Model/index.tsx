@@ -4,9 +4,12 @@ import React, {
   useState,
   useCallback,
   useRef,
+  forwardRef,
+  useImperativeHandle,
+  Ref,
+  useContext,
 } from "react";
 import { useLoader, useFrame } from "react-three-fiber";
-import _ from "lodash";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import {
   AnimationMixer,
@@ -14,126 +17,172 @@ import {
   AnimationAction,
   LoopOnce,
   LoopRepeat,
+  Event,
 } from "three";
 import { useSharedAnimations } from "../SharedAnimations";
-import useKeyPress from "../../hooks/useKeyPress";
+import useAnimations from "./useAnimations";
+import { GameContext } from "../../components/GameContext";
 
-const SCENE_NODES = "Dreyar";
-const SCENE_MATERIAL = "dreyar_M";
-
-export default () => {
-  const [timeElapsed, setTimeElapsed] = useState(0);
-  const [meshRef, setMeshRef] = useState<AnimationObjectGroup>();
-
-  const loopingClip = useRef<AnimationAction>();
-  const playingClip = useRef<AnimationAction>();
-
-  const george: any = useLoader(GLTFLoader, "./george.glb");
-
-  const mixer = useMemo(() => meshRef && new AnimationMixer(meshRef), [
-    meshRef,
-  ]);
-  const sharedClips = useSharedAnimations(mixer);
-  const animations = useMemo(
-    () => (mixer ? _.map(george.animations, (a) => mixer.clipAction(a)) : []),
-    [mixer, george]
-  );
-
-  const loopClip = useCallback(
-    (clip: AnimationAction | undefined, crossfade: number = 0.2) => {
-      if (!clip) return;
-      loopingClip.current = clip;
-      playingClip.current = clip;
-      clip.loop = LoopRepeat;
-      clip
-        .reset()
-        .setEffectiveTimeScale(1)
-        .setEffectiveWeight(1)
-        .fadeIn(crossfade)
-        .play();
+export default forwardRef(
+  (
+    props: {
+      file: string;
+      nodesPath: string;
+      materialPath: string;
     },
-    [playingClip, loopingClip]
-  );
-  const playOnce = useCallback(
-    async (clip: AnimationAction | undefined, crossfade: number = 0.2) => {
-      await new Promise((resolve) => {
-        if (!mixer || !clip) return;
-        if (playingClip.current) {
-          playingClip.current.fadeOut(crossfade);
-        }
+    ref: Ref<{
+      triggerAnimation: (animation: string, loop?: boolean) => void;
+    }>
+  ) => {
+    const { file, nodesPath, materialPath = "" } = props;
+    const [timeElapsed, setTimeElapsed] = useState(0);
+    const [meshRef, setMeshRef] = useState<AnimationObjectGroup>();
+    const { events } = useContext(GameContext);
+
+    const loopingClip = useRef<AnimationAction>();
+    const playingClip = useRef<AnimationAction>();
+
+    const model: any = useLoader(GLTFLoader, file);
+
+    const mixer = useMemo(() => meshRef && new AnimationMixer(meshRef), [
+      meshRef,
+    ]);
+
+    const sharedClips = useSharedAnimations(mixer);
+    const defaultAnimations = useAnimations("/models/kid/waiting.gltf", mixer, [
+      "waiting",
+    ]);
+    const winAnimations = useAnimations("/models/kid/win.gltf", mixer, ["win"]);
+    const loseAnimations = useAnimations("/models/kid/lose.gltf", mixer, [
+      "lose",
+    ]);
+
+    const getAnimation = useCallback(
+      (animation: string) => {
+        if (defaultAnimations && defaultAnimations[animation])
+          return defaultAnimations[animation];
+        if (winAnimations && winAnimations[animation])
+          return winAnimations[animation];
+        if (loseAnimations && loseAnimations[animation])
+          return loseAnimations[animation];
+        if (sharedClips && sharedClips[animation])
+          return sharedClips[animation];
+      },
+      [defaultAnimations, sharedClips, loseAnimations, winAnimations]
+    );
+
+    const loopClip = useCallback(
+      (clip: AnimationAction | undefined, crossfade: number = 0.2) => {
+        if (!clip) return;
+        loopingClip.current = clip;
         playingClip.current = clip;
-        const listener = () => {
-          mixer?.removeEventListener("finished", listener);
-          clip.fadeOut(crossfade);
-          if (loopingClip.current) {
-            loopClip(loopingClip.current);
-          } else {
-            playingClip.current = undefined;
-          }
-          resolve();
-        };
-        mixer?.addEventListener("finished", listener);
-        clip.loop = LoopOnce;
-        clip.clampWhenFinished = true;
+        clip.loop = LoopRepeat;
         clip
           .reset()
           .setEffectiveTimeScale(1)
           .setEffectiveWeight(1)
           .fadeIn(crossfade)
           .play();
-      });
-    },
-    [mixer, playingClip, loopClip, loopingClip]
-  );
+      },
+      [playingClip, loopingClip]
+    );
+    const playOnce = useCallback(
+      async (clip: AnimationAction | undefined, crossfade: number = 0.2) => {
+        await new Promise((resolve) => {
+          if (!mixer || !clip) return;
+          if (playingClip.current) {
+            playingClip.current.fadeOut(crossfade);
+          }
+          playingClip.current = clip;
+          const listener = () => {
+            mixer?.removeEventListener("finished", listener);
+            clip.fadeOut(crossfade);
+            if (loopingClip.current) {
+              loopClip(loopingClip.current);
+            } else {
+              playingClip.current = undefined;
+            }
+            resolve();
+          };
+          mixer?.addEventListener("finished", listener);
+          clip.loop = LoopOnce;
+          clip.clampWhenFinished = true;
+          clip
+            .reset()
+            .setEffectiveTimeScale(1)
+            .setEffectiveWeight(1)
+            .fadeIn(crossfade)
+            .play();
+        });
+      },
+      [mixer, playingClip, loopClip, loopingClip]
+    );
 
-  useEffect(() => {
-    if (mixer && sharedClips.breathing) {
-      loopClip(sharedClips.breathing);
-    }
-  }, [mixer, sharedClips, playOnce, loopClip]);
-  useFrame((state, delta) => {
-    if (mixer) {
-      mixer.update(delta);
-      setTimeElapsed((t) => t + delta);
-    }
-  });
+    useEffect(() => {
+      if (mixer && defaultAnimations) {
+        loopClip(defaultAnimations["waiting"]);
+      }
+    }, [mixer, defaultAnimations, loopClip]);
+    useFrame((state, delta) => {
+      if (mixer) {
+        mixer.update(delta);
+        setTimeElapsed((t) => t + delta);
+      }
+    });
 
-  useKeyPress("a", () => playOnce(sharedClips.victory));
-  useKeyPress("s", () => playOnce(sharedClips.defeat));
+    useImperativeHandle(
+      ref,
+      () => ({
+        triggerAnimation: (animation: string, loop?: boolean) => {
+          const anim = getAnimation(animation);
+          if (!anim) {
+            console.warn(`No animation found for ${animation}`);
+          }
+          if (loop) {
+            loopClip(anim);
+          } else {
+            playOnce(anim);
+          }
+        },
+      }),
+      [getAnimation, loopClip, playOnce]
+    );
 
-  return (
-    <group
-      ref={setMeshRef}
-      scale={[0.001, 0.001, 0.001]}
-      rotation={[0.5, 0, 0]}
-    >
-      <group
-        position={[
-          Math.sin(timeElapsed / 2) * 1000,
-          0,
-          Math.cos(timeElapsed / 2) * 1000,
-        ]}
-        rotation={[
-          Math.sin(timeElapsed / 1.25) * 0.2,
-          0,
-          -Math.cos(timeElapsed / 0.85) * 0.2,
-        ]}
-      >
-        <primitive object={george.nodes["mixamorigHips"]} />
-        <skinnedMesh
-          geometry={george.nodes[SCENE_NODES].geometry}
-          skeleton={george.nodes[SCENE_NODES].skeleton}
-          position={[0, 0, 0]}
-          rotation={[0, 0, 0]}
-        >
-          <meshPhongMaterial
-            attach="material"
-            skinning
-            map={george.materials[SCENE_MATERIAL].map}
-            normalMap={george.materials[SCENE_MATERIAL].normalMap}
-          />
-        </skinnedMesh>
+    //listen for game events
+    useEffect(() => {
+      const winListener = (e: Event) => {
+        playOnce(getAnimation("win"));
+      };
+      const loseListener = (e: Event) => {
+        playOnce(getAnimation("lose"));
+      };
+      events.addEventListener("correct", winListener);
+      events.addEventListener("incorrect", loseListener);
+      return () => {
+        events.removeEventListener("correct", winListener);
+        events.removeEventListener("incorrect", loseListener);
+      };
+    }, [events, playOnce, getAnimation]);
+
+    return (
+      <group ref={setMeshRef} scale={[0.001, 0.001, 0.001]}>
+        <group position={[0, 0, 0]} rotation={[0, 0, 0]} scale={[7, 7, 7]}>
+          <primitive object={model.nodes["mixamorigHips"]} />
+          <skinnedMesh
+            geometry={model.nodes[nodesPath].geometry}
+            skeleton={model.nodes[nodesPath].skeleton}
+            position={[0, 200, 0]}
+            rotation={[0, 0, 0]}
+          >
+            <meshPhongMaterial
+              attach="material"
+              skinning
+              map={model.materials[materialPath].map}
+              normalMap={model.materials[materialPath].normalMap}
+            />
+          </skinnedMesh>
+        </group>
       </group>
-    </group>
-  );
-};
+    );
+  }
+);

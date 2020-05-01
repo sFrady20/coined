@@ -3,9 +3,11 @@ import styles from "./Renderer.module.scss";
 import { ARContext } from ".";
 import { Canvas } from "react-three-fiber";
 import Scene from "../Scene";
+import { GameContext } from "../GameContext";
 
 export default () => {
   const { stream } = useContext(ARContext);
+  const gameContextValue = useContext(GameContext);
   const videoRef = useRef<HTMLVideoElement>(null);
   if (!stream) return null;
 
@@ -18,7 +20,9 @@ export default () => {
       <video autoPlay ref={videoRef} className={styles.video} />
       <Canvas className={styles.canvas}>
         <Suspense fallback={null}>
-          <Scene />
+          <GameContext.Provider value={gameContextValue}>
+            <Scene />
+          </GameContext.Provider>
         </Suspense>
       </Canvas>
     </div>

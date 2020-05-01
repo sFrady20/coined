@@ -22,7 +22,7 @@ export default () => {
         <ActionBar
           actions={{
             Back: () => history.push(SCAN_SCREEN),
-            Continue: () => history.push(CATEGORY_SELECT_SCREEN)
+            Continue: () => history.push(CATEGORY_SELECT_SCREEN),
           }}
         />
       </Panel>

@@ -4,6 +4,7 @@ import _ from "lodash";
 import { Question, Answer } from ".";
 import { SessionContext } from "../../components/Session";
 import classnames from "classnames";
+import { GameContext } from "../../components/GameContext";
 
 export default (props: {
   currentQuestionIndex: number;
@@ -14,6 +15,7 @@ export default (props: {
   const { question, currentQuestionIndex, totalQuestions, onComplete } = props;
   const [selectedAnswer, selectAnswer] = useState<Answer>();
   const { setScore } = useContext(SessionContext);
+  const { events } = useContext(GameContext);
 
   const answers = useMemo(
     () =>
@@ -29,15 +31,19 @@ export default (props: {
       if (!!selectedAnswer) return;
       selectAnswer(answer);
       if (answer.isCorrect) {
+        //correct
         setScore((s) => s + 100);
         window.navigator.vibrate(10);
+        events.dispatchEvent({ type: "correct" });
       } else {
+        //incorrect
         window.navigator.vibrate(50);
+        events.dispatchEvent({ type: "incorrect" });
       }
       await new Promise((resolve) => setTimeout(resolve, 400));
       onComplete(!!answer.isCorrect);
     },
-    [onComplete, selectedAnswer, selectAnswer, setScore]
+    [onComplete, selectedAnswer, selectAnswer, setScore, events]
   );
 
   return (

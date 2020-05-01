@@ -1,4 +1,6 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useState, useContext, useMemo } from "react";
+import { GameContext } from "../GameContext";
+import _ from "lodash";
 
 export type SessionContextType = {
   selectedCategory?: string;
@@ -16,16 +18,17 @@ const defaultValue: SessionContextType = {
   setScore: () => {},
   collection: [],
   collect: () => {},
-  markCollected: () => {}
+  markCollected: () => {},
 };
 export const SessionContext = createContext(defaultValue);
 
-export default (props: { children: React.ReactNode }) => {
+const SessionContextProvider = (props: { children: React.ReactNode }) => {
+  const { gameState, updateGameState } = useContext(GameContext);
   const { children } = props;
   const [selectedCategory, selectCategory] = useState<string>();
   const [score, setScore] = useState(0);
-  const [collection, updateCollection] = useState<string[]>([]);
   const [itemCollected, setItemCollected] = useState<string>();
+  const collection = useMemo(() => gameState.collection, [gameState]);
 
   return (
     <SessionContext.Provider
@@ -35,15 +38,21 @@ export default (props: { children: React.ReactNode }) => {
         score,
         setScore,
         collection,
-        collect: item => {
-          updateCollection(c => [...c, item]);
+        collect: (item) => {
           setItemCollected(item);
+          updateGameState((s) => {
+            s.collection = _.uniq([...s.collection, item]);
+          });
         },
         itemCollected,
-        markCollected: () => setItemCollected(undefined)
+        markCollected: () => {
+          setItemCollected(undefined);
+        },
       }}
     >
       {children}
     </SessionContext.Provider>
   );
 };
+
+export default SessionContextProvider;

@@ -8,7 +8,11 @@ export default () => {
       <spotLight position={[0, 3, 5]} rotation={[0, 180, 0]} />
       <hemisphereLight intensity={0.8} />
       <SharedAnimations>
-        <Model />
+        <Model
+          file="/models/kidLookingAround01.gltf"
+          nodesPath="kid"
+          materialPath=""
+        />
       </SharedAnimations>
     </>
   );

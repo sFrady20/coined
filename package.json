@@ -6,11 +6,15 @@
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
+    "@types/crypto-js": "^3.1.45",
+    "crypto-js": "^4.0.0",
+    "immer": "^6.0.3",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
     "react-three-fiber": "^4.0.27",
-    "three": "^0.115.0"
+    "three": "^0.115.0",
+    "use-immer": "^0.4.0"
   },
   "scripts": {
     "start": "react-scripts start",
