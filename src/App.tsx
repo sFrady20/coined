@@ -1,11 +1,8 @@
-import React from "react";
+import React, { memo } from "react";
 import Router from "./components/Router";
-import Session from "./components/Session";
 
-export default () => {
-  return (
-    <Session>
-      <Router />
-    </Session>
-  );
+const App = () => {
+  return <Router />;
 };
+
+export default memo(App);

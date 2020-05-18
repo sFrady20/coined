@@ -1,30 +1,51 @@
-import React, { useContext, useRef, useEffect, Suspense } from "react";
+import React, {
+  useContext,
+  useRef,
+  useEffect,
+  useMemo,
+  Suspense,
+  memo,
+} from "react";
 import styles from "./Renderer.module.scss";
-import { ARContext } from ".";
+import _ from "lodash";
+import { ARContext, CanvasPortalDef } from ".";
 import { Canvas } from "react-three-fiber";
 import Scene from "../Scene";
-import { GameContext } from "../GameContext";
+import { SessionContext } from "../Session";
 
-export default () => {
+const Renderer = (props: { portals: CanvasPortalDef[] }) => {
+  const { portals } = props;
   const { stream } = useContext(ARContext);
-  const gameContextValue = useContext(GameContext);
+  const sessionContextValue = useContext(SessionContext);
   const videoRef = useRef<HTMLVideoElement>(null);
-  if (!stream) return null;
+
+  const renderedPortals = useMemo(
+    () =>
+      _.map(portals, (p) => (
+        <React.Fragment key={p.id}>{p.scene}</React.Fragment>
+      )),
+    [portals]
+  );
 
   useEffect(() => {
     if (stream && videoRef.current) videoRef.current.srcObject = stream;
   }, [stream, videoRef]);
+
+  if (!stream) return null;
 
   return (
     <div className={styles.root}>
       <video autoPlay ref={videoRef} className={styles.video} />
       <Canvas className={styles.canvas}>
         <Suspense fallback={null}>
-          <GameContext.Provider value={gameContextValue}>
+          <SessionContext.Provider value={sessionContextValue}>
             <Scene />
-          </GameContext.Provider>
+            {renderedPortals}
+          </SessionContext.Provider>
         </Suspense>
       </Canvas>
     </div>
   );
 };
+
+export default memo(Renderer);

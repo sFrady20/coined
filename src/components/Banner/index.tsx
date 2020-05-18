@@ -1,18 +1,20 @@
-import React from "react";
+import React, { memo } from "react";
 import styles from "./index.module.scss";
 import TransitionWrapper, { TransitionType } from "../TransitionWrapper";
 
-export default (props: {
+const Banner = (props: {
   children: React.ReactNode;
   transitions?: TransitionType[];
 }) => {
   const { children, transitions } = props;
   return (
     <TransitionWrapper
-      type={transitions || ["fade", "up"]}
+      type={transitions || ["fade", "down"]}
       className={styles.root}
     >
       {children}
     </TransitionWrapper>
   );
 };
+
+export default memo(Banner);

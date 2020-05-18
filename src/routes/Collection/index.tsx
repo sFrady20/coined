@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, memo } from "react";
 import styles from "./index.module.scss";
 import _ from "lodash";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,7 +8,8 @@ import Panel from "../../components/Panel";
 import ActionBar from "../../components/ActionBar";
 import Banner from "../../components/Banner";
 import { useHistory } from "react-router";
-import { GAMEPLAY_SCREEN, SCAN_SCREEN } from "../../components/Router";
+import { SCAN_SCREEN, CATEGORY_SELECT_SCREEN } from "../../components/Router";
+import share from "../../util/share";
 
 export const COLLECTION_ITEMS = [
   "one",
@@ -19,10 +20,10 @@ export const COLLECTION_ITEMS = [
   "six",
   "seven",
   "eight",
-  "nine"
+  "nine",
 ];
 
-export default () => {
+const Collection = () => {
   const { collection, itemCollected, markCollected } = useContext(
     SessionContext
   );
@@ -37,7 +38,7 @@ export default () => {
   }, [itemCollected, markCollected]);
 
   return (
-    <div className={styles.root}>
+    <>
       <Banner transitions={["fade", "down"]}>
         <div className={styles.logo}>Coined Logo</div>
       </Banner>
@@ -53,25 +54,25 @@ export default () => {
             variants={{
               hidden: {
                 transition: {
-                  staggerChildren: 0.033
-                }
+                  staggerChildren: 0.033,
+                },
               },
               missing: {
                 transition: {
-                  staggerChildren: 0.033
-                }
+                  staggerChildren: 0.033,
+                },
               },
               collected: {
                 transition: {
-                  staggerChildren: 0.033
-                }
-              }
+                  staggerChildren: 0.033,
+                },
+              },
             }}
             initial={"hidden"}
             animate={"collected"}
             exit={"hidden"}
           >
-            {_.map(COLLECTION_ITEMS, item => (
+            {_.map(COLLECTION_ITEMS, (item) => (
               <motion.div
                 className={classnames(
                   styles.item,
@@ -81,7 +82,7 @@ export default () => {
                 variants={{
                   hidden: { opacity: 0, scale: 0.6 },
                   missing: { opacity: 0.7, scale: 1 },
-                  collected: { opacity: 1, scale: 1 }
+                  collected: { opacity: 1, scale: 1 },
                 }}
                 key={item}
               >
@@ -91,18 +92,27 @@ export default () => {
           </motion.div>
         </AnimatePresence>
       </Panel>
-      <Banner>
+      <Banner transitions={["fade", "down"]}>
         <ActionBar
           actions={{
+            Share: () => {
+              share({
+                url: window.location.href,
+                title: "title",
+                text: "text",
+              });
+            },
             Quit: () => {
               history.push(SCAN_SCREEN);
             },
             "Play Again": () => {
-              history.push(GAMEPLAY_SCREEN);
-            }
+              history.push(CATEGORY_SELECT_SCREEN);
+            },
           }}
         />
       </Banner>
-    </div>
+    </>
   );
 };
+
+export default memo(Collection);

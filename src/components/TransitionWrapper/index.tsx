@@ -1,10 +1,10 @@
-import React from "react";
+import React, { memo } from "react";
 import { motion, MotionStyle } from "framer-motion";
 import _ from "lodash";
 
 export type TransitionType = "fade" | "scale" | "up" | "down";
 
-export default (props: {
+const TransitionWrapper = (props: {
   type: TransitionType[] | TransitionType;
   className?: string;
   style?: MotionStyle;
@@ -23,7 +23,7 @@ export default (props: {
           ? 20
           : _.includes(types, "down")
           ? -20
-          : 0
+          : 0,
       }}
       animate={{ opacity: 1, scale: 1, translateY: 0 }}
       exit={{
@@ -33,7 +33,7 @@ export default (props: {
           ? 20
           : _.includes(types, "down")
           ? -20
-          : 0
+          : 0,
       }}
       {...divProps}
     >
@@ -41,3 +41,5 @@ export default (props: {
     </motion.div>
   );
 };
+
+export default memo(TransitionWrapper);

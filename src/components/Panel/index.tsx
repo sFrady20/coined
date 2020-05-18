@@ -1,8 +1,8 @@
-import React from "react";
+import React, { memo } from "react";
 import styles from "./index.module.scss";
 import TransitionWrapper, { TransitionType } from "../TransitionWrapper";
 
-export default (props: {
+const Panel = (props: {
   children: React.ReactNode;
   transitions?: TransitionType[];
 }) => {
@@ -16,3 +16,5 @@ export default (props: {
     </TransitionWrapper>
   );
 };
+
+export default memo(Panel);

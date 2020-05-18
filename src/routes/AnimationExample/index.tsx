@@ -1,52 +1,72 @@
-import React, { useRef, Suspense } from "react";
+import React, { Suspense, useEffect, useState, useMemo, memo } from "react";
 import styles from "./index.module.scss";
-import { Canvas } from "react-three-fiber";
-import Model from "../../canvas/Model";
-import SharedAnimations from "../../canvas/SharedAnimations";
+import { Canvas, useThree } from "react-three-fiber";
+import FBXModel, { FBXModelRefAttributes } from "../../canvas/FBXModel";
+import { GridHelper } from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import useFBXAnimations from "../../canvas/FBXModel/useFBXAnimations";
+import _ from "lodash";
 
-export default () => {
-  const modelRef = useRef<any>();
-  const model2Ref = useRef<any>();
+export const GridAndControls = () => {
+  const { scene, camera, gl } = useThree();
+
+  useEffect(() => {
+    if (gl && camera) {
+      const controls = new OrbitControls(camera, gl.domElement);
+      controls.update();
+
+      var grid = new GridHelper(2000, 20, 0x000000, 0x000000);
+      scene.add(grid);
+
+      return () => {
+        controls.dispose();
+        scene.remove(grid);
+      };
+    }
+  }, [gl, camera, scene]);
+
+  return <></>;
+};
+
+const AnimationExample = () => {
+  const [modelRef, setModelRef] = useState<FBXModelRefAttributes | null>(null);
+
+  const defAnims = useFBXAnimations("/models/kid/kid.fbx", ["default"]);
+  const winAnims = useFBXAnimations("/models/kid/win.fbx", ["win"]);
+  const loseAnims = useFBXAnimations("/models/kid/lose.fbx", ["lose"]);
+  const anims = useMemo(() => _.merge({}, defAnims, winAnims, loseAnims), [
+    defAnims,
+    winAnims,
+    loseAnims,
+  ]);
+
+  useEffect(() => {
+    if (modelRef && defAnims) {
+      modelRef.triggerAnimation(defAnims["default"], true);
+    }
+  }, [modelRef, defAnims]);
 
   return (
     <div className={styles.root}>
-      <Canvas className={styles.canvas}>
+      <Canvas className={styles.canvas} gl={{ antialias: true }}>
         <Suspense fallback={null}>
-          <spotLight position={[0, 3, 5]} rotation={[0, 180, 0]} />
+          <GridAndControls />
+          <spotLight position={[0, 250, 0]} rotation={[0, 180, 0]} />
           <hemisphereLight intensity={0.8} />
-          <SharedAnimations>
-            <group position={[-1, -2.3, 0]} scale={[0.15, 0.15, 0.15]}>
-              <Model
-                ref={model2Ref}
-                file="/models/george.glb"
-                nodesPath="Dreyar"
-                materialPath="dreyar_M"
-              />
-            </group>
-            <group position={[1, -2.3, 0]} scale={[0.65, 0.65, 0.65]}>
-              <Model
-                ref={modelRef}
-                file="/models/kid/waiting.gltf"
-                nodesPath="Subdivision_Surface"
-                materialPath=""
-              />
-            </group>
-          </SharedAnimations>
+          <FBXModel ref={setModelRef} file="/models/kid/kid.fbx" />
         </Suspense>
       </Canvas>
       <div className={styles.actions}>
         <button
           onClick={() => {
-            modelRef.current?.triggerAnimation("win");
-            model2Ref.current?.triggerAnimation("win");
+            modelRef?.triggerAnimation(anims["win"]);
           }}
         >
           Trigger Win animation
         </button>
         <button
           onClick={() => {
-            modelRef.current?.triggerAnimation("lose");
-            model2Ref.current?.triggerAnimation("lose");
+            modelRef?.triggerAnimation(anims["lose"]);
           }}
         >
           Trigger Lose animation
@@ -55,3 +75,5 @@ export default () => {
     </div>
   );
 };
+
+export default memo(AnimationExample);

@@ -1,21 +1,19 @@
-import React, { useMemo, useCallback, useState, useContext } from "react";
+import React, { useMemo, useCallback, useState, useContext, memo } from "react";
 import styles from "./Question.module.scss";
 import _ from "lodash";
-import { Question, Answer } from ".";
-import { SessionContext } from "../../components/Session";
+import { Question as QuestionDefinition, Answer } from ".";
 import classnames from "classnames";
-import { GameContext } from "../../components/GameContext";
+import { SessionContext } from "../../components/Session";
 
-export default (props: {
+const Question = (props: {
   currentQuestionIndex: number;
   totalQuestions: number;
-  question: Question;
+  question: QuestionDefinition;
   onComplete: (isCorrect: boolean) => void;
 }) => {
   const { question, currentQuestionIndex, totalQuestions, onComplete } = props;
   const [selectedAnswer, selectAnswer] = useState<Answer>();
-  const { setScore } = useContext(SessionContext);
-  const { events } = useContext(GameContext);
+  const { setScore, events } = useContext(SessionContext);
 
   const answers = useMemo(
     () =>
@@ -74,3 +72,5 @@ export default (props: {
     </div>
   );
 };
+
+export default memo(Question);

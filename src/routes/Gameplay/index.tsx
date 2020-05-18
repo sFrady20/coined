@@ -3,7 +3,8 @@ import React, {
   useContext,
   useMemo,
   useEffect,
-  useCallback
+  useCallback,
+  memo,
 } from "react";
 import styles from "./index.module.scss";
 import _ from "lodash";
@@ -18,7 +19,7 @@ import Panel from "../../components/Panel";
 import { Redirect, useHistory } from "react-router";
 import {
   CATEGORY_SELECT_SCREEN,
-  COLLECTION_SCREEN
+  COLLECTION_SCREEN,
 } from "../../components/Router";
 import { COLLECTION_ITEMS } from "../Collection";
 
@@ -30,23 +31,11 @@ export type Answer = {
   text: string;
   isCorrect?: boolean;
 };
-/*
-const QUESTIONS: Question[] = _.times(20, q => {
-  const correctAnswer = q % 3;
-  return {
-    text: `Question ${q + 1}`,
-    answers: _.times(3, a => ({
-      text: `answer ${a}${a === correctAnswer ? " ✓" : ""}`,
-      isCorrect: a === correctAnswer
-    }))
-  };
-});
-*/
 const QUESTION_COUNT = 10;
 
 export type GameState = "starting" | "playing" | "finished";
 
-export default () => {
+const Gameplay = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const {
     score,
@@ -54,21 +43,17 @@ export default () => {
     selectedCategory,
     itemCollected,
     collect,
-    collection
+    collection,
   } = useContext(SessionContext);
   const [correctCount, setCorrectCount] = useState(0);
   const [gameState, setGameState] = useState<GameState>("starting");
   const history = useHistory();
 
-  if (!selectedCategory) {
-    return <Redirect to={CATEGORY_SELECT_SCREEN} />;
-  }
-
   const finishGame = useCallback(() => {
     if (!itemCollected) {
       const itemToCollect = _(COLLECTION_ITEMS)
-        .filter(i => !_.includes(collection, i))
-        .sortBy(i => Math.random())
+        .filter((i) => !_.includes(collection, i))
+        .sortBy((i) => Math.random())
         .first();
       if (itemToCollect) {
         collect(itemToCollect);
@@ -98,28 +83,25 @@ export default () => {
   );
 
   useEffect(() => {
-    if (currentQuestionIndex >= questions.length) finishGame();
-  }, [questions, currentQuestionIndex]);
+    if (currentQuestionIndex >= questions.length && gameState !== "finished")
+      finishGame();
+  }, [questions, currentQuestionIndex, gameState, finishGame]);
   const currentQuestion = useMemo(() => questions[currentQuestionIndex], [
     currentQuestionIndex,
-    questions
+    questions,
   ]);
 
+  if (!selectedCategory) {
+    return <Redirect to={CATEGORY_SELECT_SCREEN} />;
+  }
+
   return (
-    <div className={styles.root}>
-      <AnimatePresence initial={false} exitBeforeEnter>
-        {gameState === "starting" || gameState === "playing" ? (
-          <Banner transitions={["fade", "down"]} key="playbanner">
-            <div className={styles.status}>Category: {selectedCategory}</div>
-            <div className={styles.status}>Score: {score}</div>
-            <div className={styles.status}>Time: {secondsLeft}</div>
-          </Banner>
-        ) : (
-          <Banner transitions={["fade", "down"]} key="resultbanner">
-            Coined Logo
-          </Banner>
-        )}
-      </AnimatePresence>
+    <>
+      <Banner transitions={["fade", "down"]} key="playbanner">
+        <div className={styles.status}>Category: {selectedCategory}</div>
+        <div className={styles.status}>Score: {score}</div>
+        <div className={styles.status}>Time: {secondsLeft}</div>
+      </Banner>
       <AnimatePresence exitBeforeEnter>
         {gameState === "starting" ? (
           <Panel key="countdown">Game Starting {countdown}</Panel>
@@ -135,9 +117,9 @@ export default () => {
                 currentQuestionIndex={currentQuestionIndex}
                 totalQuestions={questions.length}
                 question={currentQuestion}
-                onComplete={isCorrect => {
-                  if (isCorrect) setCorrectCount(c => c + 1);
-                  setCurrentQuestionIndex(i => i + 1);
+                onComplete={(isCorrect) => {
+                  if (isCorrect) setCorrectCount((c) => c + 1);
+                  setCurrentQuestionIndex((i) => i + 1);
                 }}
               />
             </motion.div>
@@ -152,6 +134,8 @@ export default () => {
           />
         )}
       </AnimatePresence>
-    </div>
+    </>
   );
 };
+
+export default memo(Gameplay);

@@ -1,9 +1,9 @@
-import React, { useContext } from "react";
+import React, { useContext, memo } from "react";
 import { SessionContext } from "../../components/Session";
 import ActionBar from "../../components/ActionBar";
 import Panel from "../../components/Panel";
 
-export default (props: {
+const Result = (props: {
   correctCount: number;
   totalQuestions: number;
   onContinue: () => void;
@@ -21,3 +21,5 @@ export default (props: {
     </Panel>
   );
 };
+
+export default memo(Result);

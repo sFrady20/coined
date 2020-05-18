@@ -1,17 +1,16 @@
-import React from "react";
-import styles from "./index.module.scss";
+import React, { memo } from "react";
 import { useHistory } from "react-router";
 import { CATEGORY_SELECT_SCREEN, SCAN_SCREEN } from "../../components/Router";
 import Banner from "../../components/Banner";
 import Panel from "../../components/Panel";
 import ActionBar from "../../components/ActionBar";
 
-export default () => {
+const Welcome = () => {
   const history = useHistory();
 
   return (
-    <div className={styles.root}>
-      <Banner transitions={["fade", "down"]}>Coined Logo</Banner>
+    <>
+      <Banner>Coined Logo</Banner>
       <Panel>
         <h5>Welcome</h5>
         <p>
@@ -26,6 +25,8 @@ export default () => {
           }}
         />
       </Panel>
-    </div>
+    </>
   );
 };
+
+export default memo(Welcome);

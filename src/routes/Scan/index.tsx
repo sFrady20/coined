@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import styles from "./index.module.scss";
 import { useHistory } from "react-router";
 import TransitionWrapper from "../../components/TransitionWrapper";
@@ -7,13 +7,16 @@ import Banner from "../../components/Banner";
 import Panel from "../../components/Panel";
 import ActionBar from "../../components/ActionBar";
 
-export default () => {
+const Scan = () => {
   const history = useHistory();
 
   return (
-    <div className={styles.root}>
-      <Banner transitions={["fade", "down"]}>Coined Logo</Banner>
-      <TransitionWrapper type={["fade", "scale"]}>
+    <>
+      <Banner>Coined Logo</Banner>
+      <TransitionWrapper
+        className={styles.scannerWrapper}
+        type={["fade", "scale"]}
+      >
         <div className={styles.scanner} />
       </TransitionWrapper>
       <Panel>
@@ -23,10 +26,12 @@ export default () => {
         </p>
         <ActionBar
           actions={{
-            Start: () => history.push(WELCOME_SCREEN)
+            Start: () => history.push(WELCOME_SCREEN),
           }}
         />
       </Panel>
-    </div>
+    </>
   );
 };
+
+export default memo(Scan);

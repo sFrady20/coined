@@ -1,50 +1,77 @@
-import React, { useState, useContext } from "react";
-import styles from "./index.module.scss";
+import React, {
+  useState,
+  useContext,
+  memo,
+  useCallback,
+  useRef,
+  Suspense,
+} from "react";
 import { useHistory } from "react-router";
 import { WELCOME_SCREEN, GAMEPLAY_SCREEN } from "../../components/Router";
 import _ from "lodash";
-import classnames from "classnames";
 import { SessionContext } from "../../components/Session";
 import Banner from "../../components/Banner";
 import Panel from "../../components/Panel";
 import ActionBar from "../../components/ActionBar";
+import CanvasPortal from "../../components/ARBridge/CanvasPortal";
+import QuarterFlipScene, { QuarterFlipSceneHandle } from "./QuarterFlipScene";
 
 const CATEGORIES = ["Science", "Math", "History"];
 
-export default () => {
+const CategorySelect = () => {
   const history = useHistory();
-  const { selectedCategory, selectCategory } = useContext(SessionContext);
-  const [category, setCategory] = useState(selectedCategory || CATEGORIES[0]);
+  const { selectCategory } = useContext(SessionContext);
+  const [category, setCategory] = useState<string | undefined>(undefined);
+  const quarterSceneRef = useRef<QuarterFlipSceneHandle>(null);
+
+  const selectRandomCategory = useCallback(() => {
+    setCategory((c) => {
+      var newCategory = c;
+      while (newCategory === c) {
+        newCategory = CATEGORIES[_.random(0, CATEGORIES.length - 1)];
+      }
+      return newCategory;
+    });
+  }, [setCategory]);
 
   return (
-    <div className={styles.root}>
-      <Banner transitions={["fade", "down"]}>Coined Logo</Banner>
+    <>
+      <CanvasPortal
+        scene={
+          <Suspense fallback={<></>}>
+            <QuarterFlipScene
+              ref={quarterSceneRef}
+              category={category}
+              onFlipStart={() => {
+                selectRandomCategory();
+              }}
+            />
+          </Suspense>
+        }
+      />
+
+      <Banner>Coined Logo</Banner>
       <Panel>
         <h5>Choose Category</h5>
-        <p>This will be something cooler later.</p>
-        {_.map(CATEGORIES, cat => (
-          <div
-            key={cat}
-            className={classnames(
-              styles.category,
-              cat === category && styles[`category--selected`]
-            )}
-            onClick={() => setCategory(cat)}
-          >
-            {cat}
-          </div>
-        ))}
+        {category}
 
         <ActionBar
           actions={{
             Back: () => history.push(WELCOME_SCREEN),
-            Play: () => {
-              selectCategory(category);
-              history.push(GAMEPLAY_SCREEN);
-            }
+            Spin: () => {
+              quarterSceneRef.current?.spin();
+            },
+            Play: category
+              ? () => {
+                  selectCategory(category);
+                  history.push(GAMEPLAY_SCREEN);
+                }
+              : undefined,
           }}
         />
       </Panel>
-    </div>
+    </>
   );
 };
+
+export default memo(CategorySelect);
