@@ -1,10 +1,12 @@
+@import url("/fonts/fonts.css");
+
 * {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  font-family: sans-serif;
+  font-family: "Rubik", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   user-select: none;

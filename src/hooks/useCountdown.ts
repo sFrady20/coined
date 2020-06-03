@@ -3,7 +3,8 @@ import { useEffect, useRef, useState } from "react";
 const useCountdown = (
   time: number,
   isRunning: boolean,
-  onExpire: () => void
+  onExpire: () => void,
+  intervalSpacing: number = 1000
 ) => {
   const interval = useRef<NodeJS.Timeout>();
   const [timeLeft, setTimeLeft] = useState(time);
@@ -18,10 +19,10 @@ const useCountdown = (
     if (interval.current) clearInterval(interval.current);
     if (isRunning) {
       interval.current = setInterval(() => {
-        setTimeLeft(t => t - 1);
-      }, 1000);
+        setTimeLeft((t) => t - intervalSpacing / 1000);
+      }, intervalSpacing);
     }
-  }, [isRunning, setTimeLeft]);
+  }, [isRunning, setTimeLeft, intervalSpacing]);
 
   useEffect(() => {
     if (timeLeft <= 0 && isRunning) {

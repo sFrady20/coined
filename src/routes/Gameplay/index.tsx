@@ -5,16 +5,18 @@ import React, {
   useEffect,
   useCallback,
   memo,
+  createContext,
+  Dispatch,
+  SetStateAction,
 } from "react";
 import styles from "./index.module.scss";
 import _ from "lodash";
 import { SessionContext } from "../../components/Session";
 import Question from "./Question";
-import { AnimatePresence, motion } from "framer-motion";
 import useCountdown from "../../hooks/useCountdown";
 import Result from "./Result";
 import QUESTIONS from "./questions.json";
-import Banner from "../../components/Banner";
+import AnimCounter from "../../components/AnimCounter";
 import Panel from "../../components/Panel";
 import { Redirect, useHistory } from "react-router";
 import {
@@ -22,9 +24,15 @@ import {
   COLLECTION_SCREEN,
 } from "../../components/Router";
 import { COLLECTION_ITEMS } from "../Collection";
+import { motion } from "framer-motion";
+import { ReactComponent as Timer } from "../../media/timer.svg";
+import Leaderboard from "./Leaderboard";
+import imgLogo from "../../media/coined.png";
 
 export type Question = {
   text: string;
+  correctMessage: string;
+  incorrectMessage: string;
   answers: Answer[];
 };
 export type Answer = {
@@ -33,21 +41,35 @@ export type Answer = {
 };
 const QUESTION_COUNT = 10;
 
-export type GameState = "starting" | "playing" | "finished";
+export type GameState = "starting" | "playing" | "finished" | "leaderboard";
+
+export type GameplayContext = {
+  gameState: GameState;
+  secondsLeft: number;
+  score: number;
+  setScore: Dispatch<SetStateAction<number>>;
+  questions: Question[];
+  currentQuestionIndex: number;
+};
+const defaultGameplayContext: GameplayContext = {
+  gameState: "starting",
+  score: 0,
+  setScore: () => {},
+  secondsLeft: 0,
+  currentQuestionIndex: 0,
+  questions: [],
+};
+export const GameplayContext = createContext(defaultGameplayContext);
 
 const Gameplay = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const {
-    score,
-    setScore,
-    selectedCategory,
-    itemCollected,
-    collect,
-    collection,
-  } = useContext(SessionContext);
-  const [correctCount, setCorrectCount] = useState(0);
+  const { selectedCategory, itemCollected, collect, collection } = useContext(
+    SessionContext
+  );
+  const [score, setScore] = useState(0);
   const [gameState, setGameState] = useState<GameState>("starting");
   const history = useHistory();
+  const [isPaused, setPaused] = useState(false);
 
   const finishGame = useCallback(() => {
     if (!itemCollected) {
@@ -62,12 +84,18 @@ const Gameplay = () => {
     setGameState("finished");
   }, [setGameState, collection, collect, itemCollected]);
 
-  const countdown = useCountdown(3, gameState === "starting", () => {
+  //TODO: change back to 3
+  const countdown = useCountdown(0, gameState === "starting", () => {
     setGameState("playing");
   });
-  const secondsLeft = useCountdown(25, gameState === "playing", () => {
-    finishGame();
-  });
+  const secondsLeft = useCountdown(
+    25,
+    gameState === "playing" && !isPaused,
+    () => {
+      finishGame();
+    },
+    30
+  );
 
   useEffect(() => {
     setScore(0);
@@ -83,58 +111,103 @@ const Gameplay = () => {
   );
 
   useEffect(() => {
-    if (currentQuestionIndex >= questions.length && gameState !== "finished")
+    if (currentQuestionIndex >= questions.length && gameState === "playing")
       finishGame();
   }, [questions, currentQuestionIndex, gameState, finishGame]);
-  const currentQuestion = useMemo(() => questions[currentQuestionIndex], [
-    currentQuestionIndex,
-    questions,
-  ]);
 
   if (!selectedCategory) {
     return <Redirect to={CATEGORY_SELECT_SCREEN} />;
   }
 
   return (
-    <>
-      <Banner transitions={["fade", "down"]} key="playbanner">
-        <div className={styles.status}>Category: {selectedCategory}</div>
-        <div className={styles.status}>Score: {score}</div>
-        <div className={styles.status}>Time: {secondsLeft}</div>
-      </Banner>
-      <AnimatePresence exitBeforeEnter>
-        {gameState === "starting" ? (
-          <Panel key="countdown">Game Starting {countdown}</Panel>
-        ) : gameState === "playing" ? (
-          currentQuestion && (
-            <motion.div
-              key={currentQuestionIndex}
-              initial={{ translateX: 32, opacity: 0 }}
-              animate={{ translateX: 0, opacity: 1 }}
-              exit={{ translateX: -32, opacity: 0 }}
-            >
-              <Question
-                currentQuestionIndex={currentQuestionIndex}
-                totalQuestions={questions.length}
-                question={currentQuestion}
-                onComplete={(isCorrect) => {
-                  if (isCorrect) setCorrectCount((c) => c + 1);
-                  setCurrentQuestionIndex((i) => i + 1);
+    <GameplayContext.Provider
+      value={{
+        score,
+        setScore,
+        questions,
+        secondsLeft,
+        currentQuestionIndex,
+        gameState,
+      }}
+    >
+      <div className={styles.logo}>
+        <img src={imgLogo} />
+      </div>
+      <div className={styles.timer}>
+        <Timer width={100} height={150} />
+        <div className={styles.score}>
+          <AnimCounter value={score} />
+        </div>
+        <div className={styles.time}>
+          <AnimCounter value={secondsLeft} />
+        </div>
+      </div>
+      <div style={{ flex: 1 }} />
+      {gameState === "starting" ? (
+        <Panel>Game Starting {countdown}</Panel>
+      ) : gameState === "playing" ? (
+        <motion.div
+          variants={{
+            hide: {},
+            show: {
+              transition: {
+                staggerChildren: 0.4 / questions.length,
+                staggerDirection: -1,
+                when: "beforeChildren",
+              },
+            },
+          }}
+          initial={"hide"}
+          animate={"show"}
+          className={styles.questionContainer}
+        >
+          {_.map(questions, (question, index) => {
+            return (
+              <motion.div
+                variants={{
+                  hide: {
+                    translateY: 350,
+                    translateZ: 20,
+                    rotateX: -10,
+                  },
+                  show: { translateY: 0, translateZ: 0, rotateX: 0 },
                 }}
-              />
-            </motion.div>
-          )
-        ) : (
-          <Result
-            correctCount={correctCount}
-            totalQuestions={questions.length}
-            onContinue={() => {
-              history.push(COLLECTION_SCREEN);
-            }}
-          />
-        )}
-      </AnimatePresence>
-    </>
+                style={{
+                  transformStyle: "preserve-3d",
+                }}
+                key={index}
+              >
+                <Question
+                  question={question}
+                  index={index}
+                  currentQuestionIndex={currentQuestionIndex}
+                  totalQuestions={questions.length}
+                  onAsk={() => {
+                    setPaused(false);
+                  }}
+                  onAnswered={() => {
+                    setPaused(true);
+                  }}
+                  onComplete={() => {
+                    setCurrentQuestionIndex((i) => i + 1);
+                  }}
+                />
+              </motion.div>
+            );
+          })}
+        </motion.div>
+      ) : gameState === "finished" ? (
+        <Result
+          onContinue={() => {
+            setGameState("leaderboard");
+          }}
+        />
+      ) : gameState === "leaderboard" ? (
+        <Leaderboard onContinue={() => history.push(COLLECTION_SCREEN)} />
+      ) : (
+        <> </>
+      )}
+    </GameplayContext.Provider>
   );
 };
 

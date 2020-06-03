@@ -1,27 +1,24 @@
-import React, { memo, useState, useEffect, useContext, useMemo } from "react";
-import Model, { GLTFModelRefAttributes } from "../../canvas/Model";
-import { useGLTFAnimation } from "../../canvas/Model/useGLTFAnimations";
+import React, { memo, useEffect, useContext, useMemo, useRef } from "react";
+import { useFBXAnimation } from "../../canvas/Model/useGLTFAnimations";
 import { SessionContext } from "../Session";
 import {
   LoopRepeat,
-  Bone,
   Matrix4,
   Quaternion,
-  Group,
   Object3D,
-  Vector3,
   Euler,
   AnimationMixer,
   LoopOnce,
+  Event,
+  AnimationAction,
+  AnimationClip,
 } from "three";
-import waitForSeconds from "../../util/waitForSeconds";
-import AnimationQueue from "../AnimationQueue";
 import _ from "lodash";
 import { useFrame, useThree, useLoader } from "react-three-fiber";
 import clamp from "../../util/clamp";
 import useGridAndControls from "../../hooks";
-import { transform } from "framer-motion";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
+import Ornament from "./Ornament";
 
 const lookAt = (eye: Object3D, target: Object3D) => {
   eye.updateWorldMatrix(true, false);
@@ -39,177 +36,168 @@ const lookAt = (eye: Object3D, target: Object3D) => {
 const Scene = () => {
   const { events } = useContext(SessionContext);
   const { camera } = useThree();
-
   useGridAndControls();
 
   const georgeModel = useLoader(
-    GLTFLoader,
-    "/models/review/GW_Idle_0515.gltf"
+    FBXLoader,
+    "/models/0522/GW_ThumbUp_0522.fbx"
   ) as any;
-  const appearAnimation = useGLTFAnimation(
-    "/models/review/GW_Appear_0515.gltf"
+  const appearAnimation = useFBXAnimation("/models/review2/GW_Appear_09.fbx");
+  const idleAnimation = useFBXAnimation("/models/review2/GW_Idle_05.fbx");
+  /*
+  const applauseAnimation = useFBXAnimation("/models/0522/GW_Applause01.fbx");
+  const easterEggAnimation = useFBXAnimation(
+    "/models/0522/GW_EasterEgg_01.fbx"
   );
-  const idleAnimation = useGLTFAnimation("/models/review/GW_Idle_0515.gltf");
+  const endGameAnimation = useFBXAnimation("/models/0522/GW_EndGame_01.fbx");
+  const laughingAnimation = useFBXAnimation("/models/0522/GW_Laughing_01.fbx");
+  const moonWalkingAnimation = useFBXAnimation(
+    "/models/0522/GW_MoonWalking_0522.fbx"
+  );
+  */
+  const laughingAnimation = useFBXAnimation("/models/0522/GW_Laughing_01.fbx");
+  const thumbsUpAnimation = useFBXAnimation("/models/0522/GW_ThumbUp_0522.fbx");
+
+  const currentAnimation = useRef<AnimationAction>();
 
   const georgeMixer = useMemo(
-    () => georgeModel && new AnimationMixer(georgeModel.scene),
+    () => georgeModel && new AnimationMixer(georgeModel),
     [georgeModel]
   );
+  const georgeNodes = useMemo(() => {
+    if (!georgeModel) return undefined;
+    const nodes: { [s: string]: Object3D } = {};
+    georgeModel.traverse((d: Object3D) => (nodes[d.name] = d));
+    return nodes;
+  }, [georgeModel]);
 
   useFrame((state, delta) => {
-    if (georgeModel) {
-      const head: Bone = georgeModel.nodes["mixamorigHead"];
-      const neck: Bone = georgeModel.nodes["mixamorigNeck"];
-      const spine: Bone = georgeModel.nodes["mixamorigSpine"];
-      const leftEye: Bone = georgeModel.nodes["EYE_LEFT"];
-      const rightEye: Bone = georgeModel.nodes["EYE_RIGHT"];
-
-      /*
-      var m = new Matrix4().lookAt(camera.position, neck.position, camera.up);
-      neck.quaternion.setFromRotationMatrix(m);
-      */
-
-      const clampQuaternion = (
-        quaternion: Quaternion,
-        x: number,
-        y: number,
-        z: number
-      ) => {
-        const clamped = new Euler().setFromQuaternion(quaternion);
-        clamped.x = clamp(-x, clamped.x, x);
-        clamped.y = clamp(-y, clamped.y, y);
-        clamped.z = clamp(-z, clamped.z, z);
-        quaternion.setFromEuler(clamped);
-      };
+    if (georgeModel && georgeNodes) {
+      const head: Object3D = georgeNodes["mixamorig_Head"];
+      const neck: Object3D = georgeNodes["mixamorig_Neck"];
+      const leftEye: Object3D = georgeNodes["EYE_LEFT"];
+      const rightEye: Object3D = georgeNodes["EYE_RIGHT"];
 
       const neckTarget = lookAt(neck, camera);
+      const a = new Euler().setFromQuaternion(neckTarget);
+      a.y = clamp(-0.6, a.y, 0.6);
+      a.x = clamp(-0.6, a.x, 0.6) + 1;
+      a.z = clamp(-0.6, a.z, 0.6);
+      neckTarget.setFromEuler(a);
       const cross = new Euler()
         .setFromQuaternion(neckTarget)
         .toVector3()
         .normalize()
         .cross(neck.rotation.toVector3().normalize())
         .length();
-      const neckClamp = 0.5;
-      clampQuaternion(
-        neckTarget,
-        neckClamp - Math.abs(neckTarget.z),
-        neckClamp,
-        neckClamp - Math.abs(neckTarget.x)
-      );
-      const a = new Euler().setFromQuaternion(neckTarget);
-      a.x += 0.6 + 0.05 * Math.abs(Math.pow(a.z, 2));
-      neckTarget.setFromEuler(a);
+      neck.quaternion.slerp(neckTarget, 0.07 + 0.1 * cross);
 
-      neck.quaternion.slerp(neckTarget, 0.01 + 0.1 * cross);
-
-      const eyeclamp = 0.2;
       const eyeTarget = lookAt(head, camera);
       const a2 = new Euler().setFromQuaternion(eyeTarget);
-      a2.x += 0.6 + 0.05 * Math.abs(Math.pow(a2.z, 2));
+      a2.x = clamp(-0.2, a2.x, 0.2) + 0.1;
+      a2.y = clamp(-0.2, a2.y, 0.2) + 0.1;
+      a2.z = clamp(-0.2, a2.z, 0.2);
       eyeTarget.setFromEuler(a2);
-      clampQuaternion(
-        eyeTarget,
-        eyeclamp - Math.abs(eyeTarget.z),
-        eyeclamp,
-        eyeclamp - Math.abs(eyeTarget.x)
-      );
       leftEye.quaternion.slerp(eyeTarget, 0.1);
       rightEye.quaternion.slerp(eyeTarget, 0.1);
-
-      //neck.rotation.setFromVector3(new Vector3(0, 0, 0));
-
-      /*
-      m = new Matrix4().lookAt(leftEye.position, camera.position, camera.up);
-      e = new Euler().setFromRotationMatrix(m);
-      leftEye.setRotationFromEuler(e);
-
-      m = new Matrix4().lookAt(rightEye.position, camera.position, camera.up);
-      e = new Euler().setFromRotationMatrix(m).clone();
-      rightEye.setRotationFromEuler(e);
-      */
     }
+
     if (georgeMixer) {
       georgeMixer.update(delta);
     }
   });
 
+  const returnToIdle = useMemo(
+    () => () => {
+      if (!georgeMixer || !idleAnimation) return;
+      const idleAction = georgeMixer.clipAction(idleAnimation);
+      idleAction.setLoop(LoopRepeat, Infinity);
+      if (currentAnimation.current) {
+        idleAction.crossFadeFrom(currentAnimation.current, 0.2, true);
+      } else {
+        idleAction.setEffectiveWeight(1);
+      }
+      idleAction.enabled = true;
+      idleAction.setEffectiveTimeScale(1);
+      idleAction.play();
+      currentAnimation.current = idleAction;
+      return idleAction;
+    },
+    [idleAnimation, georgeMixer]
+  );
+
+  const playAnimation = useMemo(
+    () => (animation: AnimationClip) => {
+      if (!georgeMixer) return;
+      const animAction = georgeMixer.clipAction(animation);
+      animAction.setLoop(LoopOnce, 1);
+      if (currentAnimation.current) {
+        animAction.crossFadeFrom(currentAnimation.current, 0.2, true);
+      } else {
+        animAction.setEffectiveWeight(1);
+      }
+      animAction.reset();
+      animAction.play();
+      currentAnimation.current = animAction;
+      return animAction;
+    },
+    [georgeMixer]
+  );
+
   useEffect(() => {
     if (georgeMixer && appearAnimation && idleAnimation) {
       (async () => {
         const disabled = [
-          "mixamorigHead.quaternion",
+          "mixamorig_Head.quaternion",
           "EYE_LEFT.quaternion",
           "EYE_RIGHT.quaternion",
         ];
         _.remove(idleAnimation.tracks, (t) => disabled.includes(t.name));
         _.remove(appearAnimation.tracks, (t) => disabled.includes(t.name));
 
-        const idleAction = georgeMixer
-          .clipAction(idleAnimation)
-          .setLoop(LoopRepeat, Infinity)
-          .play()
-          .fadeOut(0);
+        //start as idle
+        returnToIdle()!.fadeOut(0);
+        //auto reset to idle
+        georgeMixer.addEventListener("finished", () => returnToIdle());
 
-        const appearAction = georgeMixer
-          .clipAction(appearAnimation)
-          .setLoop(LoopOnce, 1)
-          .play();
-
-        console.log({
-          idleAction,
-          appearAction,
-        });
-
-        await waitForSeconds(appearAnimation.duration - 10 - 0.5);
-
-        idleAction.enabled = true;
-        idleAction.setEffectiveTimeScale(1);
-        appearAction.crossFadeTo(idleAction, 0.5, false);
-
-        console.log({
-          idleAction,
-          appearAction,
-        });
+        //play appear animation
+        playAnimation(appearAnimation);
       })();
-      /*
-      var queue = new AnimationQueue(mixer)
-        .animate(appearAnimation)
-        .animate(idleAnimation, 0.5, (a) => {
-          a.setLoop(LoopRepeat, Infinity);
-        })
-        .play();
-      (async () => {
-        await waitForSeconds(5);
-        queue.cancel("Im cancelling");
-      })();
-      */
     }
-  }, [appearAnimation, georgeMixer, idleAnimation]);
+  }, [
+    appearAnimation,
+    georgeMixer,
+    idleAnimation,
+    georgeNodes,
+    returnToIdle,
+    playAnimation,
+  ]);
 
-  /*
-    //listen for game events
-    useEffect(() => {
-      const winListener = (e: Event) => {
-        playOnce(getAnimation("win"));
-      };
-      const loseListener = (e: Event) => {
-        playOnce(getAnimation("lose"));
-      };
-      events.addEventListener("correct", winListener);
-      events.addEventListener("incorrect", loseListener);
-      return () => {
-        events.removeEventListener("correct", winListener);
-        events.removeEventListener("incorrect", loseListener);
-      };
-    }, [events, playOnce, getAnimation]);
-    */
+  //listen for game events
+  useEffect(() => {
+    const winListener = (e: Event) => {
+      //play win animation
+      if (thumbsUpAnimation) playAnimation(thumbsUpAnimation);
+    };
+    const loseListener = (e: Event) => {
+      //play lose animation
+      if (laughingAnimation) playAnimation(laughingAnimation);
+    };
+    events.addEventListener("correct", winListener);
+    events.addEventListener("incorrect", loseListener);
+    return () => {
+      events.removeEventListener("correct", winListener);
+      events.removeEventListener("incorrect", loseListener);
+    };
+  }, [events, thumbsUpAnimation, laughingAnimation, playAnimation]);
 
   return (
     <>
       <spotLight position={[0, 3, 5]} rotation={[0, 180, 0]} />
       <hemisphereLight intensity={0.8} />
-      <group scale={[0.05, 0.05, 0.05]}>
-        <primitive object={georgeModel.scene} />
+      <group scale={[0.02, 0.02, 0.02]}>
+        <primitive object={georgeModel} />
+        <Ornament />
       </group>
     </>
   );

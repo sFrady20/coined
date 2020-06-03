@@ -1,6 +1,8 @@
 [
   {
     "text": "Question 1",
+    "correctMessage": "you got it right! 1",
+    "incorrectMessage": "you got it wrong 1",
     "answers": [
       {
         "text": "Karl Marx died in England"
@@ -16,6 +18,8 @@
   },
   {
     "text": "Question 2",
+    "correctMessage": "you got it right! 2",
+    "incorrectMessage": "you got it wrong 2",
     "answers": [
       {
         "text": "The sound barrier was first broken in 1953",
@@ -31,6 +35,8 @@
   },
   {
     "text": "Question 3",
+    "correctMessage": "you got it right! 3",
+    "incorrectMessage": "you got it wrong 3",
     "answers": [
       {
         "text": "Silvio Berlusconi was Prime Minister of Italy"
@@ -46,6 +52,8 @@
   },
   {
     "text": "Question 4",
+    "correctMessage": "you got it right! 4",
+    "incorrectMessage": "you got it wrong 4",
     "answers": [
       {
         "text": "James Polk died in office",
@@ -61,6 +69,8 @@
   },
   {
     "text": "Question 5",
+    "correctMessage": "you got it right! 5",
+    "incorrectMessage": "you got it wrong 5",
     "answers": [
       {
         "text": "Martin Luther was excommunicated by the Catholic Church"
@@ -76,6 +86,8 @@
   },
   {
     "text": "Question 6",
+    "correctMessage": "you got it right! 6",
+    "incorrectMessage": "you got it wrong 6",
     "answers": [
       {
         "text": "Steven Chu was born in Taiwan",
@@ -91,6 +103,8 @@
   },
   {
     "text": "Question 7",
+    "correctMessage": "you got it right! 7",
+    "incorrectMessage": "you got it wrong 7",
     "answers": [
       {
         "text": "The Hundred Years' War lasted 116 years"
@@ -106,6 +120,8 @@
   },
   {
     "text": "Question 8",
+    "correctMessage": "you got it right! 8",
+    "incorrectMessage": "you got it wrong 8",
     "answers": [
       {
         "text": "Belgium was once ruled by Austria"
@@ -121,6 +137,8 @@
   },
   {
     "text": "Question 9",
+    "correctMessage": "you got it right! 9",
+    "incorrectMessage": "you got it wrong 9",
     "answers": [
       {
         "text": "Henry Fonda served in World War II"
@@ -136,6 +154,8 @@
   },
   {
     "text": "Question 10",
+    "correctMessage": "you got it right! 10",
+    "incorrectMessage": "you got it wrong 10",
     "answers": [
       {
         "text": "Alan Shepard walked on the Moon"

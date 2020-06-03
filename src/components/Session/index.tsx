@@ -11,11 +11,13 @@ import { EventDispatcher } from "three";
 import { Draft } from "immer";
 import { useImmer } from "use-immer";
 import crypto from "crypto-js";
+import shortid from "shortid";
 
 const LOCAL_STORAGE_KEY = "coined_data";
 const ENCRYPTION_KEY = "dcub2308cybe31y0";
 
 export type GameState = {
+  clientId: string;
   password?: string;
   name: string;
   collection: string[];
@@ -28,14 +30,13 @@ export type SessionContextType = {
   events: EventDispatcher;
   selectedCategory?: string;
   selectCategory: React.Dispatch<React.SetStateAction<string | undefined>>;
-  score: number;
-  setScore: React.Dispatch<React.SetStateAction<number>>;
   collection: string[];
   collect: (item: string) => void;
   itemCollected?: string;
   markCollected: () => void;
 };
 const defaultGameState: GameState = {
+  clientId: shortid(),
   name: "",
   collection: [],
 };
@@ -44,8 +45,6 @@ const defaultValue: SessionContextType = {
   updateGameState: () => {},
   events: new EventDispatcher(),
   selectCategory: () => {},
-  score: 0,
-  setScore: () => {},
   collection: [],
   collect: () => {},
   markCollected: () => {},
@@ -68,7 +67,6 @@ const SessionContextProvider = (props: { children: React.ReactNode }) => {
   const [gameState, updateGameState] = useImmer<GameState>(loadedGame);
   const { children } = props;
   const [selectedCategory, selectCategory] = useState<string>();
-  const [score, setScore] = useState(0);
   const [itemCollected, setItemCollected] = useState<string>();
   const collection = useMemo(() => gameState.collection, [gameState]);
 
@@ -89,8 +87,6 @@ const SessionContextProvider = (props: { children: React.ReactNode }) => {
         events,
         selectedCategory,
         selectCategory,
-        score,
-        setScore,
         collection,
         collect: (item) => {
           setItemCollected(item);

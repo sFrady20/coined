@@ -11,3 +11,46 @@
 .status {
   margin: 0 6px;
 }
+
+.logo {
+  position: absolute;
+  left: 2.5vw;
+  top: 2.5vw;
+
+  img {
+    width: 25vw;
+  }
+}
+
+.questionContainer {
+  perspective: 300px;
+  transform-style: preserve-3d;
+}
+
+.timer {
+  position: absolute;
+  right: 2.5vw;
+  top: 2.5vw;
+
+  svg {
+    filter: drop-shadow(0 20px 20px rgba(0, 0, 0, 0.4));
+  }
+}
+
+.score {
+  color: white;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-weight: bold;
+  left: 50px;
+  top: 49px;
+}
+
+.time {
+  color: white;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-weight: bold;
+  left: 50px;
+  bottom: 24px;
+}

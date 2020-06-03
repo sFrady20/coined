@@ -12,6 +12,7 @@ import ARBridge from "../ARBridge";
 import AnimationExample from "../../routes/AnimationExample";
 import SessionContextProvider from "../Session";
 import TempPassword from "../TempPassword";
+import AnimationTest from "../../routes/AnimationTest";
 
 export const SCAN_SCREEN = "/";
 export const WELCOME_SCREEN = "/welcome";
@@ -26,6 +27,11 @@ const Router = () => {
         <Route exact path="/animationExample">
           <Suspense fallback="Loading">
             <AnimationExample />
+          </Suspense>
+        </Route>
+        <Route exact path="/testAnimations">
+          <Suspense fallback="Loading">
+            <AnimationTest />
           </Suspense>
         </Route>
         <Route path="/">

@@ -12,6 +12,7 @@ import { ARContext, CanvasPortalDef } from ".";
 import { Canvas } from "react-three-fiber";
 import Scene from "../Scene";
 import { SessionContext } from "../Session";
+import { Vector3 } from "three";
 
 const Renderer = (props: { portals: CanvasPortalDef[] }) => {
   const { portals } = props;
@@ -36,7 +37,10 @@ const Renderer = (props: { portals: CanvasPortalDef[] }) => {
   return (
     <div className={styles.root}>
       <video autoPlay ref={videoRef} className={styles.video} />
-      <Canvas className={styles.canvas}>
+      <Canvas
+        className={styles.canvas}
+        camera={{ position: new Vector3(0, 6, 6) }}
+      >
         <Suspense fallback={null}>
           <SessionContext.Provider value={sessionContextValue}>
             <Scene />

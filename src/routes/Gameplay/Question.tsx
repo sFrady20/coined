@@ -1,19 +1,54 @@
-import React, { useMemo, useCallback, useState, useContext, memo } from "react";
+import React, {
+  useMemo,
+  useCallback,
+  useState,
+  useContext,
+  memo,
+  useEffect,
+  useRef,
+} from "react";
 import styles from "./Question.module.scss";
 import _ from "lodash";
-import { Question as QuestionDefinition, Answer } from ".";
+import { Question as QuestionDefinition, Answer, GameplayContext } from ".";
 import classnames from "classnames";
 import { SessionContext } from "../../components/Session";
+import { motion, useAnimation } from "framer-motion";
+import imgCardDesign from "../../media/cardDesign.png";
+import { createPortal } from "react-dom";
 
 const Question = (props: {
+  question: QuestionDefinition;
+  index: number;
   currentQuestionIndex: number;
   totalQuestions: number;
-  question: QuestionDefinition;
-  onComplete: (isCorrect: boolean) => void;
+  onAsk?: () => void;
+  onAnswered?: (answer: Answer) => void;
+  onComplete?: (isCorrect: boolean) => void;
 }) => {
-  const { question, currentQuestionIndex, totalQuestions, onComplete } = props;
+  const {
+    question,
+    index,
+    currentQuestionIndex,
+    totalQuestions,
+    onAsk,
+    onAnswered,
+    onComplete,
+  } = props;
   const [selectedAnswer, selectAnswer] = useState<Answer>();
-  const { setScore, events } = useContext(SessionContext);
+  const { events, selectedCategory } = useContext(SessionContext);
+  const { setScore } = useContext(GameplayContext);
+  const [randRotation, setRandRotation] = useState(0);
+  const answerClickEvent = useRef<MouseEvent>();
+  const feedbackAnimation = useAnimation();
+
+  const diff = useMemo(() => {
+    setRandRotation(Math.random() * 30 - 15);
+    return currentQuestionIndex - index;
+  }, [currentQuestionIndex, index]);
+
+  useEffect(() => {
+    if (diff === 0 && onAsk) onAsk();
+  }, [diff, onAsk]);
 
   const answers = useMemo(
     () =>
@@ -26,6 +61,7 @@ const Question = (props: {
 
   const validateAnswer = useCallback(
     async (answer: Answer) => {
+      if (diff !== 0) return;
       if (!!selectedAnswer) return;
       selectAnswer(answer);
       if (answer.isCorrect) {
@@ -38,38 +74,113 @@ const Question = (props: {
         window.navigator.vibrate(50);
         events.dispatchEvent({ type: "incorrect" });
       }
-      await new Promise((resolve) => setTimeout(resolve, 400));
-      onComplete(!!answer.isCorrect);
+      if (onAnswered) onAnswered(answer);
+      console.log(answerClickEvent.current);
+      feedbackAnimation.set({
+        opacity: 0,
+        translateY: 0,
+        left: `${answerClickEvent.current?.clientX}px`,
+        top: `${answerClickEvent.current?.clientY}px`,
+      });
+      await feedbackAnimation.start({
+        opacity: 1,
+        translateY: -30,
+        transition: {
+          ease: "easeOut",
+          duration: 0.6,
+        },
+      });
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      await feedbackAnimation.start({
+        opacity: 0,
+        translateY: -60,
+        transition: {
+          ease: "easeIn",
+          duration: 0.6,
+        },
+      });
+      if (onComplete) onComplete(answer.isCorrect || false);
     },
-    [onComplete, selectedAnswer, selectAnswer, setScore, events]
+    [
+      selectedAnswer,
+      selectAnswer,
+      setScore,
+      events,
+      diff,
+      onAnswered,
+      onComplete,
+      feedbackAnimation,
+    ]
   );
 
   return (
-    <div className={styles.root}>
-      <h5>
-        Question {currentQuestionIndex + 1}/{totalQuestions}
-      </h5>
-      <p>{question.text}</p>
-
-      {_.map(answers, (answer, i) => {
-        return (
-          <div
-            key={i}
-            className={classnames(
-              styles.answer,
-              selectedAnswer === answer
-                ? answer.isCorrect
-                  ? styles["answer--correct"]
-                  : styles["answer--incorrect"]
-                : undefined
-            )}
-            onClick={() => validateAnswer(answer)}
-          >
-            {answer.text}
-          </div>
-        );
-      })}
-    </div>
+    <motion.div
+      animate={
+        diff > 0
+          ? {
+              translateZ: 0,
+              translateX: selectedAnswer?.isCorrect ? 500 : -500,
+              transition: {
+                stiffness: 10,
+              },
+              rotateZ: selectedAnswer?.isCorrect ? 30 : -30,
+            }
+          : {
+              translateZ: diff * 5,
+              translateY: 0,
+              translateX: 0,
+              rotateZ: randRotation * Math.abs(diff / totalQuestions),
+            }
+      }
+      className={styles.animations}
+    >
+      <div className={styles.root}>
+        <div
+          className={styles.cardDesign}
+          style={{ backgroundImage: `url(${imgCardDesign}` }}
+        />
+        <div className={styles.number}>{index + 1}</div>
+        <div className={styles.category}>{selectedCategory}</div>
+        <div className={styles.questionText}>
+          <h5>{question.text}</h5>
+        </div>
+        <div className={styles.answers}>
+          {_.map(answers, (answer, i) => {
+            return (
+              <div
+                key={i}
+                className={classnames(
+                  styles.answer,
+                  selectedAnswer === answer
+                    ? answer.isCorrect
+                      ? styles["answer--correct"]
+                      : styles["answer--incorrect"]
+                    : undefined
+                )}
+                onClick={(e) => {
+                  answerClickEvent.current = e.nativeEvent;
+                  validateAnswer(answer);
+                }}
+              >
+                {answer.text}
+              </div>
+            );
+          })}
+        </div>
+        {createPortal(
+          <motion.div className={styles.feedback} animate={feedbackAnimation}>
+            <div
+              className={
+                selectedAnswer?.isCorrect
+                  ? styles.feedbackTrue
+                  : styles.feedbackFalse
+              }
+            />
+          </motion.div>,
+          document.body
+        )}
+      </div>
+    </motion.div>
   );
 };
 
