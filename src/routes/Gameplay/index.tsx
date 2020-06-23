@@ -8,6 +8,7 @@ import React, {
   createContext,
   Dispatch,
   SetStateAction,
+  useRef,
 } from "react";
 import styles from "./index.module.scss";
 import _ from "lodash";
@@ -36,10 +37,10 @@ export type Answer = {
   isCorrect?: boolean;
 };
 
-export type GameState = "starting" | "playing" | "finished" | "leaderboard";
+export type GamePhase = "starting" | "playing" | "finished" | "leaderboard";
 
 export type GameplayContext = {
-  gameState: GameState;
+  gamePhase: GamePhase;
   secondsLeft: number;
   score: number;
   setScore: Dispatch<SetStateAction<number>>;
@@ -47,7 +48,7 @@ export type GameplayContext = {
   currentQuestionIndex: number;
 };
 const defaultGameplayContext: GameplayContext = {
-  gameState: "starting",
+  gamePhase: "starting",
   score: 0,
   setScore: () => {},
   secondsLeft: 0,
@@ -61,15 +62,16 @@ const Gameplay = () => {
   const {
     sessionState,
     updateSessionState,
-    itemCollected,
-    collect,
-    collection,
+    gameState,
+    updateGameState,
   } = useContext(SessionContext);
   const [score, setScore] = useState(0);
-  const [gameState, setGameState] = useState<GameState>("starting");
+  const [gamePhase, setGamePhase] = useState<GamePhase>("starting");
   const [isPaused, setPaused] = useState(false);
   const { questions, sfx } = useContext(AssetContext);
+  const { collection } = gameState;
   const { selectedCategory } = sessionState;
+  const gameFinished = useRef(false);
 
   //gather sfx
   const correctSounds = useMemo(
@@ -90,6 +92,8 @@ const Gameplay = () => {
 
   //
   const finishGame = useCallback(() => {
+    if (gameFinished.current) return;
+
     //play end sfx
     stopAllSounds();
     _(endSounds)
@@ -97,28 +101,31 @@ const Gameplay = () => {
       .first()
       ?.play();
 
-    if (!itemCollected) {
-      const itemToCollect = _(quarters)
-        .filter((q, i) => !_.includes(collection, i))
-        .sortBy((i) => Math.random())
-        .keys()
-        .first();
-      if (itemToCollect) {
-        collect(itemToCollect);
-      }
+    const itemToCollect = _(quarters)
+      .keys()
+      .filter((q) => !_.includes(collection, q))
+      .sortBy((i) => Math.random())
+      .first();
+    if (itemToCollect) {
+      updateGameState((gs) => {
+        gs.collection = _(gs.collection).push(itemToCollect).uniq().value();
+      });
     }
+
     updateSessionState((s) => {
       s.phase = "leaderboard";
       s.finalScore = score;
     });
+
+    gameFinished.current = true;
   }, [
     collection,
-    collect,
-    itemCollected,
     updateSessionState,
+    updateGameState,
     endSounds,
     stopAllSounds,
     score,
+    gameFinished,
   ]);
 
   //skip questions for quick debugging
@@ -127,12 +134,12 @@ const Gameplay = () => {
   });
 
   //TODO: change back to 3
-  const countdown = useCountdown(0, gameState === "starting", () => {
-    setGameState("playing");
+  const countdown = useCountdown(0, gamePhase === "starting", () => {
+    setGamePhase("playing");
   });
   const secondsLeft = useCountdown(
     25,
-    gameState === "playing" && !isPaused,
+    gamePhase === "playing" && !isPaused,
     () => {
       finishGame();
     },
@@ -157,10 +164,10 @@ const Gameplay = () => {
     if (
       shuffledQuestions &&
       currentQuestionIndex >= shuffledQuestions.length &&
-      gameState === "playing"
+      gamePhase === "playing"
     )
       finishGame();
-  }, [shuffledQuestions, currentQuestionIndex, gameState, finishGame]);
+  }, [shuffledQuestions, currentQuestionIndex, gamePhase, finishGame]);
 
   return (
     <GameplayContext.Provider
@@ -170,7 +177,7 @@ const Gameplay = () => {
         questions: shuffledQuestions,
         secondsLeft,
         currentQuestionIndex,
-        gameState,
+        gamePhase,
       }}
     >
       <motion.div
@@ -193,9 +200,9 @@ const Gameplay = () => {
         animate={{ opacity: 1, translateY: 0 }}
         exit={{ translateY: 150, opacity: 0 }}
       >
-        {gameState === "starting" ? (
+        {gamePhase === "starting" ? (
           <Panel>Game Starting {countdown}</Panel>
-        ) : gameState === "playing" ? (
+        ) : gamePhase === "playing" ? (
           <motion.div
             variants={{
               hide: {},

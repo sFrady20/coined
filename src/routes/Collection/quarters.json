@@ -1,32 +1,38 @@
 {
   "science&Nature": {
-    "imgFront": "/images/quarters/science&Nature.png",
+    "imgFront": "/images/quarters/front.png",
     "imgBack": "/images/quarters/science&Nature.png",
-    "text": "Lorem ipsum"
+    "title": "National Park of American Samoa Quarter",
+    "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur congue tellus vitae erat dictum, sed bibendum nunc accumsan."
   },
   "science2": {
-    "imgFront": "/images/quarters/science&Nature.png",
+    "imgFront": "/images/quarters/front.png",
     "imgBack": "/images/quarters/science&Nature.png",
-    "text": "Lorem ipsum"
+    "title": "National Park of American Samoa Quarter",
+    "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur congue tellus vitae erat dictum, sed bibendum nunc accumsan."
   },
   "science3": {
-    "imgFront": "/images/quarters/science&Nature.png",
+    "imgFront": "/images/quarters/front.png",
     "imgBack": "/images/quarters/science&Nature.png",
-    "text": "Lorem ipsum"
+    "title": "National Park of American Samoa Quarter",
+    "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur congue tellus vitae erat dictum, sed bibendum nunc accumsan."
   },
   "science4": {
-    "imgFront": "/images/quarters/science&Nature.png",
+    "imgFront": "/images/quarters/front.png",
     "imgBack": "/images/quarters/science&Nature.png",
-    "text": "Lorem ipsum"
+    "title": "National Park of American Samoa Quarter",
+    "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur congue tellus vitae erat dictum, sed bibendum nunc accumsan."
   },
   "science5": {
-    "imgFront": "/images/quarters/science&Nature.png",
+    "imgFront": "/images/quarters/front.png",
     "imgBack": "/images/quarters/science&Nature.png",
-    "text": "Lorem ipsum"
+    "title": "National Park of American Samoa Quarter",
+    "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur congue tellus vitae erat dictum, sed bibendum nunc accumsan."
   },
   "science6": {
-    "imgFront": "/images/quarters/science&Nature.png",
+    "imgFront": "/images/quarters/front.png",
     "imgBack": "/images/quarters/science&Nature.png",
-    "text": "Lorem ipsum"
+    "title": "National Park of American Samoa Quarter",
+    "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur congue tellus vitae erat dictum, sed bibendum nunc accumsan."
   }
 }

@@ -1,4 +1,4 @@
-import React, { useContext, memo } from "react";
+import React, { useContext, memo, useState } from "react";
 import styles from "./index.module.scss";
 import _ from "lodash";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,9 +8,23 @@ import { ReactComponent as CollectionBgSvg } from "../../media/collectionBg.svg"
 import Button from "../../components/Button";
 import quarters from "./quarters.json";
 import CollectionItem from "./CollectionItem";
+import useKeyPress from "../../hooks/useKeyPress";
+import CollectionDetail from "./CollectionDetail";
 
 const Collection = () => {
-  const { updateSessionState } = useContext(SessionContext);
+  const { updateSessionState, updateGameState } = useContext(SessionContext);
+  const [selectedQuarter, setSelectedQuarter] = useState<
+    keyof typeof quarters
+  >();
+
+  //clear collection for debugging
+  useKeyPress("r", () => {
+    updateGameState((gs) => {
+      gs.collection = [];
+      gs.visited = [];
+      console.log(`Collection reset!`);
+    });
+  });
 
   return (
     <>
@@ -47,7 +61,20 @@ const Collection = () => {
               exit={"hidden"}
             >
               {_.map(quarters, (quarter, key: keyof typeof quarters) => (
-                <CollectionItem key={key} quarterKey={key} />
+                <CollectionItem
+                  key={key}
+                  quarterKey={key}
+                  onClick={() => {
+                    setSelectedQuarter(key);
+                    //remove new label by tracking view
+                    updateGameState((gs) => {
+                      gs.visited = _(gs.visited || [])
+                        .push(key)
+                        .uniq()
+                        .value();
+                    });
+                  }}
+                />
               ))}
             </motion.div>
           </AnimatePresence>
@@ -75,6 +102,15 @@ const Collection = () => {
             />
           </div>
         </div>
+
+        {selectedQuarter && (
+          <CollectionDetail
+            quarterKey={selectedQuarter}
+            onClose={() => {
+              setSelectedQuarter(undefined);
+            }}
+          />
+        )}
       </motion.div>
     </>
   );

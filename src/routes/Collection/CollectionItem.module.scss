@@ -5,16 +5,22 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
+  border-radius: 50%;
 
   svg {
     width: 100%;
   }
 
-  &--collected {
-    background: rgba(100, 255, 100, 0.4);
-  }
-
   &--highlighted {
-    background: rgba(255, 255, 100, 0.6);
+    border: 0.5vw solid yellow;
   }
+}
+
+.quarter {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
 }

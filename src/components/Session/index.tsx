@@ -1,11 +1,4 @@
-import React, {
-  createContext,
-  useState,
-  useMemo,
-  memo,
-  useEffect,
-  useRef,
-} from "react";
+import React, { createContext, memo, useEffect, useRef } from "react";
 import _ from "lodash";
 import { EventDispatcher } from "three";
 import { Draft } from "immer";
@@ -22,11 +15,13 @@ export type GameState = {
   password?: string;
   name: string;
   collection: string[];
+  visited: string[];
 };
 const defaultGameState: GameState = {
   clientId: shortid(),
   name: "",
   collection: [],
+  visited: [],
 };
 
 export type SessionState = {
@@ -50,10 +45,6 @@ export type SessionContextType = {
     updater: (sessionState: Draft<SessionState>) => void | SessionState
   ) => void;
   events: EventDispatcher;
-  collection: string[];
-  collect: (item: string) => void;
-  itemCollected?: string;
-  markCollected: () => void;
 };
 const defaultValue: SessionContextType = {
   gameState: defaultGameState,
@@ -61,9 +52,6 @@ const defaultValue: SessionContextType = {
   sessionState: defaultSessionState,
   updateSessionState: () => {},
   events: new EventDispatcher(),
-  collection: [],
-  collect: () => {},
-  markCollected: () => {},
 };
 export const SessionContext = createContext(defaultValue);
 
@@ -86,8 +74,6 @@ LogRocket.identify(loadedGame.clientId);
 const SessionContextProvider = (props: { children: React.ReactNode }) => {
   const [gameState, updateGameState] = useImmer<GameState>(loadedGame);
   const { children } = props;
-  const [itemCollected, setItemCollected] = useState<string>();
-  const collection = useMemo(() => gameState.collection, [gameState]);
   const [sessionState, updateSessionState] = useImmer<SessionState>(
     defaultSessionState
   );
@@ -109,17 +95,6 @@ const SessionContextProvider = (props: { children: React.ReactNode }) => {
         sessionState,
         updateSessionState,
         events,
-        collection,
-        collect: (item) => {
-          setItemCollected(item);
-          updateGameState((s) => {
-            s.collection = _.uniq([...s.collection, item]);
-          });
-        },
-        itemCollected,
-        markCollected: () => {
-          setItemCollected(undefined);
-        },
       }}
     >
       {children}
