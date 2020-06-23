@@ -1,0 +1,32 @@
+{
+  "science&Nature": {
+    "imgFront": "/images/quarters/science&Nature.png",
+    "imgBack": "/images/quarters/science&Nature.png",
+    "text": "Lorem ipsum"
+  },
+  "science2": {
+    "imgFront": "/images/quarters/science&Nature.png",
+    "imgBack": "/images/quarters/science&Nature.png",
+    "text": "Lorem ipsum"
+  },
+  "science3": {
+    "imgFront": "/images/quarters/science&Nature.png",
+    "imgBack": "/images/quarters/science&Nature.png",
+    "text": "Lorem ipsum"
+  },
+  "science4": {
+    "imgFront": "/images/quarters/science&Nature.png",
+    "imgBack": "/images/quarters/science&Nature.png",
+    "text": "Lorem ipsum"
+  },
+  "science5": {
+    "imgFront": "/images/quarters/science&Nature.png",
+    "imgBack": "/images/quarters/science&Nature.png",
+    "text": "Lorem ipsum"
+  },
+  "science6": {
+    "imgFront": "/images/quarters/science&Nature.png",
+    "imgBack": "/images/quarters/science&Nature.png",
+    "text": "Lorem ipsum"
+  }
+}

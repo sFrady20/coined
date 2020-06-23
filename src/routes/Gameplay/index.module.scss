@@ -12,16 +12,6 @@
   margin: 0 6px;
 }
 
-.logo {
-  position: absolute;
-  left: 2.5vw;
-  top: 2.5vw;
-
-  img {
-    width: 25vw;
-  }
-}
-
 .questionContainer {
   perspective: 300px;
   transform-style: preserve-3d;
@@ -43,7 +33,7 @@
   transform: translate(-50%, -50%);
   font-weight: bold;
   left: 50px;
-  top: 49px;
+  top: 45px;
 }
 
 .time {
@@ -52,5 +42,5 @@
   transform: translate(-50%, -50%);
   font-weight: bold;
   left: 50px;
-  bottom: 24px;
+  bottom: 22px;
 }

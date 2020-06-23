@@ -3,42 +3,39 @@
 }
 
 .root {
-  border: 5px solid white;
-  background: #eee;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  padding: 5vw 5vw 5vw 16vw;
   border-radius: 8px;
   width: calc(100vw - 40px);
   pointer-events: all;
   position: fixed;
   bottom: 49vw;
-  height: 88vw;
   width: 84vw;
   left: 50%;
   transform: translate(-50%, 50%);
   transform-origin: 50% 50%;
-  display: flex;
-  flex-direction: column;
   //background: url("../../media/paper.png");
+
+  svg {
+    width: 100%;
+  }
 }
 
-.cardDesign {
+.content {
+  padding: 5vw 5vw 5vw 16vw;
+  height: 100%;
+  width: 100%;
   position: absolute;
   left: 0;
   top: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  background-position: center;
-  background-size: contain;
-  background-repeat: no-repeat;
+  display: flex;
+  flex-direction: column;
 }
 
 .number {
   font-family: "Carters", sans-serif;
   position: absolute;
-  left: 6.8vw;
-  top: 6.6vw;
+  left: 9vw;
+  top: 9vw;
   font-size: 5vw;
   transform: translate(-50%, -50%);
 }
@@ -47,8 +44,8 @@
   font-family: "Carters", sans-serif;
   position: absolute;
   font-size: 4.6vw;
-  left: 7.3vw;
-  bottom: 22.4vw;
+  left: 9vw;
+  bottom: 25vw;
   color: #aaa;
   transform-origin: left center;
   transform: rotate(-90deg);
@@ -60,6 +57,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0 2vw;
+  font-size: 4vw;
 }
 
 .answers {
@@ -68,35 +67,42 @@
 .answer {
   width: 100%;
   text-align: center;
-  background: #90908c center top;
+  background: #fff center top;
   margin-bottom: 8px;
   cursor: pointer;
-  padding: 3vw 1.5vw;
-  border: 0.5vw solid black;
+  padding: 3.5vw 2vw;
   border-radius: 3vw;
   position: relative;
   font-weight: 600;
   font-size: 3.3vw;
   line-height: 1.3em;
+  box-shadow: 0 1vw 2vw rgba(0, 0, 0, 0.2);
+
+  &:before {
+    content: " ";
+    position: absolute;
+    left: 0.6vw;
+    top: 0.6vw;
+    width: calc(100% - 1.5vw);
+    height: calc(100% - 1.5vw);
+    border: 0.1vw solid #e5b450;
+    border-radius: 2vw;
+  }
 
   &--correct {
     background: rgba(100, 255, 100, 0.4);
-    border: 0.5vw solid transparent;
 
     &:before {
-      content: " ";
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: calc(100% - 1vw);
-      height: calc(100% - 1vw);
-      border: 0.5vw solid white;
-      border-radius: 2vw;
+      border-color: rgba(100, 255, 100, 0.7);
     }
   }
 
   &--incorrect {
     background: rgba(255, 100, 100, 0.7);
+
+    &:before {
+      border-color: rgba(255, 100, 100, 0.9);
+    }
   }
 }
 

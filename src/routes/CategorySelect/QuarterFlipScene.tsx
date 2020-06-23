@@ -78,7 +78,7 @@ const QuarterScene = (props: Props, ref: Ref<QuarterFlipSceneHandle>) => {
     ]);
   }, [position, rotation, onFlipStart]);
 
-  useFrame((state, delta) => {
+  useFrame(() => {
     if (meshRef.current) {
       meshRef.current.position.y = position.current;
       meshRef.current.rotation.x = rotation.current + Math.PI / 2;
@@ -96,7 +96,7 @@ const QuarterScene = (props: Props, ref: Ref<QuarterFlipSceneHandle>) => {
   const font = useLoader(FontLoader, "/helvetiker_regular.typeface.json");
 
   return (
-    <group ref={meshRef}>
+    <group ref={meshRef} position={[0, 0, -2]} scale={[0.2, 0.2, 0.2]}>
       <mesh>
         <meshPhongMaterial attach="material" reflectivity={1} color="grey" />
         <cylinderBufferGeometry attach="geometry" args={[1, 1, 0.1, 32]} />

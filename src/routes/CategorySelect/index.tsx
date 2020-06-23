@@ -1,77 +1,64 @@
-import React, {
-  useState,
-  useContext,
-  memo,
-  useCallback,
-  useRef,
-  Suspense,
-} from "react";
-import { useHistory } from "react-router";
-import { WELCOME_SCREEN, GAMEPLAY_SCREEN } from "../../components/Router";
+import React, { useState, useContext, memo } from "react";
+import styles from "./index.module.scss";
 import _ from "lodash";
 import { SessionContext } from "../../components/Session";
-import Banner from "../../components/Banner";
-import Panel from "../../components/Panel";
-import ActionBar from "../../components/ActionBar";
-import CanvasPortal from "../../components/ARBridge/CanvasPortal";
-import QuarterFlipScene, { QuarterFlipSceneHandle } from "./QuarterFlipScene";
+import { AssetContext } from "../../components/AssetLoader";
+import ReactSwiper from "react-id-swiper";
+import Button from "../../components/Button";
+import Swiper from "swiper";
+import { motion } from "framer-motion";
+import { ReactComponent as HeaderSvg } from "../../media/categoryHeader.svg";
+import { ReactComponent as CardSvg } from "../../media/science&Nature.svg";
 
-const CATEGORIES = ["Science", "Math", "History"];
-
-const CategorySelect = () => {
-  const history = useHistory();
-  const { selectCategory } = useContext(SessionContext);
-  const [category, setCategory] = useState<string | undefined>(undefined);
-  const quarterSceneRef = useRef<QuarterFlipSceneHandle>(null);
-
-  const selectRandomCategory = useCallback(() => {
-    setCategory((c) => {
-      var newCategory = c;
-      while (newCategory === c) {
-        newCategory = CATEGORIES[_.random(0, CATEGORIES.length - 1)];
-      }
-      return newCategory;
-    });
-  }, [setCategory]);
+const CategorySelect = memo(() => {
+  const { updateSessionState } = useContext(SessionContext);
+  const { questions } = useContext(AssetContext);
+  const [swiper, setSwiper] = useState<Swiper | null>(null);
 
   return (
-    <>
-      <CanvasPortal
-        scene={
-          <Suspense fallback={<></>}>
-            <QuarterFlipScene
-              ref={quarterSceneRef}
-              category={category}
-              onFlipStart={() => {
-                selectRandomCategory();
-              }}
-            />
-          </Suspense>
-        }
-      />
-
-      <Banner>Coined Logo</Banner>
-      <Panel>
-        <h5>Choose Category</h5>
-        {category}
-
-        <ActionBar
-          actions={{
-            Back: () => history.push(WELCOME_SCREEN),
-            Spin: () => {
-              quarterSceneRef.current?.spin();
-            },
-            Play: category
-              ? () => {
-                  selectCategory(category);
-                  history.push(GAMEPLAY_SCREEN);
-                }
-              : undefined,
+    <motion.div
+      className={styles.root}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1, transition: { when: "beforeChildren" } }}
+      exit={{ opacity: 0, transition: { when: "afterChildren" } }}
+    >
+      <motion.div
+        className={styles.header}
+        initial={{ opacity: 0, translateX: `-50%`, translateY: `-95%` }}
+        animate={{ opacity: 1, translateX: `-50%`, translateY: `-100%` }}
+        exit={{ opacity: 0, translateX: `-50%`, translateY: `-95%` }}
+      >
+        <HeaderSvg />
+      </motion.div>
+      <ReactSwiper
+        getSwiper={setSwiper}
+        centeredSlides
+        grabCursor
+        spaceBetween={8}
+        slidesPerView={"auto"}
+        autoHeight
+        effect="coverflow"
+      >
+        {_.map(questions, (question, category) => (
+          <div key={category} className={styles.card}>
+            <CardSvg />
+          </div>
+        ))}
+      </ReactSwiper>
+      <div className={styles.button}>
+        <Button
+          text="SELECT"
+          type="primary"
+          onClick={() => {
+            updateSessionState((s) => {
+              s.selectedCategory = _.keys(questions)[swiper?.activeIndex || 0];
+              s.phase = "play";
+            });
           }}
         />
-      </Panel>
-    </>
+      </div>
+    </motion.div>
   );
-};
+});
 
-export default memo(CategorySelect);
+export default CategorySelect;

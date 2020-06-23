@@ -1,0 +1,57 @@
+.container {
+  width: 100%;
+  position: relative;
+  pointer-events: all;
+
+  & > svg {
+    display: block;
+  }
+}
+
+.content {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 41vw 0 0;
+}
+
+.leaderboard {
+  flex: 1;
+  background: white;
+  overflow-y: auto;
+  margin: 0 6vw;
+  padding: 4vw;
+}
+
+.score {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 3vw;
+
+  &:nth-child(odd) {
+    background: #f7f5f2;
+  }
+}
+
+.actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 0 6vw 16px 6vw;
+}
+
+.finalScore {
+  color: white;
+  position: absolute;
+  left: 50%;
+  top: 13.5vw;
+  font-size: 6vw;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  font-family: "Carters";
+}

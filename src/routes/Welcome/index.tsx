@@ -1,32 +1,43 @@
-import React, { memo } from "react";
-import { useHistory } from "react-router";
-import { CATEGORY_SELECT_SCREEN, SCAN_SCREEN } from "../../components/Router";
-import Banner from "../../components/Banner";
-import Panel from "../../components/Panel";
-import ActionBar from "../../components/ActionBar";
+import React, { memo, useContext, useEffect } from "react";
+import styles from "./index.module.scss";
+import Button from "../../components/Button";
+import { SessionContext } from "../../components/Session";
+import { motion } from "framer-motion";
+import { AssetContext } from "../../components/AssetLoader";
 
-const Welcome = () => {
-  const history = useHistory();
+const Welcome = memo(() => {
+  const { updateSessionState } = useContext(SessionContext);
+  const { sfx } = useContext(AssetContext);
+  useEffect(() => {
+    const sound = sfx["intro"];
+    const soundId = sound.play();
+    sound.once("end", () => {
+      updateSessionState((s) => {
+        s.phase = "category";
+      });
+    });
+    return () => {
+      sound.stop(soundId);
+    };
+  }, [sfx, updateSessionState]);
 
   return (
-    <>
-      <Banner>Coined Logo</Banner>
-      <Panel>
-        <h5>Welcome</h5>
-        <p>
-          Bacon ipsum dolor amet chuck chislic biltong beef ribs short ribs.
-          Sirloin ham ham hock, prosciutto beef corned beef ball tip flank
-          shankle biltong bacon.
-        </p>
-        <ActionBar
-          actions={{
-            Back: () => history.push(SCAN_SCREEN),
-            Continue: () => history.push(CATEGORY_SELECT_SCREEN),
-          }}
-        />
-      </Panel>
-    </>
+    <motion.div
+      className={styles.root}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      <Button
+        text="PLAY"
+        onClick={() =>
+          updateSessionState((s) => {
+            s.phase = "category";
+          })
+        }
+      />
+    </motion.div>
   );
-};
+});
 
-export default memo(Welcome);
+export default Welcome;

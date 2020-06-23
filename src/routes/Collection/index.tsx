@@ -1,116 +1,81 @@
-import React, { useContext, useEffect, useState, memo } from "react";
+import React, { useContext, memo } from "react";
 import styles from "./index.module.scss";
 import _ from "lodash";
 import { motion, AnimatePresence } from "framer-motion";
 import { SessionContext } from "../../components/Session";
-import classnames from "classnames";
-import Panel from "../../components/Panel";
-import ActionBar from "../../components/ActionBar";
-import Banner from "../../components/Banner";
-import { useHistory } from "react-router";
-import { SCAN_SCREEN, CATEGORY_SELECT_SCREEN } from "../../components/Router";
 import share from "../../util/share";
-
-export const COLLECTION_ITEMS = [
-  "one",
-  "two",
-  "three",
-  "four",
-  "five",
-  "six",
-  "seven",
-  "eight",
-  "nine",
-];
+import { ReactComponent as CollectionBgSvg } from "../../media/collectionBg.svg";
+import Button from "../../components/Button";
+import quarters from "./quarters.json";
+import CollectionItem from "./CollectionItem";
 
 const Collection = () => {
-  const { collection, itemCollected, markCollected } = useContext(
-    SessionContext
-  );
-  const history = useHistory();
-  const [highlighted, setHighlighted] = useState<string>();
-
-  useEffect(() => {
-    if (itemCollected) {
-      setHighlighted(itemCollected);
-      markCollected();
-    }
-  }, [itemCollected, markCollected]);
+  const { updateSessionState } = useContext(SessionContext);
 
   return (
     <>
-      <Banner transitions={["fade", "down"]}>
-        <div className={styles.logo}>Coined Logo</div>
-      </Banner>
-      {highlighted && (
-        <Panel>
-          <h4>Congratulations!</h4>
-          <p>You recieved {highlighted}</p>
-        </Panel>
-      )}
-      <Panel>
-        <AnimatePresence initial>
-          <motion.div
-            variants={{
-              hidden: {
-                transition: {
-                  staggerChildren: 0.033,
+      <motion.div
+        className={styles.container}
+        initial={{ translateY: `100%` }}
+        animate={{ translateY: 0 }}
+        exit={{ translateY: `100%` }}
+      >
+        <CollectionBgSvg />
+        <div className={styles.content}>
+          <AnimatePresence initial>
+            <motion.div
+              className={styles.items}
+              variants={{
+                hidden: {
+                  transition: {
+                    staggerChildren: 0.033,
+                  },
                 },
-              },
-              missing: {
-                transition: {
-                  staggerChildren: 0.033,
+                missing: {
+                  transition: {
+                    staggerChildren: 0.033,
+                  },
                 },
-              },
-              collected: {
-                transition: {
-                  staggerChildren: 0.033,
+                collected: {
+                  transition: {
+                    staggerChildren: 0.033,
+                  },
                 },
-              },
-            }}
-            initial={"hidden"}
-            animate={"collected"}
-            exit={"hidden"}
-          >
-            {_.map(COLLECTION_ITEMS, (item) => (
-              <motion.div
-                className={classnames(
-                  styles.item,
-                  _.includes(collection, item) && styles[`item--collected`],
-                  highlighted === item && styles[`item--highlighted`]
-                )}
-                variants={{
-                  hidden: { opacity: 0, scale: 0.6 },
-                  missing: { opacity: 0.7, scale: 1 },
-                  collected: { opacity: 1, scale: 1 },
-                }}
-                key={item}
-              >
-                {item}
-              </motion.div>
-            ))}
-          </motion.div>
-        </AnimatePresence>
-      </Panel>
-      <Banner transitions={["fade", "down"]}>
-        <ActionBar
-          actions={{
-            Share: () => {
-              share({
-                url: window.location.href,
-                title: "title",
-                text: "text",
-              });
-            },
-            Quit: () => {
-              history.push(SCAN_SCREEN);
-            },
-            "Play Again": () => {
-              history.push(CATEGORY_SELECT_SCREEN);
-            },
-          }}
-        />
-      </Banner>
+              }}
+              initial={"hidden"}
+              animate={"collected"}
+              exit={"hidden"}
+            >
+              {_.map(quarters, (quarter, key: keyof typeof quarters) => (
+                <CollectionItem key={key} quarterKey={key} />
+              ))}
+            </motion.div>
+          </AnimatePresence>
+          <div className={styles.actions}>
+            <Button
+              type="secondary"
+              text="SHARE"
+              onClick={() => {
+                share({
+                  url: window.location.href,
+                  title: "title",
+                  text: "text",
+                });
+              }}
+            />
+            <Button
+              type="primary"
+              text="PLAY AGAIN"
+              onClick={() => {
+                updateSessionState((s) => {
+                  s.phase = "category";
+                  s.selectedCategory = undefined;
+                });
+              }}
+            />
+          </div>
+        </div>
+      </motion.div>
     </>
   );
 };

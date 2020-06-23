@@ -14,32 +14,27 @@ import _ from "lodash";
 import { SessionContext } from "../../components/Session";
 import Question from "./Question";
 import useCountdown from "../../hooks/useCountdown";
-import Result from "./Result";
-import QUESTIONS from "./questions.json";
 import AnimCounter from "../../components/AnimCounter";
 import Panel from "../../components/Panel";
-import { Redirect, useHistory } from "react-router";
-import {
-  CATEGORY_SELECT_SCREEN,
-  COLLECTION_SCREEN,
-} from "../../components/Router";
-import { COLLECTION_ITEMS } from "../Collection";
+import quarters from "../Collection/quarters.json";
 import { motion } from "framer-motion";
 import { ReactComponent as Timer } from "../../media/timer.svg";
-import Leaderboard from "./Leaderboard";
-import imgLogo from "../../media/coined.png";
+import { AssetContext } from "../../components/AssetLoader";
+import useKeyPress from "../../hooks/useKeyPress";
 
 export type Question = {
-  text: string;
-  correctMessage: string;
-  incorrectMessage: string;
+  quarter: string;
+  difficulty: "Easy" | "Medium" | "Hard";
+  prompt: string;
+  correctAnswer: string;
+  wrongAnswer1: string;
+  wrongAnswer2: string;
   answers: Answer[];
 };
 export type Answer = {
   text: string;
   isCorrect?: boolean;
 };
-const QUESTION_COUNT = 10;
 
 export type GameState = "starting" | "playing" | "finished" | "leaderboard";
 
@@ -63,26 +58,73 @@ export const GameplayContext = createContext(defaultGameplayContext);
 
 const Gameplay = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const { selectedCategory, itemCollected, collect, collection } = useContext(
-    SessionContext
-  );
+  const {
+    sessionState,
+    updateSessionState,
+    itemCollected,
+    collect,
+    collection,
+  } = useContext(SessionContext);
   const [score, setScore] = useState(0);
   const [gameState, setGameState] = useState<GameState>("starting");
-  const history = useHistory();
   const [isPaused, setPaused] = useState(false);
+  const { questions, sfx } = useContext(AssetContext);
+  const { selectedCategory } = sessionState;
 
+  //gather sfx
+  const correctSounds = useMemo(
+    () => [sfx.correct1, sfx.correct2, sfx.correct3],
+    [sfx]
+  );
+  const wrongSounds = useMemo(() => [sfx.wrong1, sfx.wrong2, sfx.wrong3], [
+    sfx,
+  ]);
+  const endSounds = useMemo(() => [sfx.end1, sfx.end2, sfx.end3], [sfx]);
+
+  //
+  const stopAllSounds = useCallback(() => {
+    _.forEach(correctSounds, (s) => s.stop());
+    _.forEach(wrongSounds, (s) => s.stop());
+    _.forEach(endSounds, (s) => s.stop());
+  }, [correctSounds, wrongSounds, endSounds]);
+
+  //
   const finishGame = useCallback(() => {
+    //play end sfx
+    stopAllSounds();
+    _(endSounds)
+      .sort((s) => (Math.random() > 0.5 ? -1 : 1))
+      .first()
+      ?.play();
+
     if (!itemCollected) {
-      const itemToCollect = _(COLLECTION_ITEMS)
-        .filter((i) => !_.includes(collection, i))
+      const itemToCollect = _(quarters)
+        .filter((q, i) => !_.includes(collection, i))
         .sortBy((i) => Math.random())
+        .keys()
         .first();
       if (itemToCollect) {
         collect(itemToCollect);
       }
     }
-    setGameState("finished");
-  }, [setGameState, collection, collect, itemCollected]);
+    updateSessionState((s) => {
+      s.phase = "leaderboard";
+      s.finalScore = score;
+    });
+  }, [
+    collection,
+    collect,
+    itemCollected,
+    updateSessionState,
+    endSounds,
+    stopAllSounds,
+    score,
+  ]);
+
+  //skip questions for quick debugging
+  useKeyPress("q", () => {
+    finishGame();
+  });
 
   //TODO: change back to 3
   const countdown = useCountdown(0, gameState === "starting", () => {
@@ -101,39 +143,42 @@ const Gameplay = () => {
     setScore(0);
   }, [setScore]);
 
-  const questions = useMemo(
+  const shuffledQuestions = useMemo(
     () =>
-      _(QUESTIONS)
-        .sort(() => Math.random())
-        .take(QUESTION_COUNT)
-        .value(),
-    []
+      questions
+        ? _(questions[selectedCategory!])
+            .sort(() => (Math.random() > 0.5 ? 1 : -1))
+            .value()
+        : [],
+    [selectedCategory, questions]
   );
 
   useEffect(() => {
-    if (currentQuestionIndex >= questions.length && gameState === "playing")
+    if (
+      shuffledQuestions &&
+      currentQuestionIndex >= shuffledQuestions.length &&
+      gameState === "playing"
+    )
       finishGame();
-  }, [questions, currentQuestionIndex, gameState, finishGame]);
-
-  if (!selectedCategory) {
-    return <Redirect to={CATEGORY_SELECT_SCREEN} />;
-  }
+  }, [shuffledQuestions, currentQuestionIndex, gameState, finishGame]);
 
   return (
     <GameplayContext.Provider
       value={{
         score,
         setScore,
-        questions,
+        questions: shuffledQuestions,
         secondsLeft,
         currentQuestionIndex,
         gameState,
       }}
     >
-      <div className={styles.logo}>
-        <img src={imgLogo} />
-      </div>
-      <div className={styles.timer}>
+      <motion.div
+        className={styles.timer}
+        initial={{ translateY: -150, opacity: 0 }}
+        animate={{ translateY: 0, opacity: 1 }}
+        exit={{ translateY: -150, opacity: 0 }}
+      >
         <Timer width={100} height={150} />
         <div className={styles.score}>
           <AnimCounter value={score} />
@@ -141,72 +186,88 @@ const Gameplay = () => {
         <div className={styles.time}>
           <AnimCounter value={secondsLeft} />
         </div>
-      </div>
+      </motion.div>
       <div style={{ flex: 1 }} />
-      {gameState === "starting" ? (
-        <Panel>Game Starting {countdown}</Panel>
-      ) : gameState === "playing" ? (
-        <motion.div
-          variants={{
-            hide: {},
-            show: {
-              transition: {
-                staggerChildren: 0.4 / questions.length,
-                staggerDirection: -1,
-                when: "beforeChildren",
+      <motion.div
+        initial={{ opacity: 1, translateY: 0 }}
+        animate={{ opacity: 1, translateY: 0 }}
+        exit={{ translateY: 150, opacity: 0 }}
+      >
+        {gameState === "starting" ? (
+          <Panel>Game Starting {countdown}</Panel>
+        ) : gameState === "playing" ? (
+          <motion.div
+            variants={{
+              hide: {},
+              show: {
+                transition: {
+                  staggerChildren: 0.4 / shuffledQuestions.length,
+                  staggerDirection: -1,
+                  when: "beforeChildren",
+                },
               },
-            },
-          }}
-          initial={"hide"}
-          animate={"show"}
-          className={styles.questionContainer}
-        >
-          {_.map(questions, (question, index) => {
-            return (
-              <motion.div
-                variants={{
-                  hide: {
-                    translateY: 350,
-                    translateZ: 20,
-                    rotateX: -10,
-                  },
-                  show: { translateY: 0, translateZ: 0, rotateX: 0 },
-                }}
-                style={{
-                  transformStyle: "preserve-3d",
-                }}
-                key={index}
-              >
-                <Question
-                  question={question}
-                  index={index}
-                  currentQuestionIndex={currentQuestionIndex}
-                  totalQuestions={questions.length}
-                  onAsk={() => {
-                    setPaused(false);
-                  }}
-                  onAnswered={() => {
-                    setPaused(true);
-                  }}
-                  onComplete={() => {
-                    setCurrentQuestionIndex((i) => i + 1);
-                  }}
-                />
-              </motion.div>
-            );
-          })}
-        </motion.div>
-      ) : gameState === "finished" ? (
-        <Result
-          onContinue={() => {
-            setGameState("leaderboard");
-          }}
-        />
-      ) : gameState === "leaderboard" ? (
-        <Leaderboard onContinue={() => history.push(COLLECTION_SCREEN)} />
-      ) : (
-        <> </>
-      )}
+            }}
+            initial={"hide"}
+            animate={"show"}
+            className={styles.questionContainer}
+          >
+            {_(shuffledQuestions)
+              .map((question, index) => {
+                if (index < currentQuestionIndex - 1) return null;
+                if (index > currentQuestionIndex + 5) return null;
+
+                return (
+                  <motion.div
+                    variants={{
+                      hide: {
+                        translateY: 350,
+                        translateZ: -20,
+                        rotateX: 10,
+                      },
+                      show: { translateY: 0, translateZ: 0, rotateX: 0 },
+                    }}
+                    style={{
+                      transformStyle: "preserve-3d",
+                    }}
+                    key={index}
+                  >
+                    <Question
+                      question={question}
+                      index={index}
+                      currentQuestionIndex={currentQuestionIndex}
+                      onAsk={() => {
+                        setPaused(false);
+                      }}
+                      onAnswered={(answer) => {
+                        setPaused(true);
+                        stopAllSounds();
+                        if (answer.isCorrect) {
+                          //play random correct sfx
+                          _(correctSounds)
+                            .sort((s) => (Math.random() > 0.5 ? -1 : 1))
+                            .first()
+                            ?.play();
+                        } else {
+                          //play random wrong sfx
+                          _(wrongSounds)
+                            .sort((s) => (Math.random() > 0.5 ? -1 : 1))
+                            .first()
+                            ?.play();
+                        }
+                      }}
+                      onComplete={() => {
+                        setCurrentQuestionIndex((i) => i + 1);
+                      }}
+                    />
+                  </motion.div>
+                );
+              })
+              .value()}
+          </motion.div>
+        ) : (
+          <> </>
+        )}
+      </motion.div>
     </GameplayContext.Provider>
   );
 };

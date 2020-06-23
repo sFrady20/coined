@@ -13,14 +13,13 @@ import { Question as QuestionDefinition, Answer, GameplayContext } from ".";
 import classnames from "classnames";
 import { SessionContext } from "../../components/Session";
 import { motion, useAnimation } from "framer-motion";
-import imgCardDesign from "../../media/cardDesign.png";
 import { createPortal } from "react-dom";
+import { ReactComponent as QuestionCardSvg } from "../../media/questionCard.svg";
 
 const Question = (props: {
   question: QuestionDefinition;
   index: number;
   currentQuestionIndex: number;
-  totalQuestions: number;
   onAsk?: () => void;
   onAnswered?: (answer: Answer) => void;
   onComplete?: (isCorrect: boolean) => void;
@@ -29,17 +28,17 @@ const Question = (props: {
     question,
     index,
     currentQuestionIndex,
-    totalQuestions,
     onAsk,
     onAnswered,
     onComplete,
   } = props;
   const [selectedAnswer, selectAnswer] = useState<Answer>();
-  const { events, selectedCategory } = useContext(SessionContext);
+  const { events, sessionState } = useContext(SessionContext);
   const { setScore } = useContext(GameplayContext);
   const [randRotation, setRandRotation] = useState(0);
   const answerClickEvent = useRef<MouseEvent>();
   const feedbackAnimation = useAnimation();
+  const { selectedCategory } = sessionState;
 
   const diff = useMemo(() => {
     setRandRotation(Math.random() * 30 - 15);
@@ -52,8 +51,21 @@ const Question = (props: {
 
   const answers = useMemo(
     () =>
-      _(question.answers)
-        .sort(() => Math.random())
+      _([
+        {
+          isCorrect: true,
+          text: question.correctAnswer,
+        },
+        {
+          isCorrect: false,
+          text: question.wrongAnswer1,
+        },
+        {
+          isCorrect: false,
+          text: question.wrongAnswer2,
+        },
+      ])
+        .sort(() => (Math.random() > 0.5 ? 1 : -1))
         .take(5)
         .value(),
     [question]
@@ -67,15 +79,14 @@ const Question = (props: {
       if (answer.isCorrect) {
         //correct
         setScore((s) => s + 100);
-        window.navigator.vibrate(10);
+        if (window.navigator.vibrate) window.navigator.vibrate(10);
         events.dispatchEvent({ type: "correct" });
       } else {
         //incorrect
-        window.navigator.vibrate(50);
+        if (window.navigator.vibrate) window.navigator.vibrate(50);
         events.dispatchEvent({ type: "incorrect" });
       }
       if (onAnswered) onAnswered(answer);
-      console.log(answerClickEvent.current);
       feedbackAnimation.set({
         opacity: 0,
         translateY: 0,
@@ -129,56 +140,55 @@ const Question = (props: {
               translateZ: diff * 5,
               translateY: 0,
               translateX: 0,
-              rotateZ: randRotation * Math.abs(diff / totalQuestions),
+              rotateZ: randRotation * Math.abs(diff / 5),
             }
       }
       className={styles.animations}
     >
       <div className={styles.root}>
-        <div
-          className={styles.cardDesign}
-          style={{ backgroundImage: `url(${imgCardDesign}` }}
-        />
+        <QuestionCardSvg />
         <div className={styles.number}>{index + 1}</div>
         <div className={styles.category}>{selectedCategory}</div>
-        <div className={styles.questionText}>
-          <h5>{question.text}</h5>
-        </div>
-        <div className={styles.answers}>
-          {_.map(answers, (answer, i) => {
-            return (
+        <div className={styles.content}>
+          <div className={styles.questionText}>
+            <h5>{question.prompt}</h5>
+          </div>
+          <div className={styles.answers}>
+            {_.map(answers, (answer, i) => {
+              return (
+                <div
+                  key={i}
+                  className={classnames(
+                    styles.answer,
+                    selectedAnswer === answer
+                      ? answer.isCorrect
+                        ? styles["answer--correct"]
+                        : styles["answer--incorrect"]
+                      : undefined
+                  )}
+                  onClick={(e) => {
+                    answerClickEvent.current = e.nativeEvent;
+                    validateAnswer(answer);
+                  }}
+                >
+                  {answer.text}
+                </div>
+              );
+            })}
+          </div>
+          {createPortal(
+            <motion.div className={styles.feedback} animate={feedbackAnimation}>
               <div
-                key={i}
-                className={classnames(
-                  styles.answer,
-                  selectedAnswer === answer
-                    ? answer.isCorrect
-                      ? styles["answer--correct"]
-                      : styles["answer--incorrect"]
-                    : undefined
-                )}
-                onClick={(e) => {
-                  answerClickEvent.current = e.nativeEvent;
-                  validateAnswer(answer);
-                }}
-              >
-                {answer.text}
-              </div>
-            );
-          })}
+                className={
+                  selectedAnswer?.isCorrect
+                    ? styles.feedbackTrue
+                    : styles.feedbackFalse
+                }
+              />
+            </motion.div>,
+            document.body
+          )}
         </div>
-        {createPortal(
-          <motion.div className={styles.feedback} animate={feedbackAnimation}>
-            <div
-              className={
-                selectedAnswer?.isCorrect
-                  ? styles.feedbackTrue
-                  : styles.feedbackFalse
-              }
-            />
-          </motion.div>,
-          document.body
-        )}
       </div>
     </motion.div>
   );

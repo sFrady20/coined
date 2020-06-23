@@ -1,37 +1,96 @@
-import React, { memo } from "react";
+import React, { memo, useContext, useEffect } from "react";
 import styles from "./index.module.scss";
 import { useHistory } from "react-router";
-import TransitionWrapper from "../../components/TransitionWrapper";
-import { WELCOME_SCREEN } from "../../components/Router";
-import Banner from "../../components/Banner";
-import Panel from "../../components/Panel";
-import ActionBar from "../../components/ActionBar";
+import { ARContext } from "../../components/ARBridge";
+import { SessionContext } from "../../components/Session";
+import { ReactComponent as ScannerSvg } from "../../media/scanner.svg";
+import { ReactComponent as ScanPromptSvg } from "../../media/scanPrompt.svg";
+import { ReactComponent as ScanFadeSvg } from "../../media/scanFade.svg";
+import { motion } from "framer-motion";
+import useKeyPress from "../../hooks/useKeyPress";
 
-const Scan = () => {
+const Scan = memo(() => {
   const history = useHistory();
+  const { events, updateSessionState } = useContext(SessionContext);
+  const { detection } = useContext(ARContext);
+
+  useEffect(() => {
+    updateSessionState((s) => {
+      s.phase = "scan";
+    });
+  }, [updateSessionState]);
+
+  useEffect(() => {
+    if (detection.label === "USQUARTER") {
+      events.dispatchEvent({ type: "scan" });
+      updateSessionState((s) => {
+        s.phase = "intro";
+      });
+    }
+  }, [detection.label, updateSessionState, events, history]);
+
+  //skip scanning for quick debugging
+  useKeyPress("q", () => {
+    updateSessionState((s) => {
+      s.phase = "intro";
+    });
+  });
 
   return (
     <>
-      <Banner>Coined Logo</Banner>
-      <TransitionWrapper
-        className={styles.scannerWrapper}
-        type={["fade", "scale"]}
+      <motion.div
+        className={styles.scanFade}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
       >
-        <div className={styles.scanner} />
-      </TransitionWrapper>
-      <Panel>
-        <p>
-          Place a quarter heads-side up on a flat surface and line up in the
-          target area to begin.
-        </p>
-        <ActionBar
-          actions={{
-            Start: () => history.push(WELCOME_SCREEN),
-          }}
-        />
-      </Panel>
+        <ScanFadeSvg />
+      </motion.div>
+      <motion.div
+        className={styles.scanner}
+        initial={{
+          opacity: 0,
+          scale: 0.95,
+          translateX: "-50%",
+          translateY: "-50%",
+        }}
+        animate={{
+          opacity: 1,
+          scale: 1,
+          translateX: "-50%",
+          translateY: "-50%",
+        }}
+        exit={{
+          opacity: 0,
+          scale: 0.95,
+          translateX: "-50%",
+          translateY: "-50%",
+        }}
+      >
+        <ScannerSvg />
+      </motion.div>
+      <motion.div
+        className={styles.scanPrompt}
+        initial={{
+          opacity: 0,
+          translateX: "-50%",
+          translateY: "-50%",
+        }}
+        animate={{
+          opacity: 1,
+          translateX: "-50%",
+          translateY: "-50%",
+        }}
+        exit={{
+          opacity: 0,
+          translateX: "-50%",
+          translateY: "-50%",
+        }}
+      >
+        <ScanPromptSvg />
+      </motion.div>
     </>
   );
-};
+});
 
-export default memo(Scan);
+export default Scan;

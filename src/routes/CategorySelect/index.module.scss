@@ -1,0 +1,35 @@
+.root {
+  position: relative;
+  pointer-events: all;
+  width: 100%;
+  padding: 0 0 30px;
+}
+
+.header {
+  position: absolute;
+  left: 50%;
+  top: 22px;
+  width: 165px;
+  transform: translate(-50%, -100%);
+  height: auto;
+  z-index: 10;
+}
+
+.slide {
+  width: auto;
+}
+
+.card {
+  background: none white center center no-repeat;
+  border-radius: 8px;
+  width: 75vw !important;
+  height: 83vw !important;
+}
+
+.button {
+  position: absolute;
+  left: 50%;
+  bottom: 20px;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+}

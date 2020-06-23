@@ -1,0 +1,143 @@
+.root {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loadingBar {
+  width: 100%;
+  height: 8px;
+  background: rgba(34, 43, 61, 1);
+  border: 1px solid rgba(34, 43, 61, 1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.loadingBarInner {
+  background: rgb(179, 138, 24);
+  background: linear-gradient(
+    90deg,
+    rgba(179, 138, 24, 1) 0%,
+    rgba(34, 43, 61, 1) 10%
+  );
+  height: 100%;
+}
+
+.startButton {
+  margin-top: 3vw;
+  background: #eee;
+  padding: 12px 24px;
+  font-size: 20px;
+  position: absolute;
+  left: 50%;
+  bottom: -46px;
+  text-shadow: 0 2px 3px rgba(0, 0, 0, 0.5);
+  transform: translate(-50%, -50%);
+  color: white;
+  font-family: "Carters";
+  text-transform: uppercase;
+  border-radius: 4px;
+  transition: all 0.2s ease-out;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.6);
+
+  background: rgb(128, 76, 27);
+  background: linear-gradient(
+    138deg,
+    rgba(128, 76, 27, 1) 0%,
+    rgba(128, 76, 27, 1) 9%,
+    rgba(212, 164, 66, 1) 35%,
+    rgba(161, 104, 33, 1) 63%,
+    rgba(173, 140, 36, 1) 100%
+  );
+
+  &:active {
+    transform: translate(-50%, -45%);
+  }
+
+  &:before {
+    content: " ";
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    position: absolute;
+    left: 4px;
+    top: 4px;
+    bottom: 4px;
+    right: 4px;
+    border-radius: 4px;
+  }
+}
+.startButtonDisabled {
+  @extend .startButton;
+  filter: grayscale(1);
+  transform: translate(-50%, -50%) scale(0.95);
+}
+
+.panel {
+  position: absolute;
+  left: 15%;
+  bottom: 150px;
+  width: 70%;
+  background: rgb(128, 76, 27);
+  background: linear-gradient(
+    138deg,
+    rgba(128, 76, 27, 1) 0%,
+    rgba(128, 76, 27, 1) 9%,
+    rgba(212, 164, 66, 1) 35%,
+    rgba(161, 104, 33, 1) 63%,
+    rgba(173, 140, 36, 1) 100%
+  );
+  text-align: center;
+  border-radius: 7px;
+  padding: 7px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+}
+.panelInner {
+  background: white;
+  padding: 16px 12px 20px 12px;
+  font-size: 13px;
+  line-height: 1.4em;
+
+  h2 {
+    font-weight: normal;
+    font-size: 24px;
+    letter-spacing: 1.4px;
+    margin: 0;
+    font-family: "Carters";
+    text-transform: uppercase;
+  }
+
+  p {
+    margin: 12px 0;
+  }
+
+  span {
+    display: block;
+  }
+}
+
+.container {
+  width: 100%;
+  position: relative;
+}
+
+@keyframes :global(loading) {
+  0% {
+    opacity: 0.4;
+  }
+  10% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 0.4;
+  }
+}
+
+.loadingLetter {
+  :global {
+    animation: 3s ease infinite loading;
+  }
+}

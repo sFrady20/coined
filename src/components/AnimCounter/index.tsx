@@ -3,19 +3,22 @@ import styles from "./index.module.scss";
 import _ from "lodash";
 import { AnimatePresence, motion, useSpring } from "framer-motion";
 
-const AnimCounter = (props: { value: number }) => {
-  const { value } = props;
+const AnimCounter = (props: { value: number; initialValue?: number }) => {
+  const { value, initialValue } = props;
   const [displayValue, setDisplayValue] = useState(value);
   const direction = useRef(0);
 
-  const spring = useSpring(value, { damping: 100 });
+  const spring = useSpring(initialValue !== undefined ? initialValue : value, {
+    damping: 1000,
+    stiffness: 100,
+  });
   useEffect(() => {
     spring.onChange((v) => {
       const nextVal = Math.round(v);
       direction.current = nextVal > displayValue ? 1 : -1;
       setDisplayValue(nextVal);
     });
-  }, [spring]);
+  }, [spring, setDisplayValue]);
   useEffect(() => {
     spring.set(value);
   }, [value, displayValue, spring]);
@@ -28,7 +31,7 @@ const AnimCounter = (props: { value: number }) => {
     <>
       {_.map(chars, (char, index) => {
         return (
-          <div className={styles.char}>
+          <div className={styles.char} key={index}>
             <AnimatePresence exitBeforeEnter>
               <motion.div
                 initial={{

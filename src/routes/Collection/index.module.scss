@@ -1,18 +1,32 @@
-.item {
-  width: 30%;
-  float: left;
-  height: 100px;
-  background: #eee;
-  margin: 1.5%;
+.container {
+  width: 100%;
+  position: relative;
+  pointer-events: all;
+
+  & > svg {
+    display: block;
+  }
+}
+
+.content {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-direction: column;
+  padding: 25vw 0 0;
+}
 
-  &--collected {
-    background: rgba(100, 255, 100, 0.4);
-  }
+.items {
+  flex: 1;
+  padding: 0 7vw;
+}
 
-  &--highlighted {
-    background: rgba(255, 255, 100, 0.6);
-  }
+.actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 4vw 7vw;
 }

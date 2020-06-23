@@ -16,7 +16,7 @@ export default (props: {
               className={styles.button}
               key={title}
               onClick={() => {
-                window.navigator.vibrate(10);
+                if (window.navigator.vibrate) window.navigator.vibrate(10);
                 action();
               }}
             >

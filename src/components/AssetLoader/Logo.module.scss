@@ -1,0 +1,17 @@
+.title {
+  position: absolute;
+  left: 50%;
+  top: calc(50% - 55vw);
+  width: 100vw;
+  z-index: 1000;
+  transform: translate(-50%, -50%);
+}
+
+.logo {
+  position: absolute;
+  left: 2.5vw;
+  top: 2.5vw;
+  width: 90px;
+  height: 90px;
+  z-index: 1000;
+}
