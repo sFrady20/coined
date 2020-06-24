@@ -216,7 +216,7 @@ const Gameplay = () => {
             }}
             initial={"hide"}
             animate={"show"}
-            className={styles.questionContainer}
+            className={styles.questions}
           >
             {_(shuffledQuestions)
               .map((question, index) => {
@@ -233,9 +233,7 @@ const Gameplay = () => {
                       },
                       show: { translateY: 0, translateZ: 0, rotateX: 0 },
                     }}
-                    style={{
-                      transformStyle: "preserve-3d",
-                    }}
+                    className={styles.questionContainer}
                     key={index}
                   >
                     <Question

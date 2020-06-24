@@ -5,7 +5,6 @@
 .root {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   border-radius: 8px;
-  width: calc(100vw - 40px);
   pointer-events: all;
   position: fixed;
   bottom: 49vw;
@@ -13,6 +12,7 @@
   left: 50%;
   transform: translate(-50%, 50%);
   transform-origin: 50% 50%;
+  backface-visibility: hidden;
   //background: url("../../media/paper.png");
 
   svg {
