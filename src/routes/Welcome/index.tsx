@@ -4,6 +4,7 @@ import Button from "../../components/Button";
 import { SessionContext } from "../../components/Session";
 import { motion } from "framer-motion";
 import { AssetContext } from "../../components/AssetLoader";
+import { DEBUG_SCANNING } from "../../config";
 
 const Welcome = memo(() => {
   const { updateSessionState } = useContext(SessionContext);
@@ -13,7 +14,7 @@ const Welcome = memo(() => {
     const soundId = sound.play();
     sound.once("end", () => {
       updateSessionState((s) => {
-        s.phase = "category";
+        if (!DEBUG_SCANNING) s.phase = "category";
       });
     });
     return () => {

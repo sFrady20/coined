@@ -1,5 +1,6 @@
 .animations {
   transform-origin: 50% 50%;
+  transform: translateY(350px) translateZ(-200px) rotateX(10deg);
 }
 
 .root {
@@ -7,8 +8,8 @@
   border-radius: 8px;
   pointer-events: all;
   position: fixed;
-  bottom: 49vw;
-  width: 84vw;
+  bottom: 52vw;
+  width: 95vw;
   left: 50%;
   transform: translate(-50%, 50%);
   transform-origin: 50% 50%;
@@ -21,7 +22,7 @@
 }
 
 .content {
-  padding: 5vw 5vw 5vw 16vw;
+  padding: 6vw 6vw 6vw 17vw;
   height: 100%;
   width: 100%;
   position: absolute;
@@ -34,8 +35,8 @@
 .number {
   font-family: "Carters", sans-serif;
   position: absolute;
-  left: 8.8vw;
-  top: 9.5vw;
+  left: 10vw;
+  top: 10.25vw;
   font-size: 5vw;
   transform: translate(-50%, -50%);
 }
@@ -44,8 +45,8 @@
   font-family: "Carters", sans-serif;
   position: absolute;
   font-size: 4.6vw;
-  left: 9vw;
-  bottom: 25vw;
+  left: 9.8vw;
+  bottom: 27.5vw;
   color: #aaa;
   transform-origin: left center;
   transform: rotate(-90deg);
@@ -56,9 +57,15 @@
   text-align: center;
   display: flex;
   align-items: center;
+  line-height: 1.3em;
   justify-content: center;
   padding: 0 2vw;
-  font-size: 4vw;
+  font-size: 5vw;
+  font-weight: 100;
+
+  h5 {
+    margin: 3vw 0;
+  }
 }
 
 .answers {
@@ -74,7 +81,7 @@
   border-radius: 3vw;
   position: relative;
   font-weight: 600;
-  font-size: 3.3vw;
+  font-size: 3.7vw;
   line-height: 1.3em;
   box-shadow: 0 1vw 2vw rgba(0, 0, 0, 0.2);
 

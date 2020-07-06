@@ -38,6 +38,12 @@ const CategorySelect = memo(() => {
         slidesPerView={"auto"}
         autoHeight
         effect="coverflow"
+        navigation={{
+          nextEl: `.${styles.next}`,
+          prevEl: `.${styles.prev}`,
+        }}
+        renderNextButton={() => <div className={styles.next} />}
+        renderPrevButton={() => <div className={styles.prev} />}
       >
         {_.map(questions, (question, category) => (
           <div key={category} className={styles.card}>

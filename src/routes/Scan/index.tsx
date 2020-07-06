@@ -1,6 +1,5 @@
 import React, { memo, useContext, useEffect } from "react";
 import styles from "./index.module.scss";
-import { useHistory } from "react-router";
 import { ARContext } from "../../components/ARBridge";
 import { SessionContext } from "../../components/Session";
 import { ReactComponent as ScannerSvg } from "../../media/scanner.svg";
@@ -8,26 +7,35 @@ import { ReactComponent as ScanPromptSvg } from "../../media/scanPrompt.svg";
 import { ReactComponent as ScanFadeSvg } from "../../media/scanFade.svg";
 import { motion } from "framer-motion";
 import useKeyPress from "../../hooks/useKeyPress";
+import { AssetContext } from "../../components/AssetLoader";
 
 const Scan = memo(() => {
-  const history = useHistory();
-  const { events, updateSessionState } = useContext(SessionContext);
-  const { detection } = useContext(ARContext);
+  const { updateSessionState } = useContext(SessionContext);
+  const { arController } = useContext(ARContext);
+  const { models } = useContext(AssetContext);
 
   useEffect(() => {
-    updateSessionState((s) => {
-      s.phase = "scan";
-    });
-  }, [updateSessionState]);
+    if (arController) {
+      arController.isCoinDetectionEnabled = true;
 
-  useEffect(() => {
-    if (detection.label === "USQUARTER") {
-      events.dispatchEvent({ type: "scan" });
-      updateSessionState((s) => {
-        s.phase = "intro";
-      });
+      const listener = () => {
+        arController.george.model.visible = true;
+        arController.george.playAnimation(models["appear"].animations[0]);
+
+        setTimeout(() => {
+          //arController.isCoinDetectionEnabled = false;
+          updateSessionState((s) => {
+            s.phase = "intro";
+          });
+        }, 3000);
+      };
+
+      arController.events.addEventListener("onDetectStart", listener);
+      return () => {
+        arController.events.removeEventListener("onDetectStart", listener);
+      };
     }
-  }, [detection.label, updateSessionState, events, history]);
+  }, [arController, updateSessionState]);
 
   //skip scanning for quick debugging
   useKeyPress("q", () => {

@@ -1,12 +1,13 @@
 .item {
   width: 30%;
   float: left;
-  margin: 1.5%;
+  margin: 1.4%;
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
   border-radius: 50%;
+  box-sizing: border-box;
 
   svg {
     width: 100%;

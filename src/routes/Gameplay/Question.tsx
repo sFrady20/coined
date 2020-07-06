@@ -39,6 +39,7 @@ const Question = (props: {
   const answerClickEvent = useRef<MouseEvent>();
   const feedbackAnimation = useAnimation();
   const { selectedCategory } = sessionState;
+  const anim = useAnimation();
 
   const diff = useMemo(() => {
     setRandRotation(Math.random() * 30 - 15);
@@ -124,25 +125,43 @@ const Question = (props: {
     ]
   );
 
+  useEffect(() => {
+    anim.set({
+      translateY: 350,
+      translateZ: -200,
+      rotateX: 10,
+    });
+  }, [anim]);
+  useEffect(() => {
+    anim.stop();
+    anim.start(
+      diff > 0
+        ? {
+            translateZ: 20,
+            translateX: selectedAnswer?.isCorrect ? 500 : -500,
+            transition: {
+              stiffness: 10,
+            },
+            rotateX: 0,
+            rotateZ: selectedAnswer?.isCorrect ? 30 : -30,
+          }
+        : {
+            translateZ: diff * 20,
+            translateY: 0,
+            translateX: 0,
+            rotateX: 0,
+            rotateZ: randRotation * Math.abs(diff / 5),
+            transition: {
+              delay: Math.max(0, -diff * 0.1),
+            },
+          }
+    );
+  }, [anim, diff, selectedAnswer]);
+
   return (
     <motion.div
-      animate={
-        diff > 0
-          ? {
-              translateZ: 0,
-              translateX: selectedAnswer?.isCorrect ? 500 : -500,
-              transition: {
-                stiffness: 10,
-              },
-              rotateZ: selectedAnswer?.isCorrect ? 30 : -30,
-            }
-          : {
-              translateZ: diff * 5,
-              translateY: 0,
-              translateX: 0,
-              rotateZ: randRotation * Math.abs(diff / 5),
-            }
-      }
+      animate={anim}
+      custom={{ diff, isCorrect: selectedAnswer?.isCorrect }}
       className={styles.animations}
     >
       <div className={styles.root}>

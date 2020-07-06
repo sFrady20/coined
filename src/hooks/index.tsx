@@ -2,12 +2,13 @@ import { useEffect } from "react";
 import { useThree } from "react-three-fiber";
 import { GridHelper } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { DEVELOPMENT_MODE } from "../config";
 
 const useGridAndControls = () => {
   const { scene, camera, gl } = useThree();
 
   useEffect(() => {
-    if (gl && camera) {
+    if (gl && camera && DEVELOPMENT_MODE) {
       const controls = new OrbitControls(camera, gl.domElement);
       controls.update();
 

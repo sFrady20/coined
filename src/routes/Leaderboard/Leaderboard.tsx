@@ -27,7 +27,6 @@ const Leaderboard = memo(() => {
     SessionContext
   );
   const { sessionState } = useContext(SessionContext);
-  const { score } = useContext(GameplayContext);
   const [error, setError] = useState("");
   const [hasSubmitted, setHasSubmitted] = useState(false);
 
@@ -40,7 +39,7 @@ const Leaderboard = memo(() => {
         {
           clientId: gameState.clientId,
           initials: gameState.name,
-          score,
+          score: finalScore,
         },
         {
           headers: {
@@ -54,13 +53,13 @@ const Leaderboard = memo(() => {
       setError(err.message);
       console.error(err);
     }
-  }, [score, gameState, setHasSubmitted]);
+  }, [finalScore, gameState, setHasSubmitted]);
 
   useEffect(() => {
     fetchLeaderboard()
       .then(setLeaderboard)
       .catch((err) => console.error(err));
-  }, [setLeaderboard, score, setError]);
+  }, [setLeaderboard]);
 
   return (
     <motion.div
@@ -76,19 +75,41 @@ const Leaderboard = memo(() => {
       <div className={styles.content}>
         <div className={styles.leaderboard}>
           {!hasSubmitted && (
-            <input
-              value={gameState.name}
-              onChange={(e) => {
-                const name = e.target.value;
-                updateGameState((gs) => {
-                  gs.name = name;
-                });
-              }}
-            />
+            <div className={styles.submission}>
+              <div className={styles.submissionPrompt}>
+                Add your
+                <br />
+                initials
+              </div>
+              <div className={styles.submissionField}>
+                <div className={styles.submissionLetter}>
+                  {gameState.name?.substr(0, 1)}
+                </div>
+                <div className={styles.submissionLetter}>
+                  {gameState.name?.substr(1, 1)}
+                </div>
+                <div className={styles.submissionLetter}>
+                  {gameState.name?.substr(2, 1)}
+                </div>
+                <input
+                  maxLength={3}
+                  value={gameState.name}
+                  onChange={(e) => {
+                    const name = e.target.value;
+                    updateGameState((gs) => {
+                      gs.name = name.toUpperCase();
+                    });
+                  }}
+                />
+              </div>
+              <div className={styles.submissionScore}>{finalScore}</div>
+            </div>
           )}
           {_.map(leaderboard, (leader, index) => (
             <div className={styles.score} key={index}>
-              <span>{leader.initials}</span>
+              <span>
+                {index + 1}. {leader.initials}
+              </span>
               <span>{leader.score}</span>
             </div>
           ))}
@@ -106,16 +127,24 @@ const Leaderboard = memo(() => {
           />
           <Button
             type="primary"
-            text="ADD YOUR SCORE"
-            onClick={async () => {
-              try {
-                await postScoreToLeaderboard();
-                const scores = await fetchLeaderboard();
-                setLeaderboard(scores);
-              } catch (err) {
-                console.error(err);
-              }
-            }}
+            text={hasSubmitted ? "CONTINUE" : "ADD YOUR SCORE"}
+            onClick={
+              hasSubmitted
+                ? () => {
+                    updateSessionState((s) => {
+                      s.phase = "collection";
+                    });
+                  }
+                : async () => {
+                    try {
+                      await postScoreToLeaderboard();
+                      const scores = await fetchLeaderboard();
+                      setLeaderboard(scores);
+                    } catch (err) {
+                      console.error(err);
+                    }
+                  }
+            }
           />
         </div>
       </div>

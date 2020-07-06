@@ -14,9 +14,13 @@ const TempPassword = (props: { password: string; children: ReactNode }) => {
       <form
         className={styles.form}
         onSubmit={(e) => {
-          updateGameState((g) => {
-            g.password = passwordInput;
-          });
+          try {
+            updateGameState((g) => {
+              g.password = passwordInput;
+            });
+          } catch (err) {
+            alert(err.message);
+          }
         }}
       >
         <label className={styles.label}>Password</label>
@@ -28,6 +32,7 @@ const TempPassword = (props: { password: string; children: ReactNode }) => {
             setPasswordInput(val);
           }}
         />
+        <button type="submit">Submit</button>
       </form>
     );
   }

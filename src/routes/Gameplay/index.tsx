@@ -221,50 +221,38 @@ const Gameplay = () => {
             {_(shuffledQuestions)
               .map((question, index) => {
                 if (index < currentQuestionIndex - 1) return null;
-                if (index > currentQuestionIndex + 5) return null;
+                if (index > currentQuestionIndex + 0) return null;
 
                 return (
-                  <motion.div
-                    variants={{
-                      hide: {
-                        translateY: 350,
-                        translateZ: -20,
-                        rotateX: 10,
-                      },
-                      show: { translateY: 0, translateZ: 0, rotateX: 0 },
-                    }}
-                    className={styles.questionContainer}
+                  <Question
                     key={index}
-                  >
-                    <Question
-                      question={question}
-                      index={index}
-                      currentQuestionIndex={currentQuestionIndex}
-                      onAsk={() => {
-                        setPaused(false);
-                      }}
-                      onAnswered={(answer) => {
-                        setPaused(true);
-                        stopAllSounds();
-                        if (answer.isCorrect) {
-                          //play random correct sfx
-                          _(correctSounds)
-                            .sort((s) => (Math.random() > 0.5 ? -1 : 1))
-                            .first()
-                            ?.play();
-                        } else {
-                          //play random wrong sfx
-                          _(wrongSounds)
-                            .sort((s) => (Math.random() > 0.5 ? -1 : 1))
-                            .first()
-                            ?.play();
-                        }
-                      }}
-                      onComplete={() => {
-                        setCurrentQuestionIndex((i) => i + 1);
-                      }}
-                    />
-                  </motion.div>
+                    question={question}
+                    index={index}
+                    currentQuestionIndex={currentQuestionIndex}
+                    onAsk={() => {
+                      setPaused(false);
+                    }}
+                    onAnswered={(answer) => {
+                      setPaused(true);
+                      stopAllSounds();
+                      if (answer.isCorrect) {
+                        //play random correct sfx
+                        _(correctSounds)
+                          .sort((s) => (Math.random() > 0.5 ? -1 : 1))
+                          .first()
+                          ?.play();
+                      } else {
+                        //play random wrong sfx
+                        _(wrongSounds)
+                          .sort((s) => (Math.random() > 0.5 ? -1 : 1))
+                          .first()
+                          ?.play();
+                      }
+                    }}
+                    onComplete={() => {
+                      setCurrentQuestionIndex((i) => i + 1);
+                    }}
+                  />
                 );
               })
               .value()}
