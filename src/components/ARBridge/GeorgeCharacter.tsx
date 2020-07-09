@@ -11,6 +11,7 @@ import {
 } from "three";
 import ARController from "./ARController";
 import _ from "lodash";
+import { Howl } from "howler";
 
 const lookAt = (eye: Object3D, target: Object3D) => {
   eye.updateWorldMatrix(true, false);
@@ -26,6 +27,8 @@ const lookAt = (eye: Object3D, target: Object3D) => {
 };
 
 const DISABLED_BONES = [
+  "cane_targetr.position", //moves root for some reason
+  "cane_targetr.quaternion", //moves root for some reason
   "mixamorig_Head.quaternion",
   "EYE_LEFT.quaternion",
   "EYE_RIGHT.quaternion",
@@ -38,7 +41,9 @@ class GeorgeCharacter {
   public nodes: { [s: string]: Object3D };
   private lastUpdate = Date.now();
   private idleAnimation!: AnimationClip;
+
   private currentAnimation?: AnimationAction;
+  private currentSfx?: Howl;
 
   constructor(context: ARController) {
     this.context = context;
@@ -132,6 +137,13 @@ class GeorgeCharacter {
     idleAction.play();
     this.currentAnimation = idleAction;
     return idleAction;
+  };
+
+  public say = (sfx?: Howl) => {
+    if (!sfx) return;
+    if (this.currentSfx) this.currentSfx.stop();
+    sfx.play();
+    this.currentSfx = sfx;
   };
 }
 

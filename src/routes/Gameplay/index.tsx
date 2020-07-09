@@ -22,6 +22,7 @@ import { motion } from "framer-motion";
 import { ReactComponent as Timer } from "../../media/timer.svg";
 import { AssetContext } from "../../components/AssetLoader";
 import useKeyPress from "../../hooks/useKeyPress";
+import { ARContext } from "../../components/ARBridge";
 
 export type Question = {
   quarter: string;
@@ -60,6 +61,7 @@ export const GameplayContext = createContext(defaultGameplayContext);
 const Gameplay = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const {
+    events,
     sessionState,
     updateSessionState,
     gameState,
@@ -69,37 +71,45 @@ const Gameplay = () => {
   const [gamePhase, setGamePhase] = useState<GamePhase>("starting");
   const [isPaused, setPaused] = useState(false);
   const { questions, sfx } = useContext(AssetContext);
+  const { arController } = useContext(ARContext);
   const { collection } = gameState;
   const { selectedCategory } = sessionState;
   const gameFinished = useRef(false);
 
   //gather sfx
-  const correctSounds = useMemo(
+  const correctSounds = useMemo(() => [sfx.correct], [sfx]);
+  const gwCorrectSounds = useMemo(
     () => [sfx.correct1, sfx.correct2, sfx.correct3],
     [sfx]
   );
-  const wrongSounds = useMemo(() => [sfx.wrong1, sfx.wrong2, sfx.wrong3], [
+  const wrongSounds = useMemo(() => [sfx.wrong], [sfx]);
+  const gwWrongSounds = useMemo(() => [sfx.wrong1, sfx.wrong2, sfx.wrong3], [
     sfx,
   ]);
   const endSounds = useMemo(() => [sfx.end1, sfx.end2, sfx.end3], [sfx]);
 
-  //
-  const stopAllSounds = useCallback(() => {
-    _.forEach(correctSounds, (s) => s.stop());
-    _.forEach(wrongSounds, (s) => s.stop());
-    _.forEach(endSounds, (s) => s.stop());
-  }, [correctSounds, wrongSounds, endSounds]);
+  const limitedEffect = useMemo(
+    () =>
+      _.throttle(
+        (action: () => void) => {
+          action();
+        },
+        11500,
+        { leading: true, trailing: false }
+      ),
+    []
+  );
 
   //
   const finishGame = useCallback(() => {
     if (gameFinished.current) return;
 
     //play end sfx
-    stopAllSounds();
-    _(endSounds)
-      .sort((s) => (Math.random() > 0.5 ? -1 : 1))
-      .first()
-      ?.play();
+    arController.george.say(
+      _(endSounds)
+        .sort((s) => (Math.random() > 0.5 ? -1 : 1))
+        .first()
+    );
 
     const itemToCollect = _(quarters)
       .keys()
@@ -112,6 +122,9 @@ const Gameplay = () => {
       });
     }
 
+    //fire event
+    events.dispatchEvent({ type: "endGame" });
+
     updateSessionState((s) => {
       s.phase = "leaderboard";
       s.finalScore = score;
@@ -123,9 +136,10 @@ const Gameplay = () => {
     updateSessionState,
     updateGameState,
     endSounds,
-    stopAllSounds,
+    arController,
     score,
     gameFinished,
+    events,
   ]);
 
   //skip questions for quick debugging
@@ -138,12 +152,11 @@ const Gameplay = () => {
     setGamePhase("playing");
   });
   const secondsLeft = useCountdown(
-    25,
+    60,
     gamePhase === "playing" && !isPaused,
     () => {
       finishGame();
-    },
-    30
+    }
   );
 
   useEffect(() => {
@@ -233,20 +246,35 @@ const Gameplay = () => {
                       setPaused(false);
                     }}
                     onAnswered={(answer) => {
-                      setPaused(true);
-                      stopAllSounds();
+                      //setPaused(true);
                       if (answer.isCorrect) {
                         //play random correct sfx
                         _(correctSounds)
                           .sort((s) => (Math.random() > 0.5 ? -1 : 1))
                           .first()
                           ?.play();
+
+                        limitedEffect(() => {
+                          arController.george.say(
+                            _(gwCorrectSounds)
+                              .sort((s) => (Math.random() > 0.5 ? -1 : 1))
+                              .first()
+                          );
+                        });
                       } else {
                         //play random wrong sfx
                         _(wrongSounds)
                           .sort((s) => (Math.random() > 0.5 ? -1 : 1))
                           .first()
                           ?.play();
+
+                        limitedEffect(() => {
+                          arController.george.say(
+                            _(gwWrongSounds)
+                              .sort((s) => (Math.random() > 0.5 ? -1 : 1))
+                              .first()
+                          );
+                        });
                       }
                     }}
                     onComplete={() => {

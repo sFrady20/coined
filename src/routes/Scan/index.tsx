@@ -1,4 +1,4 @@
-import React, { memo, useContext, useEffect } from "react";
+import React, { memo, useContext, useEffect, useRef } from "react";
 import styles from "./index.module.scss";
 import { ARContext } from "../../components/ARBridge";
 import { SessionContext } from "../../components/Session";
@@ -13,12 +13,16 @@ const Scan = memo(() => {
   const { updateSessionState } = useContext(SessionContext);
   const { arController } = useContext(ARContext);
   const { models } = useContext(AssetContext);
+  const hasScanned = useRef(false);
 
   useEffect(() => {
     if (arController) {
       arController.isCoinDetectionEnabled = true;
 
       const listener = () => {
+        if (hasScanned.current) return;
+        hasScanned.current = true;
+
         arController.george.model.visible = true;
         arController.george.playAnimation(models["appear"].animations[0]);
 
@@ -35,7 +39,7 @@ const Scan = memo(() => {
         arController.events.removeEventListener("onDetectStart", listener);
       };
     }
-  }, [arController, updateSessionState]);
+  }, [arController, updateSessionState, hasScanned, models]);
 
   //skip scanning for quick debugging
   useKeyPress("q", () => {

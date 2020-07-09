@@ -13,7 +13,7 @@ import { GameplayContext } from "../Gameplay";
 import { SessionContext } from "../../components/Session";
 import { ReactComponent as LeaderboardBgSvg } from "../../media/leaderboardBg.svg";
 import Button from "../../components/Button";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import AnimCounter from "../../components/AnimCounter";
 
 const fetchLeaderboard = async () => {
@@ -115,27 +115,43 @@ const Leaderboard = memo(() => {
           ))}
           {error && <div style={{ color: "red" }}>{error}</div>}
         </div>
-        <div className={styles.actions}>
-          <Button
-            type="secondary"
-            text="SKIP"
-            onClick={() => {
-              updateSessionState((s) => {
-                s.phase = "collection";
-              });
-            }}
-          />
-          <Button
-            type="primary"
-            text={hasSubmitted ? "CONTINUE" : "ADD YOUR SCORE"}
-            onClick={
-              hasSubmitted
-                ? () => {
+        <AnimatePresence exitBeforeEnter>
+          <motion.div
+            className={styles.actions}
+            key={hasSubmitted ? "submitted" : "submitting"}
+            initial={{ opacity: 0, translateX: 12 }}
+            animate={{ opacity: 1, translateX: 0 }}
+            exit={{ opacity: 0, translateX: -12 }}
+          >
+            {hasSubmitted ? (
+              <>
+                <div />
+                <Button
+                  type="primary"
+                  text={"CONTINUE"}
+                  onClick={() => {
                     updateSessionState((s) => {
                       s.phase = "collection";
                     });
-                  }
-                : async () => {
+                  }}
+                />
+                <div />
+              </>
+            ) : (
+              <>
+                <Button
+                  type="secondary"
+                  text="SKIP"
+                  onClick={() => {
+                    updateSessionState((s) => {
+                      s.phase = "collection";
+                    });
+                  }}
+                />
+                <Button
+                  type="primary"
+                  text={"ADD YOUR SCORE"}
+                  onClick={async () => {
                     try {
                       await postScoreToLeaderboard();
                       const scores = await fetchLeaderboard();
@@ -143,10 +159,12 @@ const Leaderboard = memo(() => {
                     } catch (err) {
                       console.error(err);
                     }
-                  }
-            }
-          />
-        </div>
+                  }}
+                />
+              </>
+            )}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </motion.div>
   );

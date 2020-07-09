@@ -1,7 +1,6 @@
 import _ from "lodash";
 import xlsx from "xlsx";
 import Axios from "axios";
-import { AssetContextType } from ".";
 
 const preloadQuestions = async () => {
   const results = await Axios.get("/questions.xlsx", {
@@ -21,7 +20,7 @@ const preloadQuestions = async () => {
         "wrongAnswer2",
       ],
     })
-  ) as AssetContextType["questions"];
+  ) as { [s: string]: any };
   return questions;
 };
 

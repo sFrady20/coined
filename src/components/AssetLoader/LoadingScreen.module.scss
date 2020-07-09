@@ -132,6 +132,8 @@
 }
 
 .loadingLetter {
+  opacity: 0.4;
+
   :global {
     animation: 3s ease infinite loading;
   }

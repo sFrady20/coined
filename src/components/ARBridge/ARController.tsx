@@ -9,9 +9,10 @@ import {
   Renderer,
 } from "three";
 import { DEVELOPMENT_MODE } from "../../config";
-import NN from "./models/NN_USQUARTER_2.json";
+import NN from "./models/NN_USQUARTER_3.json";
 import { AssetContextType } from "../AssetLoader";
 import GeorgeCharacter from "./GeorgeCharacter";
+import { MouseEvent } from "react";
 
 //@ts-ignore
 const WebARRocksObject = window.WEBARROCKSOBJECT;
@@ -98,12 +99,28 @@ class ARController {
     raycaster.setFromCamera(v2, camera);
     const intersects = raycaster.intersectObject(this.surface);
 
-    if (intersects.length === 1 && intersects[0].object === this.surface) {
+    if (intersects.length > 0) {
       return [intersects[0].point.x, intersects[0].point.z];
     } else {
       return undefined;
     }
   }
+
+  //find surface point from screen point
+  public handleClick = (e: MouseEvent) => {
+    const { camera } = this.getXR8Scene();
+
+    v2.x = (e.clientX / window.innerWidth) * 2 - 1;
+    v2.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+    raycaster.setFromCamera(v2, camera);
+    const intersects = raycaster.intersectObject(this.george.model, true);
+
+    if (intersects.length > 0) {
+      this.george.playAnimation(this.assets.models.easterEgg.animations[0]);
+      this.assets.sfx["huzzah"].stop().play();
+    }
+  };
 
   private initThreeScene = () => {
     const { scene, camera, renderer } = this.getXR8Scene();

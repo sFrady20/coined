@@ -3,6 +3,8 @@ import { Howl } from "howler";
 
 const preloadAudio = async (onProgress: (pct: number) => void) => {
   const files = {
+    correct: "/sfx/correct.mp3",
+    wrong: "/sfx/wrong.mp3",
     intro: "/sfx/GW_intro.mp3",
     correct1: "/sfx/GW_correct_1.mp3",
     correct2: "/sfx/GW_correct_2.mp3",
@@ -13,6 +15,7 @@ const preloadAudio = async (onProgress: (pct: number) => void) => {
     end1: "/sfx/GW_end_1.mp3",
     end2: "/sfx/GW_end_2.mp3",
     end3: "/sfx/GW_end_3.mp3",
+    huzzah: "/sfx/GW_huzzah.mp3",
   };
   var current = 0;
 

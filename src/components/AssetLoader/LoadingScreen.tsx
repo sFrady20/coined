@@ -18,8 +18,8 @@ const variants: { [s: string]: Variants } = {
       translateX: `-50%`,
       translateY: `-100%`,
       transition: {
-        delay: 2,
-        delayChildren: 2.5,
+        delay: 0,
+        delayChildren: 0.5,
         staggerChildren: 0.03,
         duration: 1,
       },
@@ -28,11 +28,9 @@ const variants: { [s: string]: Variants } = {
   peek: {
     hidden: {
       opacity: 0,
-      translateY: 4,
     },
     shown: {
       opacity: 1,
-      translateY: 0,
     },
   },
 };
@@ -55,20 +53,12 @@ const LoadingScreen = memo(
           exit={"hidden"}
         >
           <div className={styles.panelInner}>
-            <motion.h2 variants={variants.peek}>Greetings!</motion.h2>
+            <h2>Greetings!</h2>
             <p>
-              <motion.span variants={variants.peek}>
-                Catch George Washington in a
-              </motion.span>
-              <motion.span variants={variants.peek}>
-                lie during this classic trivia game.
-              </motion.span>
-              <motion.span variants={variants.peek}>
-                Think you're up to the challenge?
-              </motion.span>
-              <motion.span variants={variants.peek}>
-                George is waiting.
-              </motion.span>
+              <span>Catch George Washington in a</span>
+              <span>lie during this classic trivia game.</span>
+              <span>Think you're up to the challenge?</span>
+              <span>George is waiting.</span>
             </p>
             <div className={styles.loadingBar}>
               <div

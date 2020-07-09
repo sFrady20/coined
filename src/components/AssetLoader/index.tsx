@@ -8,22 +8,21 @@ import React, {
 import { motion, AnimatePresence } from "framer-motion";
 import LoadingScreen from "./LoadingScreen";
 import Logo from "./Logo";
-import { Howl } from "howler";
 import preloadImages from "./preloadImages";
 import preloadAudio from "./preloadAudio";
 import preloadQuestions from "./preloadQuestions";
 import preloadModels from "./preloadModels";
+import waitForSeconds from "../../util/waitForSeconds";
+
+type PromiseResolvedType<T> = T extends Promise<infer R> ? R : never;
 
 export type AssetContextType = {
-  models: { [s: string]: any };
-  questions: { [s: string]: any };
-  sfx: { [s: string]: Howl };
+  models: PromiseResolvedType<ReturnType<typeof preloadModels>>;
+  questions: PromiseResolvedType<ReturnType<typeof preloadQuestions>>;
+  sfx: PromiseResolvedType<ReturnType<typeof preloadAudio>>;
 };
-const defaultAssetContext: AssetContextType = {
-  questions: {},
-  models: {},
-  sfx: {},
-};
+//@ts-ignore
+const defaultAssetContext: AssetContextType = {};
 export const AssetContext = createContext(defaultAssetContext);
 
 const Preloader = memo((props: { children: ReactNode }) => {
@@ -38,6 +37,8 @@ const Preloader = memo((props: { children: ReactNode }) => {
     (async () => {
       var step = 0;
       const totalSteps = 4;
+
+      await waitForSeconds(1.5);
 
       setQuestions(await preloadQuestions());
       step++;
