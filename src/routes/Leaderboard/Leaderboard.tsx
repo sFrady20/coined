@@ -9,7 +9,6 @@ import styles from "./Leaderboard.module.scss";
 import Axios from "axios";
 import _ from "lodash";
 import { LEADERBOARD_API_URL } from "../../config";
-import { GameplayContext } from "../Gameplay";
 import { SessionContext } from "../../components/Session";
 import { ReactComponent as LeaderboardBgSvg } from "../../media/leaderboardBg.svg";
 import Button from "../../components/Button";

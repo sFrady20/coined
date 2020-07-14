@@ -14,7 +14,24 @@ import classnames from "classnames";
 import { SessionContext } from "../../components/Session";
 import { motion, useAnimation } from "framer-motion";
 import { createPortal } from "react-dom";
-import { ReactComponent as QuestionCardSvg } from "../../media/questionCard.svg";
+
+import { ReactComponent as CardSvg } from "../../media/categories/science&NatureQuestion.svg";
+import { ReactComponent as CultureCardSvg } from "../../media/categories/cultureQuestion.svg";
+import { ReactComponent as HistoryCardSvg } from "../../media/categories/historyQuestion.svg";
+import { ReactComponent as ScienceCardSvg } from "../../media/categories/science&NatureQuestion.svg";
+import { ReactComponent as StatesCardSvg } from "../../media/categories/states&TerritoriesQuestion.svg";
+import { ReactComponent as WildlifeCardSvg } from "../../media/categories/wildlifeQuestion.svg";
+
+const artMap = {
+  default: CardSvg,
+  Culture: CultureCardSvg,
+  "History.": HistoryCardSvg,
+  "Science & Nature": ScienceCardSvg,
+  "State History": StatesCardSvg,
+  "DC &amp; U.S. Territories History": StatesCardSvg,
+  "States & Territories": StatesCardSvg,
+  Wildlife: WildlifeCardSvg,
+};
 
 const Question = (props: {
   question: QuestionDefinition;
@@ -158,6 +175,11 @@ const Question = (props: {
     );
   }, [anim, diff, selectedAnswer]);
 
+  const CardSvg = useMemo(
+    () => _.get(artMap, selectedCategory || "default") || artMap["default"],
+    [selectedCategory]
+  );
+
   return (
     <motion.div
       animate={anim}
@@ -165,9 +187,8 @@ const Question = (props: {
       className={styles.animations}
     >
       <div className={styles.root}>
-        <QuestionCardSvg />
+        <CardSvg />
         <div className={styles.number}>{index + 1}</div>
-        <div className={styles.category}>{selectedCategory}</div>
         <div className={styles.content}>
           <div className={styles.questionText}>
             <h5>{question.prompt}</h5>

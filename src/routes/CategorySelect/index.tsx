@@ -8,7 +8,24 @@ import Button from "../../components/Button";
 import Swiper from "swiper";
 import { motion } from "framer-motion";
 import { ReactComponent as HeaderSvg } from "../../media/categoryHeader.svg";
+
 import { ReactComponent as CardSvg } from "../../media/science&Nature.svg";
+import { ReactComponent as CultureCardSvg } from "../../media/categories/culture.svg";
+import { ReactComponent as HistoryCardSvg } from "../../media/categories/history.svg";
+import { ReactComponent as ScienceCardSvg } from "../../media/categories/science&Nature.svg";
+import { ReactComponent as StatesCardSvg } from "../../media/categories/states&Territories.svg";
+import { ReactComponent as WildlifeCardSvg } from "../../media/categories/wildlife.svg";
+
+const artMap = {
+  default: CardSvg,
+  Culture: CultureCardSvg,
+  "History.": HistoryCardSvg,
+  "Science & Nature": ScienceCardSvg,
+  "State History": StatesCardSvg,
+  "DC &amp; U.S. Territories History": StatesCardSvg,
+  "States & Territories": StatesCardSvg,
+  Wildlife: WildlifeCardSvg,
+};
 
 const CategorySelect = memo(() => {
   const { updateSessionState } = useContext(SessionContext);
@@ -45,11 +62,14 @@ const CategorySelect = memo(() => {
         renderNextButton={() => <div className={styles.next} />}
         renderPrevButton={() => <div className={styles.prev} />}
       >
-        {_.map(questions, (question, category) => (
-          <div key={category} className={styles.card}>
-            <CardSvg />
-          </div>
-        ))}
+        {_.map(questions, (question, category) => {
+          const CMP = _.get(artMap, category) || artMap["default"];
+          return (
+            <div key={category} className={styles.card}>
+              <CMP />
+            </div>
+          );
+        })}
       </ReactSwiper>
       <div className={styles.button}>
         <Button
