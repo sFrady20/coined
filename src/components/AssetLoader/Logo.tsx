@@ -3,7 +3,7 @@ import styles from "./Logo.module.scss";
 import { SessionContext } from "../Session";
 import { AnimatePresence, motion } from "framer-motion";
 import { ReactComponent as SVG } from "../../media/logo.svg";
-import { ReactComponent as CoinedSvg } from "../../media/coined.svg";
+//import { ReactComponent as CoinedSvg } from "../../media/coined.svg";
 
 const Logo = memo(() => {
   const { sessionState } = useContext(SessionContext);
@@ -20,7 +20,7 @@ const Logo = memo(() => {
         exit={{ opacity: 0 }}
         key={logoType}
       >
-        {logoType === "title" ? <SVG /> : <CoinedSvg />}
+        {logoType === "title" ? <SVG /> : undefined}
       </motion.div>
     </AnimatePresence>
   );

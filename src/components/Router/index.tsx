@@ -9,6 +9,8 @@ import AnimationTest from "../../routes/AnimationTest";
 import AssetLoader from "../AssetLoader";
 import MainRoute from "../../routes/Main";
 import ARRenderer from "../ARBridge/ARRenderer";
+import EffectTest from "../../routes/EffectTest";
+import Test2 from "../../routes/AnimationTest/Test2";
 
 export const SCAN_SCREEN = "/";
 export const WELCOME_SCREEN = "/welcome";
@@ -23,6 +25,16 @@ const Router = memo(() => {
         <Route exact path="/testAnimations">
           <Suspense fallback="Loading">
             <AnimationTest />
+          </Suspense>
+        </Route>
+        <Route exact path="/testAnimations/2">
+          <Suspense fallback="Loading">
+            <Test2 />
+          </Suspense>
+        </Route>
+        <Route exact path="/testEffects">
+          <Suspense fallback="Loading">
+            <EffectTest />
           </Suspense>
         </Route>
 

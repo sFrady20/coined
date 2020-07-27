@@ -46,6 +46,8 @@ class ARController {
   public root: Object3D = new Object3D();
   public surface!: THREE.Mesh;
   public george!: GeorgeCharacter;
+  public composer!: any;
+  public godRays!: any;
 
   public isCoinDetectionEnabled = true;
 
@@ -90,7 +92,10 @@ class ARController {
   };
 
   //find surface point from screen point
-  private cast(screenX: number, screenY: number): [number, number] | undefined {
+  private castSurface(
+    screenX: number,
+    screenY: number
+  ): [number, number] | undefined {
     const { camera } = this.getXR8Scene();
 
     v2.x = (screenX / window.innerWidth) * 2 - 1;
@@ -116,7 +121,7 @@ class ARController {
     raycaster.setFromCamera(v2, camera);
     const intersects = raycaster.intersectObject(this.george.model, true);
 
-    if (intersects.length > 0) {
+    if (intersects.length > 0 && this.george.model.visible) {
       this.george.playAnimation(this.assets.models.easterEgg.animations[0]);
       this.assets.sfx["huzzah"].stop().play();
     }
@@ -126,16 +131,18 @@ class ARController {
     const { scene, camera, renderer } = this.getXR8Scene();
     camera.position.set(0, 3, 0);
 
-    scene.add(new THREE.AmbientLight(0x404040, 5));
+    scene.add(new THREE.AmbientLight(0x404040, 0.5));
+
+    const inivisible = new THREE.MeshBasicMaterial({
+      color: 0xffff00,
+      transparent: true,
+      opacity: 0.0,
+      side: THREE.DoubleSide,
+    });
 
     this.surface = new THREE.Mesh(
       new THREE.PlaneGeometry(100, 100, 1, 1),
-      new THREE.MeshBasicMaterial({
-        color: 0xffff00,
-        transparent: true,
-        opacity: 0.0,
-        side: THREE.DoubleSide,
-      })
+      inivisible
     );
     this.surface.rotateX(-Math.PI / 2);
     this.surface.position.set(0, 0, 0);
@@ -195,6 +202,7 @@ class ARController {
   private updateCoinDetection = () => {
     if (!this.isCoinDetectionStarted) return;
     if (!this.isCoinDetectionEnabled) return;
+    if (this.george.isFloating) return;
 
     this.detectState = WebARRocksObject.detect(0, null, {
       isKeepTracking: true,
@@ -205,7 +213,7 @@ class ARController {
       trackingFactors: [0.3, 0.3, 1.0],
     });
     if (this.detectState && (this.detectState.detectScore || 0) > 0.9) {
-      const hit = this.cast(
+      const hit = this.castSurface(
         this.detectState.positionScale[0] * this.canvas.width,
         (1 - this.detectState.positionScale[1]) * this.canvas.height
       );

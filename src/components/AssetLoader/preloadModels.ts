@@ -30,11 +30,9 @@ const preloadModels = async (onProgress: (pct: number) => void) => {
       .loadAsync("/models/0522/GW_EndGame_01.fbx")
       .then(trackProgress),
     /*
-    moonwalk: await loader
-      .loadAsync("/models/0522/GW_MoonWalking_0522.fbx")
+    moonwalk: await loader.loadAsync("/models/0522/GW_MoonWalking_0522.fbx")
       .then(trackProgress),
-    thumbsUp: await loader
-      .loadAsync("/models/0522/GW_ThumbUp_0522.fbx")
+    thumbsUp: await loader.loadAsync("/models/0522/GW_ThumbUp_0522.fbx")
       .then(trackProgress),*/
   };
 };

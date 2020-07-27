@@ -16,6 +16,7 @@
     "immer": "^6.0.3",
     "logrocket": "^1.0.8",
     "popmotion": "^8.7.3",
+    "postprocessing": "^6.16.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-id-swiper": "^3.0.0",

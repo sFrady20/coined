@@ -8,12 +8,15 @@ import {
   AnimationClip,
   LoopOnce,
   LoopRepeat,
+  Vector3,
+  MathUtils,
+  Clock,
 } from "three";
 import ARController from "./ARController";
 import _ from "lodash";
 import { Howl } from "howler";
 
-const lookAt = (eye: Object3D, target: Object3D) => {
+export const lookAt = (eye: Object3D, target: Object3D) => {
   eye.updateWorldMatrix(true, false);
   const pos = eye.position.clone().setFromMatrixPosition(eye.matrixWorld);
   var m = new Matrix4().lookAt(target.position, pos, target.up);
@@ -42,8 +45,14 @@ class GeorgeCharacter {
   private lastUpdate = Date.now();
   private idleAnimation!: AnimationClip;
 
+  private clock = new Clock();
   private currentAnimation?: AnimationAction;
   private currentSfx?: Howl;
+  private _isFloating = false;
+
+  get isFloating() {
+    return this._isFloating;
+  }
 
   constructor(context: ARController) {
     this.context = context;
@@ -68,6 +77,7 @@ class GeorgeCharacter {
 
   public update = () => {
     const { camera } = this.context.getXR8Scene();
+    const delta = this.clock.getDelta();
 
     const head: Object3D = this.nodes["mixamorig_Head"];
     const neck: Object3D = this.nodes["mixamorig_Neck"];
@@ -100,6 +110,44 @@ class GeorgeCharacter {
     const now = Date.now();
     this.mixer.update((now - this.lastUpdate) / 1000);
     this.lastUpdate = now;
+
+    if (this._isFloating) {
+      const pos = new Vector3(0, 0, -6);
+      camera
+        .localToWorld(pos)
+        .sub(
+          this.model.parent?.getWorldPosition(new Vector3(0, 0, 0)) ||
+            new Vector3(0, 0, 0)
+        );
+      this.model.position.lerp(pos, 0.1);
+
+      const v1 = new Vector3();
+      this.model.getWorldPosition(v1);
+      const v2 = new Vector3();
+      camera.getWorldPosition(v2);
+      const dir = v1.sub(v2).normalize();
+
+      var mx = new Matrix4();
+      mx.makeRotationY(Math.atan2(-dir.z, dir.x) - 90 * MathUtils.DEG2RAD);
+
+      this.model.quaternion.slerp(
+        new Quaternion().setFromRotationMatrix(mx),
+        1 * delta
+      );
+    } else {
+      const pos = new Vector3(0, 0, 0);
+      this.model.position.lerp(pos, 1 * delta);
+      this.model.rotation.set(0, 0, 0);
+    }
+  };
+
+  public float = () => {
+    if (this._isFloating) return;
+    this._isFloating = true;
+  };
+  public snapToQuarter = () => {
+    if (!this._isFloating) return;
+    this._isFloating = false;
   };
 
   public playAnimation = (animation: AnimationClip) => {

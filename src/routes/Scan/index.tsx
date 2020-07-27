@@ -25,6 +25,7 @@ const Scan = memo(() => {
 
         arController.george.model.visible = true;
         arController.george.playAnimation(models["appear"].animations[0]);
+        arController.george.snapToQuarter();
 
         setTimeout(() => {
           //arController.isCoinDetectionEnabled = false;

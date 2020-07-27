@@ -13,23 +13,21 @@ const MainRoute = memo(() => {
   const { phase } = sessionState;
 
   return (
-    <>
-      <Transitioner pageKey={phase}>
-        {phase === "scan" ? (
-          <Scan />
-        ) : phase === "intro" ? (
-          <Welcome />
-        ) : phase === "category" ? (
-          <CategorySelect />
-        ) : phase === "play" ? (
-          <Gameplay />
-        ) : phase === "leaderboard" ? (
-          <Leaderboard />
-        ) : phase === "collection" ? (
-          <Collection />
-        ) : null}
-      </Transitioner>
-    </>
+    <Transitioner pageKey={phase}>
+      {phase === "scan" ? (
+        <Scan />
+      ) : phase === "intro" ? (
+        <Welcome />
+      ) : phase === "category" ? (
+        <CategorySelect />
+      ) : phase === "play" ? (
+        <Gameplay />
+      ) : phase === "leaderboard" ? (
+        <Leaderboard />
+      ) : phase === "collection" ? (
+        <Collection />
+      ) : null}
+    </Transitioner>
   );
 });
 

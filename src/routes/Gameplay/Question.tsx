@@ -173,7 +173,7 @@ const Question = (props: {
             },
           }
     );
-  }, [anim, diff, selectedAnswer]);
+  }, [anim, diff, selectedAnswer, randRotation]);
 
   const CardSvg = useMemo(
     () => _.get(artMap, selectedCategory || "default") || artMap["default"],
