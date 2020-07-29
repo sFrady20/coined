@@ -5,7 +5,6 @@ import { Draft } from "immer";
 import { useImmer } from "use-immer";
 import crypto from "crypto-js";
 import shortid from "shortid";
-import LogRocket from "logrocket";
 
 const LOCAL_STORAGE_KEY = "coined_data";
 const ENCRYPTION_KEY = "dcub2308cybe31y0";
@@ -66,10 +65,6 @@ const loadedGame = loadedGameStr
       defaultGameState
     )
   : defaultGameState;
-
-//set logging id
-LogRocket.init("y2ubu0/coined");
-LogRocket.identify(loadedGame.clientId);
 
 const SessionContextProvider = (props: { children: React.ReactNode }) => {
   const [gameState, updateGameState] = useImmer<GameState>(loadedGame);

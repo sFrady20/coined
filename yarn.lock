@@ -6829,11 +6829,6 @@ loglevel@^1.6.6:
   resolved "https://registry.yarnpkg.com/loglevel/-/loglevel-1.6.7.tgz#b3e034233188c68b889f5b862415306f565e2c56"
   integrity sha512-cY2eLFrQSAfVPhCgH1s7JI73tMbg9YC3v3+ZHVW67sBS7UxWzNEk/ZBbSfLykBWHp33dqqtOv82gjhKEi81T/A==
 
-logrocket@^1.0.8:
-  version "1.0.8"
-  resolved "https://registry.yarnpkg.com/logrocket/-/logrocket-1.0.8.tgz#45a1517257bc534a6e8c2397e3fa95f44c96c73d"
-  integrity sha512-klyJQaxanFZlDR5sd+/nyc4eBb4VY8fcYXlQMoNkks0Ftw4uu8LV6lGwSCtctWTYDIA4kLzaC3s7Vt8XIUEw9Q==
-
 loose-envify@^1.0.0, loose-envify@^1.1.0, loose-envify@^1.2.0, loose-envify@^1.3.1, loose-envify@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/loose-envify/-/loose-envify-1.4.0.tgz#71ee51fa7be4caec1a63839f7e682d8132d30caf"
