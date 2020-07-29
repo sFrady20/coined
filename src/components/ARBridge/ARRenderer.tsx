@@ -55,6 +55,13 @@ const ARRenderer = memo((props: { children?: ReactNode }) => {
   return (
     <div className={styles.root}>
       <div className={styles.renderer} ref={(r) => setRootRef(r || undefined)}>
+        <video
+          className={styles.video}
+          id={"cameraFeed"}
+          autoPlay
+          playsInline
+          muted
+        />
         <canvas className={styles.debugCanvas} id={"debugCanvas"} />
         <canvas
           className={styles.mainCanvas}

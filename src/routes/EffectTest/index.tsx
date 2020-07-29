@@ -11,7 +11,6 @@ import {
   MeshPhongMaterial,
   BoxBufferGeometry,
   Clock,
-  CircleBufferGeometry,
   MeshBasicMaterial,
   Vector3,
   CylinderBufferGeometry,
@@ -26,7 +25,6 @@ import {
 } from "postprocessing";
 
 const clock = new Clock();
-var v3 = new Vector3();
 
 const AnimationExample = () => {
   const [rootRef, setRootRef] = useState<HTMLDivElement>();
@@ -119,7 +117,7 @@ const AnimationExample = () => {
       const intensity = Math.sin(clock.elapsedTime * 2) * 0.5 + 0.5;
       godraysEffect.lightSource.material.opacity = _.clamp(intensity / 1, 0, 1);
 
-      const tv3 = camera.localToWorld(new Vector3(0, 0, -5));
+      const tv3 = new Vector3(0, 0, 1).unproject(camera);
       cube.position.lerp(tv3, 0.1);
 
       //renderer.render(scene, camera);

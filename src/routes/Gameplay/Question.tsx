@@ -51,7 +51,6 @@ const Question = (props: {
   } = props;
   const [selectedAnswer, selectAnswer] = useState<Answer>();
   const { events, sessionState } = useContext(SessionContext);
-  const { setScore } = useContext(GameplayContext);
   const [randRotation, setRandRotation] = useState(0);
   const answerClickEvent = useRef<MouseEvent>();
   const feedbackAnimation = useAnimation();
@@ -96,7 +95,6 @@ const Question = (props: {
       selectAnswer(answer);
       if (answer.isCorrect) {
         //correct
-        setScore((s) => s + 100);
         if (window.navigator.vibrate) window.navigator.vibrate(10);
         events.dispatchEvent({ type: "correct" });
       } else {
@@ -133,7 +131,6 @@ const Question = (props: {
     [
       selectedAnswer,
       selectAnswer,
-      setScore,
       events,
       diff,
       onAnswered,

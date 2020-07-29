@@ -11,6 +11,7 @@ import {
   Vector3,
   MathUtils,
   Clock,
+  SkinnedMesh,
 } from "three";
 import ARController from "./ARController";
 import _ from "lodash";
@@ -41,11 +42,11 @@ class GeorgeCharacter {
   private context: ARController;
   public model: Object3D;
   public mixer: AnimationMixer;
+  public mesh: SkinnedMesh;
   public nodes: { [s: string]: Object3D };
   private lastUpdate = Date.now();
   private idleAnimation!: AnimationClip;
 
-  private clock = new Clock();
   private currentAnimation?: AnimationAction;
   private currentSfx?: Howl;
   private _isFloating = false;
@@ -68,6 +69,11 @@ class GeorgeCharacter {
     this.nodes = {};
     this.model.traverse((d: Object3D) => (this.nodes[d.name] = d));
 
+    this.mesh = _.find(
+      this.model.children,
+      (c) => (c as SkinnedMesh).morphTargetInfluences
+    ) as SkinnedMesh;
+
     this.mixer = new AnimationMixer(this.model);
     this.mixer.addEventListener("finished", this.returnToIdle); //auto reset to idle
 
@@ -75,9 +81,8 @@ class GeorgeCharacter {
     this.returnToIdle().fadeOut(0);
   }
 
-  public update = () => {
-    const { camera } = this.context.getXR8Scene();
-    const delta = this.clock.getDelta();
+  public update = (delta: number) => {
+    const camera = this.context.camera;
 
     const head: Object3D = this.nodes["mixamorig_Head"];
     const neck: Object3D = this.nodes["mixamorig_Neck"];
@@ -110,6 +115,23 @@ class GeorgeCharacter {
     const now = Date.now();
     this.mixer.update((now - this.lastUpdate) / 1000);
     this.lastUpdate = now;
+
+    if (
+      this.currentSfx &&
+      this.currentSfx.playing &&
+      this.currentSfx.seek() < this.currentSfx.duration() &&
+      this.mesh &&
+      this.mesh.morphTargetInfluences
+    ) {
+      const x = this.context.clock.elapsedTime * 5;
+      const n = (o: number) =>
+        (Math.sin(2 * (x + o)) + Math.sin(Math.PI * (x + o))) * 0.5 + 0.5;
+      this.mesh.morphTargetInfluences[0] = n(27.252); /*big open*/
+      this.mesh.morphTargetInfluences[1] = n(35.2357) * 0.3 + 0.3 /*eyebrows*/;
+      this.mesh.morphTargetInfluences[2] = n(96.35) /*smling open*/;
+      this.mesh.morphTargetInfluences[3] = n(148.7) * 0.8 /*Oh face*/;
+      this.mesh.morphTargetInfluences[4] = n(14.51) * 0.1 /*the rock*/;
+    }
 
     if (this._isFloating) {
       const pos = new Vector3(0, 0, -6);
@@ -190,6 +212,12 @@ class GeorgeCharacter {
   public say = (sfx?: Howl) => {
     if (!sfx) return;
     if (this.currentSfx) this.currentSfx.stop();
+    sfx.once("end", () => {
+      this.currentSfx = undefined;
+    });
+    sfx.once("stop", () => {
+      this.currentSfx = undefined;
+    });
     sfx.play();
     this.currentSfx = sfx;
   };

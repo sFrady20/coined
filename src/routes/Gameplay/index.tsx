@@ -6,23 +6,18 @@ import React, {
   useCallback,
   memo,
   createContext,
-  Dispatch,
-  SetStateAction,
   useRef,
 } from "react";
 import styles from "./index.module.scss";
 import _ from "lodash";
 import { SessionContext } from "../../components/Session";
 import Question from "./Question";
-import useCountdown from "../../hooks/useCountdown";
-import AnimCounter from "../../components/AnimCounter";
-import Panel from "../../components/Panel";
 import quarters from "../Collection/quarters.json";
 import { motion } from "framer-motion";
-import { ReactComponent as Timer } from "../../media/timer.svg";
 import { AssetContext } from "../../components/AssetLoader";
 import useKeyPress from "../../hooks/useKeyPress";
 import { ARContext } from "../../components/ARBridge";
+import shortid from "shortid";
 
 export type Question = {
   quarter: string;
@@ -38,25 +33,18 @@ export type Answer = {
   isCorrect?: boolean;
 };
 
-export type GamePhase = "starting" | "playing" | "finished" | "leaderboard";
-
 export type GameplayContext = {
-  gamePhase: GamePhase;
-  secondsLeft: number;
-  score: number;
-  setScore: Dispatch<SetStateAction<number>>;
   questions: Question[];
   currentQuestionIndex: number;
 };
 const defaultGameplayContext: GameplayContext = {
-  gamePhase: "starting",
-  score: 0,
-  setScore: () => {},
-  secondsLeft: 0,
   currentQuestionIndex: 0,
   questions: [],
 };
 export const GameplayContext = createContext(defaultGameplayContext);
+
+const QUESTION_GOAL = 10;
+const MAX_QUESTIONS = 15;
 
 const Gameplay = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -67,14 +55,36 @@ const Gameplay = () => {
     gameState,
     updateGameState,
   } = useContext(SessionContext);
-  const [score, setScore] = useState(0);
-  const [gamePhase, setGamePhase] = useState<GamePhase>("starting");
-  const [isPaused, setPaused] = useState(false);
   const { questions, sfx } = useContext(AssetContext);
   const { arController } = useContext(ARContext);
   const { collection } = gameState;
   const { selectedCategory } = sessionState;
   const gameFinished = useRef(false);
+  const batch = useRef(shortid());
+
+  const [answeredQuestions, setAnsweredQuestions] = useState<Question[]>([]);
+  const [shuffledQuestions, setShuffledQuestions] = useState<Question[]>([]);
+
+  const shuffleQuestions = useCallback(() => {
+    batch.current = shortid();
+    setShuffledQuestions(
+      _(questions[selectedCategory!])
+        .take(MAX_QUESTIONS)
+        .filter((q) => !answeredQuestions.includes(q))
+        .orderBy(() => Math.random())
+        .value()
+    );
+  }, [
+    selectedCategory,
+    questions,
+    setShuffledQuestions,
+    answeredQuestions,
+    batch,
+  ]);
+
+  useEffect(() => {
+    shuffleQuestions();
+  }, []);
 
   //gather sfx
   const correctSounds = useMemo(() => [sfx.correct], [sfx]);
@@ -94,7 +104,7 @@ const Gameplay = () => {
         (action: () => void) => {
           action();
         },
-        11500,
+        15000,
         { leading: true, trailing: false }
       ),
     []
@@ -126,8 +136,7 @@ const Gameplay = () => {
     events.dispatchEvent({ type: "endGame" });
 
     updateSessionState((s) => {
-      s.phase = "leaderboard";
-      s.finalScore = score;
+      s.phase = "collection";
     });
 
     gameFinished.current = true;
@@ -137,7 +146,6 @@ const Gameplay = () => {
     updateGameState,
     endSounds,
     arController,
-    score,
     gameFinished,
     events,
   ]);
@@ -147,147 +155,111 @@ const Gameplay = () => {
     finishGame();
   });
 
-  //TODO: change back to 3
-  const countdown = useCountdown(0, gamePhase === "starting", () => {
-    setGamePhase("playing");
-  });
-  const secondsLeft = useCountdown(
-    60,
-    gamePhase === "playing" && !isPaused,
-    () => {
-      finishGame();
-    }
-  );
-
   useEffect(() => {
-    setScore(0);
-  }, [setScore]);
-
-  const shuffledQuestions = useMemo(
-    () =>
-      questions
-        ? _(questions[selectedCategory!])
-            .sort(() => (Math.random() > 0.5 ? 1 : -1))
-            .value()
-        : [],
-    [selectedCategory, questions]
-  );
-
-  useEffect(() => {
-    if (
-      shuffledQuestions &&
-      currentQuestionIndex >= shuffledQuestions.length &&
-      gamePhase === "playing"
-    )
-      finishGame();
-  }, [shuffledQuestions, currentQuestionIndex, gamePhase, finishGame]);
+    if (answeredQuestions.length >= QUESTION_GOAL) finishGame();
+  }, [answeredQuestions, finishGame]);
 
   return (
     <GameplayContext.Provider
       value={{
-        score,
-        setScore,
         questions: shuffledQuestions,
-        secondsLeft,
         currentQuestionIndex,
-        gamePhase,
       }}
     >
-      <motion.div
-        className={styles.timer}
-        initial={{ translateY: -150, opacity: 0 }}
-        animate={{ translateY: 0, opacity: 1 }}
-        exit={{ translateY: -150, opacity: 0 }}
-      >
-        <Timer width={100} height={150} />
-        <div className={styles.score}>
-          <AnimCounter value={score} />
-        </div>
-        <div className={styles.time}>
-          <AnimCounter value={secondsLeft} />
-        </div>
-      </motion.div>
+      <div className={styles.counter}>
+        {_.times(QUESTION_GOAL, (i) => (
+          <div
+            key={i}
+            className={
+              answeredQuestions.length > i
+                ? styles.counterItemFilled
+                : styles.counterItem
+            }
+          />
+        ))}
+      </div>
       <div style={{ flex: 1 }} />
       <motion.div
         initial={{ opacity: 1, translateY: 0 }}
         animate={{ opacity: 1, translateY: 0 }}
         exit={{ translateY: 150, opacity: 0 }}
       >
-        {gamePhase === "starting" ? (
-          <Panel>Game Starting {countdown}</Panel>
-        ) : gamePhase === "playing" ? (
-          <motion.div
-            variants={{
-              hide: {},
-              show: {
-                transition: {
-                  staggerChildren: 0.4 / shuffledQuestions.length,
-                  staggerDirection: -1,
-                  when: "beforeChildren",
-                },
+        <motion.div
+          variants={{
+            hide: {},
+            show: {
+              transition: {
+                staggerChildren: 0.4 / shuffledQuestions.length,
+                staggerDirection: -1,
+                when: "beforeChildren",
               },
-            }}
-            initial={"hide"}
-            animate={"show"}
-            className={styles.questions}
-          >
-            {_(shuffledQuestions)
-              .map((question, index) => {
-                if (index < currentQuestionIndex - 1) return null;
-                if (index > currentQuestionIndex + 0) return null;
+            },
+          }}
+          initial={"hide"}
+          animate={"show"}
+          className={styles.questions}
+        >
+          {_(shuffledQuestions)
+            .map((question, index) => {
+              if (index < currentQuestionIndex - 1) return null;
+              if (index > currentQuestionIndex + 0) return null;
 
-                return (
-                  <Question
-                    key={index}
-                    question={question}
-                    index={index}
-                    currentQuestionIndex={currentQuestionIndex}
-                    onAsk={() => {
-                      setPaused(false);
-                    }}
-                    onAnswered={(answer) => {
-                      //setPaused(true);
-                      if (answer.isCorrect) {
-                        //play random correct sfx
-                        _(correctSounds)
-                          .sort((s) => (Math.random() > 0.5 ? -1 : 1))
-                          .first()
-                          ?.play();
+              return (
+                <Question
+                  key={batch.current + "-" + index}
+                  question={question}
+                  index={index}
+                  currentQuestionIndex={currentQuestionIndex}
+                  onAsk={() => {}}
+                  onAnswered={(answer) => {
+                    //setPaused(true);
+                    if (answer.isCorrect) {
+                      setAnsweredQuestions((a) => [...a, question]);
 
-                        limitedEffect(() => {
-                          arController.george.say(
-                            _(gwCorrectSounds)
-                              .sort((s) => (Math.random() > 0.5 ? -1 : 1))
-                              .first()
-                          );
-                        });
+                      //play random correct sfx
+                      _(correctSounds)
+                        .orderBy(() => Math.random())
+                        .first()
+                        ?.play();
+
+                      limitedEffect(() => {
+                        arController.george.say(
+                          _(gwCorrectSounds)
+                            .orderBy(() => Math.random())
+                            .first()
+                        );
+                      });
+                    } else {
+                      //play random wrong sfx
+                      _(wrongSounds)
+                        .orderBy(() => Math.random())
+                        .first()
+                        ?.play();
+
+                      limitedEffect(() => {
+                        arController.george.say(
+                          _(gwWrongSounds)
+                            .orderBy(() => Math.random())
+                            .first()
+                        );
+                      });
+                    }
+                  }}
+                  onComplete={() => {
+                    setCurrentQuestionIndex((a) => {
+                      if (a + 1 < shuffledQuestions.length) {
+                        return a + 1;
                       } else {
-                        //play random wrong sfx
-                        _(wrongSounds)
-                          .sort((s) => (Math.random() > 0.5 ? -1 : 1))
-                          .first()
-                          ?.play();
-
-                        limitedEffect(() => {
-                          arController.george.say(
-                            _(gwWrongSounds)
-                              .sort((s) => (Math.random() > 0.5 ? -1 : 1))
-                              .first()
-                          );
-                        });
+                        shuffleQuestions();
+                        return 0;
                       }
-                    }}
-                    onComplete={() => {
-                      setCurrentQuestionIndex((i) => i + 1);
-                    }}
-                  />
-                );
-              })
-              .value()}
-          </motion.div>
-        ) : (
-          <> </>
-        )}
+                    });
+                  }}
+                />
+              );
+            })
+            .value()}
+        </motion.div>
       </motion.div>
     </GameplayContext.Provider>
   );

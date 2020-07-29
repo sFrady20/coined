@@ -12,6 +12,25 @@
   margin: 0 6px;
 }
 
+.counter {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+
+.counterItem {
+  width: 10px;
+  height: 10px;
+  margin: 5px;
+  background: red;
+  border-radius: 5px;
+}
+
+.counterItemFilled {
+  @extend .counterItem;
+  background: green;
+}
+
 .questions {
   perspective: 300px;
   transform-style: preserve-3d;
@@ -21,16 +40,6 @@
 .questionContainer {
   transform-style: preserve-3d;
   backface-visibility: hidden;
-}
-
-.timer {
-  position: absolute;
-  right: 2.5vw;
-  top: 2.5vw;
-
-  svg {
-    filter: drop-shadow(0 20px 20px rgba(0, 0, 0, 0.4));
-  }
 }
 
 .score {

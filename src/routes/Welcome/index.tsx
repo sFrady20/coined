@@ -25,14 +25,14 @@ const Welcome = memo(() => {
 
   useEffect(() => {
     const sound = sfx["intro"];
-    const soundId = sound.play();
     sound.once("end", () => {
       next();
     });
+    arController.george.say(sound);
     return () => {
-      sound.stop(soundId);
+      sound.stop();
     };
-  }, [sfx, next]);
+  }, [sfx, next, arController]);
 
   return (
     <motion.div
