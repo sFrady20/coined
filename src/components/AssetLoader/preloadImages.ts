@@ -1,7 +1,5 @@
 import _ from "lodash";
 
-import imgPaper from "../../media/paper.png";
-import imgCardDesign from "../../media/cardDesign.png";
 import imgFalseSymbol from "../../media/falseSymbol.png";
 import imgTrueSymbol from "../../media/trueSymbol.png";
 
@@ -10,7 +8,7 @@ const preloadImages = async (onProgress: (pct: number) => void) => {
   container.style.display = "none";
   document.body.appendChild(container);
 
-  const images = [imgPaper, imgCardDesign, imgFalseSymbol, imgTrueSymbol];
+  const images = [imgFalseSymbol, imgTrueSymbol];
   var current = 0;
 
   await Promise.all(
