@@ -10,7 +10,6 @@ import {
   LoopRepeat,
   Vector3,
   MathUtils,
-  Clock,
   SkinnedMesh,
 } from "three";
 import ARController from "./ARController";

@@ -10,21 +10,21 @@ import {
   Vector3,
   Quaternion,
   Clock,
-  CylinderBufferGeometry,
-  MeshBasicMaterial,
-  Mesh,
+  // CylinderBufferGeometry,
+  // MeshBasicMaterial,
+  // Mesh,
 } from "three";
 import { DEVELOPMENT_MODE, AUTO_FOV } from "../../config";
 import NN from "./models/NN_USQUARTER_3.json";
 import { AssetContextType } from "../AssetLoader";
 import GeorgeCharacter from "./GeorgeCharacter";
 import { MouseEvent } from "react";
-import _ from "lodash";
+// import _ from "lodash";
 import {
   EffectComposer,
-  EffectPass,
+  // EffectPass,
   RenderPass,
-  GodRaysEffect,
+  // GodRaysEffect,
   //@ts-ignore
 } from "postprocessing";
 

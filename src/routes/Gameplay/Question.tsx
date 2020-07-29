@@ -9,7 +9,7 @@ import React, {
 } from "react";
 import styles from "./Question.module.scss";
 import _ from "lodash";
-import { Question as QuestionDefinition, Answer, GameplayContext } from ".";
+import { Question as QuestionDefinition, Answer } from ".";
 import classnames from "classnames";
 import { SessionContext } from "../../components/Session";
 import { motion, useAnimation } from "framer-motion";

@@ -127,7 +127,7 @@ const AnimationExample = () => {
     return () => {
       cancelAnimationFrame(request);
     };
-  }, [scene, camera, renderer, composer, godraysEffect]);
+  }, [scene, camera, renderer, composer, godraysEffect, cube]);
 
   return (
     <div className={styles.root}>
