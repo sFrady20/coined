@@ -3,30 +3,26 @@ import { DeviceOrientationControls } from "three/examples/jsm/controls/DeviceOri
 import {
   GridHelper,
   EventDispatcher,
-  Object3D,
   Scene,
   PerspectiveCamera,
   WebGLRenderer,
   Vector3,
   Quaternion,
   Clock,
-  // CylinderBufferGeometry,
-  // MeshBasicMaterial,
-  // Mesh,
 } from "three";
 import { DEVELOPMENT_MODE, AUTO_FOV } from "../../config";
 import NN from "./models/NN_USQUARTER_3.json";
 import { AssetContextType } from "../AssetLoader";
 import GeorgeCharacter from "./GeorgeCharacter";
 import { MouseEvent } from "react";
-// import _ from "lodash";
+import _ from "lodash";
 import {
   EffectComposer,
-  // EffectPass,
   RenderPass,
-  // GodRaysEffect,
   //@ts-ignore
 } from "postprocessing";
+import GlowEffect from "./GlowEffect";
+import yRotTowards from "../../util/yRotTowards";
 
 //@ts-ignore
 const WebARRocksObject = window.WEBARROCKSOBJECT;
@@ -50,19 +46,17 @@ class ARController {
   public scene!: Scene;
   public camera!: PerspectiveCamera;
   public renderer!: WebGLRenderer;
-  public root: Object3D = new Object3D();
-  public surface!: THREE.Mesh;
   public george!: GeorgeCharacter;
+  public glow!: GlowEffect;
   public composer!: any;
-  public godRays!: any;
 
+  public readonly quarterPosition = new Vector3();
+  public readonly quarterRotation = new Quaternion();
   public isCoinDetectionEnabled = true;
 
   private isInited = false;
   private isCoinDetectionStarted = false;
   private prevCoinDetection: string | false = false;
-  private rootPosition = new Vector3();
-  private rootRotation = new Quaternion();
 
   public init = async (assets: AssetContextType) => {
     //only run once
@@ -114,44 +108,15 @@ class ARController {
       alpha: true,
     });
 
-    // let circleGeo = new CylinderBufferGeometry(1.1, 0.9, 0.2, 32, 2);
-    // let circleMat = new MeshBasicMaterial({ color: 0xffccaa });
-    // let circle = new Mesh(circleGeo, circleMat);
-    // circle.position.set(0, 0, -1);
-    // this.root.add(circle);
-
-    // this.godRays = new GodRaysEffect(this.camera, circle, {
-    //   resolutionScale: 1,
-    //   density: 2,
-    //   decay: 0.95,
-    //   weight: 0.5,
-    //   samples: 100,
-    // });
-
     this.composer = new EffectComposer(this.renderer);
     this.composer.addPass(new RenderPass(this.scene, this.camera));
-    //this.composer.addPass(new EffectPass(this.camera, this.godRays));
 
     this.camera.position.set(0, 3, 0);
 
     this.scene.add(new THREE.AmbientLight(0x404040, 0.5));
 
-    const inivisible = new THREE.MeshBasicMaterial({
-      color: 0xffff00,
-      transparent: true,
-      opacity: 0.0,
-      side: THREE.DoubleSide,
-    });
-
-    this.surface = new THREE.Mesh(
-      new THREE.PlaneGeometry(100, 100, 1, 1),
-      inivisible
-    );
-    this.surface.rotateX(-Math.PI / 2);
-    this.surface.position.set(0, 0, 0);
-    this.scene.add(this.surface);
-
     this.george = new GeorgeCharacter(this);
+    //this.glow = new GlowEffect(this);
 
     this.orientation = new DeviceOrientationControls(this.camera);
     this.orientation.connect();
@@ -160,8 +125,6 @@ class ARController {
       var grid = new GridHelper(2000, 20, 0x000000, 0x000000);
       this.scene.add(grid);
     }
-
-    this.scene.add(this.root);
   };
 
   private initCoinDetection = () => {
@@ -209,6 +172,7 @@ class ARController {
     this.orientation.update();
 
     this.george.update(delta);
+    //this.glow.update(delta);
 
     // compute vertical field of view:
     if (AUTO_FOV) {
@@ -246,18 +210,14 @@ class ARController {
       this.camera.updateProjectionMatrix();
     }
 
-    // const intensity = Math.sin(this.clock.elapsedTime * 2) * 0.5 + 0.5;
-    // this.godRays.lightSource.material.opacity = _.clamp(intensity / 1, 0, 1);
-
     this.composer.render(delta);
-    //this.renderer.render(this.scene, this.camera);
+    this.renderer.render(this.scene, this.camera);
     requestAnimationFrame(this.update);
   };
 
   private updateCoinDetection = (delta: number) => {
     if (!this.isCoinDetectionStarted) return;
     if (!this.isCoinDetectionEnabled) return;
-    if (this.george.isFloating) return;
 
     this.detectState = WebARRocksObject.detect(0, null, {
       isKeepTracking: true,
@@ -268,65 +228,50 @@ class ARController {
       trackingFactors: [0.3, 0.3, 1.0],
     });
 
-    if (this.detectState && (this.detectState.detectScore || 0) > 0.8) {
-      // const pos = new Vector3(0, 0, -6);
-      // this.camera.localToWorld(pos);
-      // this.rootPosition.copy(pos);
+    if (this.detectState) {
+      this.detectState.scoreHistory = this.detectState?.scoreHistory
+        ? _.take(
+            [this.detectState.detectScore, ...this.detectState.scoreHistory],
+            30
+          )
+        : [this.detectState?.detectScore];
+      this.detectState.avgDetectScore = _.mean(this.detectState.scoreHistory);
 
-      // const v1 = new Vector3();
-      // this.model.getWorldPosition(v1);
-      // const v2 = new Vector3();
-      // camera.getWorldPosition(v2);
-      // const dir = v1.sub(v2).normalize();
+      //calculate quarter position
+      this.quarterPosition
+        .set(
+          this.detectState.positionScale[0] * 2 - 1,
+          this.detectState.positionScale[1] * 2 - 1,
+          0.96 + (1 - this.detectState.positionScale[2]) * 0.035
+        )
+        .unproject(this.camera);
 
-      // var mx = new Matrix4();
-      // mx.makeRotationY(Math.atan2(-dir.z, dir.x) - 90 * MathUtils.DEG2RAD);
-      // this.rootRotation.copy(new Quaternion().setFromRotationMatrix(mx))
+      if ((this.detectState.avgDetectScore || 0) > 0.3) {
+        if (this.prevCoinDetection !== this.detectState.label) {
+          //calculate quarter rotation (towards camera)
+          this.quarterRotation.copy(
+            yRotTowards(
+              this.quarterPosition,
+              this.camera.getWorldPosition(new Vector3(0, 0, 0)),
+              -90
+            )
+          );
 
-      this.root.position.copy(
-        new Vector3(
-          this.detectState.positionScale[0] * this.canvas.width * 2 + 1,
-          (1 - this.detectState.positionScale[1]) * this.canvas.height * 2 + 1,
-          0.99
-        ).unproject(this.camera)
-      );
-
-      if (this.prevCoinDetection !== this.detectState.label) {
-        this.events.dispatchEvent({
-          type: "onDetectStart",
-          state: this.detectState,
-        });
-        this.prevCoinDetection = this.detectState.label;
+          this.events.dispatchEvent({
+            type: "onDetectStart",
+            state: this.detectState,
+          });
+          this.prevCoinDetection = this.detectState.label;
+        }
+      } else {
+        if (this.prevCoinDetection !== false) {
+          this.events.dispatchEvent({
+            type: "onDetectEnd",
+            state: this.detectState,
+          });
+          this.prevCoinDetection = false;
+        }
       }
-    } else {
-      if (this.prevCoinDetection !== false) {
-        this.events.dispatchEvent({
-          type: "onDetectEnd",
-          state: this.detectState,
-        });
-        this.prevCoinDetection = false;
-      }
-    }
-
-    this.root.position.lerp(this.rootPosition, 0.1 * delta);
-    this.root.quaternion.slerp(this.rootRotation, 1 * delta);
-  };
-
-  //find surface point from screen point
-  private castSurface = (
-    screenX: number,
-    screenY: number
-  ): [number, number] | undefined => {
-    v2.x = (screenX / window.innerWidth) * 2 - 1;
-    v2.y = -(screenY / window.innerHeight) * 2 + 1;
-
-    raycaster.setFromCamera(v2, this.camera);
-    const intersects = raycaster.intersectObject(this.surface);
-
-    if (intersects.length > 0) {
-      return [intersects[0].point.x, intersects[0].point.z];
-    } else {
-      return undefined;
     }
   };
 
@@ -340,7 +285,7 @@ class ARController {
 
     if (intersects.length > 0 && this.george.model.visible) {
       this.george.playAnimation(this.assets.models.easterEgg.animations[0]);
-      this.assets.sfx["huzzah"].stop().play();
+      this.george.say(this.assets.sfx["huzzah"]);
     }
   };
 }

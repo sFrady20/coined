@@ -6,35 +6,48 @@ const preloadAudio = async (onProgress: (pct: number) => void) => {
     correct: "/sfx/correct.mp3",
     wrong: "/sfx/wrong.mp3",
     intro: "/sfx/GW_intro.mp3",
-    correct1: "/sfx/GW_correct_1.mp3",
-    correct2: "/sfx/GW_correct_2.mp3",
-    correct3: "/sfx/GW_correct_3.mp3",
-    wrong1: "/sfx/GW_wrong_1.mp3",
-    wrong2: "/sfx/GW_wrong_2.mp3",
-    wrong3: "/sfx/GW_wrong_3.mp3",
-    end1: "/sfx/GW_end_1.mp3",
-    end2: "/sfx/GW_end_2.mp3",
-    end3: "/sfx/GW_end_3.mp3",
     huzzah: "/sfx/GW_huzzah.mp3",
+    gwCorrect: _.times(10, (i) => `/sfx/GW_right_${i + 1}.mp3`),
+    gwWrong: _.times(10, (i) => `/sfx/GW_wrong_${i + 1}.mp3`),
+    gwEnd: _.times(7, (i) => `/sfx/GW_end_${i + 1}.mp3`),
+    gwVictory: _.times(3, (i) => `/sfx/GW_victory_${i + 1}.mp3`),
   };
   var current = 0;
 
-  return _.fromPairs(
-    await Promise.all(
+  console.log(_.flatMap(files).length);
+  const results = _.fromPairs(
+    await Promise.all<[string, Howl[]]>(
       _(files)
-        .map(
-          (path, key) =>
-            new Promise<[string, Howl]>((resolve) => {
-              const sound = new Howl({ src: [path], preload: true });
-              sound.once("load", () => {
-                onProgress(++current / _.keys(files).length);
-                resolve([key, sound]);
-              });
-            })
-        )
+        .map((path, key) => {
+          if (typeof path === "string") {
+            path = [path];
+          }
+          return new Promise<[string, Howl[]]>(async (resolveGroup) => {
+            const sounds = await Promise.all(
+              _.map(
+                path,
+                (subpath) =>
+                  new Promise<Howl>((resolve) => {
+                    const sound = new Howl({ src: [subpath], preload: true });
+                    sound.once("loaderror", () => {
+                      onProgress(++current / _.flatMap(files).length);
+                      console.warn(`Could not load sound "${subpath}"`);
+                    });
+                    sound.once("load", () => {
+                      onProgress(++current / _.flatMap(files).length);
+                      resolve(sound);
+                    });
+                  })
+              )
+            );
+            resolveGroup([key, sounds]);
+          });
+        })
         .value()
     )
   );
+
+  return results;
 };
 
 export default preloadAudio;

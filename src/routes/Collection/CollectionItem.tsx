@@ -1,52 +1,64 @@
 import React, { memo, useContext } from "react";
 import styles from "./CollectionItem.module.scss";
 import { motion } from "framer-motion";
-import classnames from "classnames";
 import _ from "lodash";
-import quarters from "./quarters.json";
 import { SessionContext } from "../../components/Session";
-import { ReactComponent as InactiveBgSvg } from "../../media/collectionItemBg.svg";
-import { ReactComponent as ActiveBgSvg } from "../../media/collectionItemBgActive.svg";
+import { ReactComponent as QuarterHoleSvg } from "../../media/quarterHole.svg";
+import { AssetContext } from "../../components/AssetLoader";
+import Quarters from "./Quarters";
+import Button from "../../components/Button";
 
 const CollectionItem = memo(
-  (props: { quarterKey: keyof typeof quarters; onClick?: () => void }) => {
+  (props: {
+    quarterKey: keyof typeof Quarters;
+    onClick?: (isCollected: boolean) => void;
+  }) => {
     const { quarterKey, onClick } = props;
+    const { images } = useContext(AssetContext);
     const { gameState } = useContext(SessionContext);
     const { collection, visited } = gameState;
-    const quarter = quarters[quarterKey];
     const isCollected = _.includes(collection, quarterKey);
     const isNew = isCollected && !_.includes(visited, quarterKey);
 
+    const BannerComponent = Quarters[quarterKey].banner;
+
     return (
       <motion.div
-        className={classnames(
-          styles.item,
-          isCollected && styles[`item--collected`],
-          isNew && styles[`item--highlighted`]
-          //highlighted === key && styles[`item--highlighted`]
-        )}
+        className={styles.container}
         variants={{
-          hidden: { opacity: 0, scale: 0.6 },
-          missing: { opacity: 0.7, scale: 1 },
-          collected: { opacity: 1, scale: 1 },
-        }}
-        key={quarterKey}
-        onClick={() => {
-          if (isCollected && onClick) onClick();
+          hidden: { opacity: 0, scale: 0.4 },
+          collapsed: { opacity: 0, scale: 0.4 },
+          expanded: { opacity: 1, scale: 1 },
         }}
       >
-        {isCollected ? (
-          <>
+        <motion.div
+          className={styles.banner}
+          variants={{
+            hidden: { translateX: "-50%", translateY: "50%" },
+            collapsed: { translateX: "-50%", translateY: "50%" },
+            expanded: { translateX: "-50%", translateY: "-50%" },
+          }}
+        >
+          <BannerComponent />
+        </motion.div>
+        <div className={styles.quarterHole} key={quarterKey}>
+          <QuarterHoleSvg />
+          <div className={styles.count}>0/10</div>
+          {isCollected && (
             <img
               className={styles.quarter}
-              src={quarter.imgBack}
+              src={images[Quarters[quarterKey].imgFront]}
               alt={quarterKey}
             />
-            <ActiveBgSvg />
-          </>
-        ) : (
-          <InactiveBgSvg />
-        )}
+          )}
+        </div>
+        <div className={styles.action}>
+          <Button
+            type="primary"
+            onClick={() => onClick && onClick(isCollected)}
+            text="Collect"
+          />
+        </div>
       </motion.div>
     );
   }

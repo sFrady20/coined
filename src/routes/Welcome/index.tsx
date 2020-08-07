@@ -4,7 +4,6 @@ import Button from "../../components/Button";
 import { SessionContext } from "../../components/Session";
 import { motion } from "framer-motion";
 import { AssetContext } from "../../components/AssetLoader";
-import { DEBUG_SCANNING } from "../../config";
 import { ARContext } from "../../components/ARBridge";
 
 const Welcome = memo(() => {
@@ -19,12 +18,12 @@ const Welcome = memo(() => {
   const next = useCallback(() => {
     arController.george.float();
     updateSessionState((s) => {
-      if (!DEBUG_SCANNING) s.phase = "category";
+      s.phase = "home";
     });
   }, [updateSessionState, arController]);
 
   useEffect(() => {
-    const sound = sfx["intro"];
+    const sound = sfx["intro"][0];
     sound.once("end", () => {
       next();
     });

@@ -21,6 +21,7 @@ import {
   EffectPass,
   RenderPass,
   GodRaysEffect,
+  KernelSize,
   //@ts-ignore
 } from "postprocessing";
 
@@ -79,14 +80,11 @@ const AnimationExample = () => {
     let circleMat = new MeshBasicMaterial({ color: 0xffccaa });
     let circle = new Mesh(circleGeo, circleMat);
     circle.position.set(0, 0, -1);
-    scene.add(circle);
+    //scene.add(circle);
 
     let godraysEffect = new GodRaysEffect(camera, circle, {
-      resolutionScale: 1,
-      density: 2,
-      decay: 0.95,
-      weight: 0.5,
       samples: 100,
+      kernelSize: KernelSize.HUGE,
     });
 
     const composer = new EffectComposer(renderer);
@@ -117,7 +115,7 @@ const AnimationExample = () => {
       const intensity = Math.sin(clock.elapsedTime * 2) * 0.5 + 0.5;
       godraysEffect.lightSource.material.opacity = _.clamp(intensity / 1, 0, 1);
 
-      const tv3 = new Vector3(0, 0, 1).unproject(camera);
+      const tv3 = new Vector3(0, 0, 0.95).unproject(camera);
       cube.position.lerp(tv3, 0.1);
 
       //renderer.render(scene, camera);

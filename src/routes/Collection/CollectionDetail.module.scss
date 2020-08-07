@@ -1,4 +1,15 @@
-.wrapper {
+.fade {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 150vw;
+  background: rgb(0, 0, 0);
+  background: linear-gradient(0deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 100%);
+  opacity: 1;
+}
+
+.panelWrapper {
   position: absolute;
   left: 50%;
   top: 50%;
@@ -7,6 +18,7 @@
   transform: translate(-50%, -50%);
   border-radius: 3vw;
   padding: 0.6vw;
+  z-index: 100;
 
   background: rgb(128, 76, 27);
   background: linear-gradient(
@@ -89,14 +101,66 @@
 }
 
 .close {
-  width: 6vw;
-  height: 6vw;
+  width: 8vw;
+  height: 8vw;
   margin-left: 2vw;
   padding: 0;
   border-radius: 50%;
   padding: 0.4vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgb(169, 112, 38);
+  background: linear-gradient(
+    45deg,
+    rgba(169, 112, 38, 1) 0%,
+    rgba(198, 154, 67, 1) 100%
+  );
+  box-shadow: 0 1vw 2vw rgba(0, 0, 0, 0.3);
+  border: 1vw solid white;
+
+  svg {
+    width: 50%;
+  }
 
   &:active {
-    background: #ebe6dd;
+    opacity: 0.6;
   }
+}
+
+.card {
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  width: 92vw;
+  height: 92vw;
+  transform: translate(-50%, -50%);
+  border-radius: 3vw;
+  padding: 0.6vw;
+  z-index: 100;
+}
+
+.cardClose {
+  @extend .close;
+
+  position: absolute;
+  right: 7vw;
+  top: 7vw;
+}
+
+.quarter {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  left: 50%;
+  top: 57%;
+  width: 60vw;
+}
+
+.cardButton {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  left: 50%;
+  bottom: -2vw;
+  z-index: 120;
+  font-size: 6vw;
 }

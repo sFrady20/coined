@@ -24,14 +24,14 @@ const defaultGameState: GameState = {
 };
 
 export type SessionState = {
-  phase: "scan" | "intro" | "category" | "play" | "leaderboard" | "collection";
+  phase: "scan" | "intro" | "home" | "play";
   selectedCategory?: string;
-  finalScore: number;
+  isCollectionCollapsed: boolean;
 };
 const defaultSessionState: SessionState = {
   phase: "scan",
   selectedCategory: undefined,
-  finalScore: 0,
+  isCollectionCollapsed: false,
 };
 
 export type SessionContextType = {

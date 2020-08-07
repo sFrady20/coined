@@ -27,12 +27,9 @@ const Scan = memo(() => {
         arController.george.playAnimation(models["appear"].animations[0]);
         arController.george.snapToQuarter();
 
-        setTimeout(() => {
-          //arController.isCoinDetectionEnabled = false;
-          updateSessionState((s) => {
-            s.phase = "intro";
-          });
-        }, 3000);
+        updateSessionState((s) => {
+          s.phase = "intro";
+        });
       };
 
       arController.events.addEventListener("onDetectStart", listener);

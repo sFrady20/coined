@@ -10,16 +10,6 @@
   align-items: center;
 }
 
-.logo {
-  position: absolute;
-  left: 2.5vw;
-  top: 2.5vw;
-
-  img {
-    width: 25vw;
-  }
-}
-
 .content {
   flex: 1;
   display: flex;
@@ -27,4 +17,5 @@
   justify-content: flex-end;
   align-items: center;
   width: 100%;
+  position: relative;
 }

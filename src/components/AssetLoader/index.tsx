@@ -17,6 +17,7 @@ import waitForSeconds from "../../util/waitForSeconds";
 type PromiseResolvedType<T> = T extends Promise<infer R> ? R : never;
 
 export type AssetContextType = {
+  images: PromiseResolvedType<ReturnType<typeof preloadImages>>;
   models: PromiseResolvedType<ReturnType<typeof preloadModels>>;
   questions: PromiseResolvedType<ReturnType<typeof preloadQuestions>>;
   sfx: PromiseResolvedType<ReturnType<typeof preloadAudio>>;
@@ -28,6 +29,7 @@ export const AssetContext = createContext(defaultAssetContext);
 const Preloader = memo((props: { children: ReactNode }) => {
   const { children } = props;
   const [isStarted, setStarted] = useState(false);
+  const [images, setImages] = useState<AssetContextType["images"]>();
   const [models, setModels] = useState<AssetContextType["models"]>();
   const [questions, setQuestions] = useState<AssetContextType["questions"]>();
   const [sfx, setSfx] = useState<AssetContextType["sfx"]>();
@@ -43,7 +45,9 @@ const Preloader = memo((props: { children: ReactNode }) => {
       setQuestions(await preloadQuestions());
       step++;
       setProgress(step);
-      await preloadImages((pct) => setProgress((step + pct) / totalSteps));
+      setImages(
+        await preloadImages((pct) => setProgress((step + pct) / totalSteps))
+      );
       step++;
       setModels(
         await preloadModels((pct) => setProgress((step + pct) / totalSteps))
@@ -74,15 +78,13 @@ const Preloader = memo((props: { children: ReactNode }) => {
           }}
           key={isStarted ? "started" : "loading"}
         >
-          {!isStarted ? (
+          {!isStarted || !images || !questions || !models || !sfx ? (
             <LoadingScreen
               progress={progress}
               onStart={() => setStarted(true)}
             />
-          ) : !questions || !models || !sfx ? (
-            <></>
           ) : (
-            <AssetContext.Provider value={{ questions, models, sfx }}>
+            <AssetContext.Provider value={{ images, questions, models, sfx }}>
               {children}
             </AssetContext.Provider>
           )}

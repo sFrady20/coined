@@ -134,10 +134,10 @@
 
 .feedbackTrue {
   @extend .feedbackImage;
-  background-image: url("../../media/trueSymbol.png");
+  //background-image: url("../../media/trueSymbol.png");
 }
 
 .feedbackFalse {
   @extend .feedbackImage;
-  background-image: url("../../media/falseSymbol.png");
+  //background-image: url("../../media/falseSymbol.png");
 }

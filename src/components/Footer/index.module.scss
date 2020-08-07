@@ -1,0 +1,25 @@
+.root {
+  display: flex;
+  padding: 8px 11px;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  background: #222b3d;
+  position: relative;
+  z-index: 1000;
+  color: #ffffff;
+  font-size: 12px;
+}
+
+.branding {
+}
+
+.flag {
+  height: 1em;
+  display: inline-block;
+  margin-right: 5px;
+  vertical-align: middle;
+}
+
+.links {
+}

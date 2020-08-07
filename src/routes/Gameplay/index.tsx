@@ -12,7 +12,7 @@ import styles from "./index.module.scss";
 import _ from "lodash";
 import { SessionContext } from "../../components/Session";
 import Question from "./Question";
-import quarters from "../Collection/quarters.json";
+import Quarters from "../Collection/Quarters";
 import { motion } from "framer-motion";
 import { AssetContext } from "../../components/AssetLoader";
 import useKeyPress from "../../hooks/useKeyPress";
@@ -86,18 +86,6 @@ const Gameplay = () => {
     shuffleQuestions();
   }, []);
 
-  //gather sfx
-  const correctSounds = useMemo(() => [sfx.correct], [sfx]);
-  const gwCorrectSounds = useMemo(
-    () => [sfx.correct1, sfx.correct2, sfx.correct3],
-    [sfx]
-  );
-  const wrongSounds = useMemo(() => [sfx.wrong], [sfx]);
-  const gwWrongSounds = useMemo(() => [sfx.wrong1, sfx.wrong2, sfx.wrong3], [
-    sfx,
-  ]);
-  const endSounds = useMemo(() => [sfx.end1, sfx.end2, sfx.end3], [sfx]);
-
   const limitedEffect = useMemo(
     () =>
       _.throttle(
@@ -115,13 +103,9 @@ const Gameplay = () => {
     if (gameFinished.current) return;
 
     //play end sfx
-    arController.george.say(
-      _(endSounds)
-        .sort((s) => (Math.random() > 0.5 ? -1 : 1))
-        .first()
-    );
+    arController.george.say(sfx["gwEnd"]);
 
-    const itemToCollect = _(quarters)
+    const itemToCollect = _(Quarters)
       .keys()
       .filter((q) => !_.includes(collection, q))
       .sortBy((i) => Math.random())
@@ -136,7 +120,7 @@ const Gameplay = () => {
     events.dispatchEvent({ type: "endGame" });
 
     updateSessionState((s) => {
-      s.phase = "collection";
+      s.phase = "home";
     });
 
     gameFinished.current = true;
@@ -144,7 +128,7 @@ const Gameplay = () => {
     collection,
     updateSessionState,
     updateGameState,
-    endSounds,
+    sfx,
     arController,
     gameFinished,
     events,
@@ -217,31 +201,23 @@ const Gameplay = () => {
                       setAnsweredQuestions((a) => [...a, question]);
 
                       //play random correct sfx
-                      _(correctSounds)
+                      _(sfx["correct"])
                         .orderBy(() => Math.random())
                         .first()
                         ?.play();
 
                       limitedEffect(() => {
-                        arController.george.say(
-                          _(gwCorrectSounds)
-                            .orderBy(() => Math.random())
-                            .first()
-                        );
+                        arController.george.say(sfx["gwCorrect"]);
                       });
                     } else {
                       //play random wrong sfx
-                      _(wrongSounds)
+                      _(sfx["wrong"])
                         .orderBy(() => Math.random())
                         .first()
                         ?.play();
 
                       limitedEffect(() => {
-                        arController.george.say(
-                          _(gwWrongSounds)
-                            .orderBy(() => Math.random())
-                            .first()
-                        );
+                        arController.george.say(sfx["gwWrong"]);
                       });
                     }
                   }}

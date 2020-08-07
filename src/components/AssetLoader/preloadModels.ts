@@ -10,7 +10,20 @@ const preloadModels = async (onProgress: (pct: number) => void) => {
     return r;
   };
 
+  const fake = await loader
+    .loadAsync("/models/GW_Idle_05.fbx")
+    .then(trackProgress);
+
   return {
+    idle: fake,
+    appear: await loader
+      .loadAsync("/models/GW_Appear_09.fbx")
+      .then(trackProgress),
+    applause: fake,
+    laugh: fake,
+    easterEgg: fake,
+    endGame: fake,
+    /*
     idle: await loader.loadAsync("/models/GW_Idle_05.fbx").then(trackProgress),
     appear: await loader
       .loadAsync("/models/GW_Appear_09.fbx")
@@ -27,7 +40,6 @@ const preloadModels = async (onProgress: (pct: number) => void) => {
     endGame: await loader
       .loadAsync("/models/GW_EndGame_01.fbx")
       .then(trackProgress),
-    /*
     moonwalk: await loader.loadAsync("/models/GW_MoonWalking_0522.fbx")
       .then(trackProgress),
     thumbsUp: await loader.loadAsync("/models/GW_ThumbUp_0522.fbx")

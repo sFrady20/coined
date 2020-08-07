@@ -9,12 +9,12 @@ import {
   LoopOnce,
   LoopRepeat,
   Vector3,
-  MathUtils,
   SkinnedMesh,
 } from "three";
 import ARController from "./ARController";
 import _ from "lodash";
 import { Howl } from "howler";
+import yRotTowards from "../../util/yRotTowards";
 
 export const lookAt = (eye: Object3D, target: Object3D) => {
   eye.updateWorldMatrix(true, false);
@@ -60,7 +60,7 @@ class GeorgeCharacter {
     this.model = context.assets.models["idle"];
     this.model.scale.set(0.02, 0.02, 0.02);
     this.model.visible = false;
-    this.context.root.add(this.model);
+    this.context.scene.add(this.model);
 
     //@ts-ignore
     this.idleAnimation = this.model.animations[0];
@@ -133,32 +133,35 @@ class GeorgeCharacter {
     }
 
     if (this._isFloating) {
-      const pos = new Vector3(0, 0, -6);
-      camera
-        .localToWorld(pos)
-        .sub(
-          this.model.parent?.getWorldPosition(new Vector3(0, 0, 0)) ||
-            new Vector3(0, 0, 0)
+      if (
+        this.context.detectState &&
+        (this.context.detectState.avgDetectScore || 0) > 0.3
+      ) {
+        //if quarter detected land on quarter
+        this.model.position.lerp(this.context.quarterPosition, 5 * delta);
+        this.model.quaternion.slerp(this.context.quarterRotation, 5 * delta);
+      } else {
+        //no quarter so free to float
+        const targetPos = new Vector3(0, -0.3, 0.965).unproject(
+          this.context.camera
         );
-      this.model.position.lerp(pos, 0.1);
+        const targetRot = yRotTowards(
+          this.model.getWorldPosition(new Vector3(0, 0, 0)),
+          camera.getWorldPosition(new Vector3(0, 0, 0)),
+          -90
+        );
 
-      const v1 = new Vector3();
-      this.model.getWorldPosition(v1);
-      const v2 = new Vector3();
-      camera.getWorldPosition(v2);
-      const dir = v1.sub(v2).normalize();
-
-      var mx = new Matrix4();
-      mx.makeRotationY(Math.atan2(-dir.z, dir.x) - 90 * MathUtils.DEG2RAD);
-
-      this.model.quaternion.slerp(
-        new Quaternion().setFromRotationMatrix(mx),
-        1 * delta
-      );
+        this.model.position.lerp(targetPos, 3 * delta);
+        this.model.quaternion.slerp(targetRot, 5 * delta);
+      }
     } else {
-      const pos = new Vector3(0, 0, 0);
-      this.model.position.lerp(pos, 1 * delta);
-      this.model.rotation.set(0, 0, 0);
+      if (
+        this.context.detectState &&
+        (this.context.detectState.avgDetectScore || 0) > 0.3
+      ) {
+        this.model.position.lerp(this.context.quarterPosition, 15 * delta);
+        this.model.quaternion.slerp(this.context.quarterRotation, 5 * delta);
+      }
     }
   };
 
@@ -168,6 +171,8 @@ class GeorgeCharacter {
   };
   public snapToQuarter = () => {
     if (!this._isFloating) return;
+    this.model.position.copy(this.context.quarterPosition);
+    this.model.quaternion.copy(this.context.quarterRotation);
     this._isFloating = false;
   };
 
@@ -208,8 +213,14 @@ class GeorgeCharacter {
     return idleAction;
   };
 
-  public say = (sfx?: Howl) => {
+  public say = (sfx?: Howl | Howl[]) => {
+    if (Array.isArray(sfx)) {
+      sfx = _(sfx)
+        .orderBy(() => Math.random())
+        .first();
+    }
     if (!sfx) return;
+
     if (this.currentSfx) this.currentSfx.stop();
     sfx.once("end", () => {
       this.currentSfx = undefined;

@@ -6,4 +6,6 @@ declare type WebARRocksDetectState = {
   yaw: number;
   pitch: number;
   roll: number;
+  avgDetectScore: number;
+  scoreHistory: number[];
 };

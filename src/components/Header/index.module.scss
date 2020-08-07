@@ -1,0 +1,14 @@
+.root {
+  display: flex;
+  padding: 5px;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  background: #222b3d;
+  position: relative;
+  z-index: 1000;
+}
+
+.logo {
+  height: 22px;
+}

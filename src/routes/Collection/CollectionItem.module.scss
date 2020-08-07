@@ -1,20 +1,26 @@
-.item {
-  width: 30%;
-  float: left;
-  margin: 1.4%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.container {
+  width: 27%;
+  display: inline-block;
+  margin: 2%;
   position: relative;
-  border-radius: 50%;
   box-sizing: border-box;
+  padding: 1% 1% 7% 1%;
+}
+
+.banner {
+  position: absolute;
+  width: 100%;
+  z-index: 5;
+  left: 50%;
+  top: 3vw;
+  transform: translate(-50%, -50%);
+}
+
+.quarterHole {
+  position: relative;
 
   svg {
     width: 100%;
-  }
-
-  &--highlighted {
-    border: 0.5vw solid yellow;
   }
 }
 
@@ -24,4 +30,22 @@
   top: 50%;
   transform: translate(-50%, -50%);
   width: 90%;
+}
+
+.count {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  color: #cc9312;
+  transform: translate(-50%, -50%);
+  font-size: 3.8vw;
+  font-family: "Carters";
+}
+
+.action {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translate(-50%, -50%);
+  font-size: 3vw;
 }

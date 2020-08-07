@@ -1,4 +1,4 @@
-import React, { Suspense, memo } from "react";
+import React, { Suspense, memo, useContext } from "react";
 import { BrowserRouter } from "react-router-dom";
 import { Route, Switch } from "react-router";
 import styles from "./index.module.scss";
@@ -7,16 +7,41 @@ import SessionContextProvider from "../Session";
 import TempPassword from "../TempPassword";
 import AnimationTest from "../../routes/AnimationTest";
 import AssetLoader from "../AssetLoader";
-import MainRoute from "../../routes/Main";
 import ARRenderer from "../ARBridge/ARRenderer";
 import EffectTest from "../../routes/EffectTest";
 import Test2 from "../../routes/AnimationTest/Test2";
+import Header from "../Header";
+import Footer from "../Footer";
+import Collection from "../../routes/Collection";
+import Scan from "../../routes/Scan";
+import Welcome from "../../routes/Welcome";
+import Gameplay from "../../routes/Gameplay";
+import { SessionContext } from "../../components/Session";
 
 export const SCAN_SCREEN = "/";
 export const WELCOME_SCREEN = "/welcome";
 export const CATEGORY_SELECT_SCREEN = "/category";
 export const GAMEPLAY_SCREEN = "/play";
 export const COLLECTION_SCREEN = "/collection";
+
+const MainRoute = memo(() => {
+  const { sessionState } = useContext(SessionContext);
+  const { phase } = sessionState;
+
+  return (
+    <Transitioner pageKey={phase}>
+      {phase === "scan" ? (
+        <Scan />
+      ) : phase === "intro" ? (
+        <Welcome />
+      ) : phase === "home" ? (
+        ""
+      ) : phase === "play" ? (
+        <Gameplay />
+      ) : null}
+    </Transitioner>
+  );
+});
 
 const Router = memo(() => {
   return (
@@ -45,13 +70,18 @@ const Router = memo(() => {
                 <AssetLoader>
                   <ARRenderer>
                     <div className={styles.page}>
-                      <Transitioner pageKey={location.pathname}>
-                        <Switch location={location}>
-                          <Route path={"/"}>
-                            <MainRoute />
-                          </Route>
-                        </Switch>
-                      </Transitioner>
+                      <Header />
+                      <div className={styles.content}>
+                        <Transitioner pageKey={location.pathname}>
+                          <Switch location={location}>
+                            <Route path={"/"}>
+                              <MainRoute />
+                            </Route>
+                          </Switch>
+                        </Transitioner>
+                        <Collection />
+                      </div>
+                      <Footer />
                     </div>
                   </ARRenderer>
                 </AssetLoader>
