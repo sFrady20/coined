@@ -1,0 +1,30 @@
+.root {
+  position: relative;
+
+  svg {
+    display: block;
+    width: 100%;
+  }
+}
+
+.counter {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 63%;
+  height: 63%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Carters";
+  font-size: 3vw;
+  background: rgb(255, 255, 255);
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(233, 229, 216, 1) 100%
+  );
+  border: 1vw solid white;
+  border-radius: 50%;
+}

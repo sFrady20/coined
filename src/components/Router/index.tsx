@@ -17,6 +17,7 @@ import Scan from "../../routes/Scan";
 import Welcome from "../../routes/Welcome";
 import Gameplay from "../../routes/Gameplay";
 import { SessionContext } from "../../components/Session";
+import { AnimatePresence } from "framer-motion";
 
 export const SCAN_SCREEN = "/";
 export const WELCOME_SCREEN = "/welcome";
@@ -27,6 +28,7 @@ export const COLLECTION_SCREEN = "/collection";
 const MainRoute = memo(() => {
   const { sessionState } = useContext(SessionContext);
   const { phase } = sessionState;
+  const { selectedCategory } = sessionState;
 
   return (
     <Transitioner pageKey={phase}>
@@ -36,8 +38,10 @@ const MainRoute = memo(() => {
         <Welcome />
       ) : phase === "home" ? (
         ""
-      ) : phase === "play" ? (
-        <Gameplay />
+      ) : phase === "play" && selectedCategory ? (
+        <AnimatePresence exitBeforeEnter>
+          <Gameplay key={selectedCategory} category={selectedCategory} />
+        </AnimatePresence>
       ) : null}
     </Transitioner>
   );

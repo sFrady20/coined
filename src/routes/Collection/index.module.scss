@@ -3,6 +3,7 @@
   top: 100%;
   width: 100%;
   pointer-events: all;
+  z-index: 50;
 
   & > svg {
     display: block;

@@ -11,6 +11,8 @@ const Logo = memo(() => {
 
   const logoType = phase === "scan" || phase === "intro" ? "title" : "logo";
 
+  if (logoType !== "title") return null;
+
   return (
     <AnimatePresence exitBeforeEnter>
       <motion.div
@@ -20,7 +22,7 @@ const Logo = memo(() => {
         exit={{ opacity: 0 }}
         key={logoType}
       >
-        {logoType === "title" ? <SVG /> : undefined}
+        <SVG />
       </motion.div>
     </AnimatePresence>
   );

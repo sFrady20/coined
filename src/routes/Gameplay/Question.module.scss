@@ -1,143 +1,93 @@
-.animations {
-  transform-origin: 50% 50%;
-  transform: translateY(350px) translateZ(-200px) rotateX(10deg);
-}
-
 .root {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  border-radius: 8px;
-  pointer-events: all;
-  position: fixed;
-  bottom: 52vw;
-  width: 95vw;
-  left: 50%;
-  transform: translate(-50%, 50%);
-  transform-origin: 50% 50%;
-  backface-visibility: hidden;
-  //background: url("../../media/paper.png");
-
-  svg {
-    width: 100%;
-  }
+  position: absolute;
+  z-index: 10;
+  width: 88vw;
+  left: 6vw;
+  bottom: 10vw;
+  perspective: 150vw;
 }
 
-.content {
-  padding: 6vw 6vw 6vw 17vw;
-  height: 100%;
+.question {
+  box-sizing: border-box;
   width: 100%;
   position: absolute;
   left: 0;
-  top: 0;
-  display: flex;
-  flex-direction: column;
+  bottom: 0;
+  backface-visibility: hidden;
 }
 
-.number {
-  font-family: "Carters", sans-serif;
-  position: absolute;
-  left: 10vw;
-  top: 10.6vw;
-  font-size: 5vw;
-  transform: translate(-50%, -50%);
-}
-
-.category {
-  font-family: "Carters", sans-serif;
-  position: absolute;
-  font-size: 4.6vw;
-  left: 9.8vw;
-  bottom: 27.5vw;
-  color: #aaa;
-  transform-origin: left center;
-  transform: rotate(-90deg);
+.questionBg {
+  position: relative;
 }
 
 .questionText {
-  flex: 1;
-  text-align: center;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
-  line-height: 1.3em;
   justify-content: center;
-  padding: 0 2vw;
-  font-size: 5vw;
-  font-weight: 100;
-
-  h5 {
-    margin: 3vw 0;
-  }
+  text-align: center;
+  padding: 5vw 5vw 10vw 5vw;
+  font-size: 4.5vw;
 }
 
-.answers {
+.questionActions {
+  position: absolute;
+  left: 50%;
+  bottom: -8vw;
+  transform: translate(-50%, -50%);
+  width: 70%;
+  display: flex;
+  justify-content: space-around;
 }
 
 .answer {
+  box-sizing: border-box;
   width: 100%;
-  text-align: center;
-  background: #fff center top;
-  margin-bottom: 8px;
-  cursor: pointer;
-  padding: 3.5vw 2vw;
-  border-radius: 3vw;
-  position: relative;
-  font-weight: 600;
-  font-size: 3.7vw;
-  line-height: 1.3em;
-  box-shadow: 0 1vw 2vw rgba(0, 0, 0, 0.2);
-
-  &:before {
-    content: " ";
-    position: absolute;
-    left: 0.6vw;
-    top: 0.6vw;
-    width: calc(100% - 1.5vw);
-    height: calc(100% - 1.5vw);
-    border: 0.1vw solid #e5b450;
-    border-radius: 2vw;
-  }
-
-  &--correct {
-    background: rgba(100, 255, 100, 0.4);
-
-    &:before {
-      border-color: rgba(100, 255, 100, 0.7);
-    }
-  }
-
-  &--incorrect {
-    background: rgba(255, 100, 100, 0.7);
-
-    &:before {
-      border-color: rgba(255, 100, 100, 0.9);
-    }
-  }
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  backface-visibility: hidden;
 }
 
-.feedback {
-  position: fixed;
+.answerBg {
+  position: relative;
+}
+
+.answerHeader {
+  font-family: "Rubik";
+  font-weight: bold;
+  position: absolute;
+  left: 50%;
+  top: 19vw;
+  transform: translate(-50%, -50%);
+  font-size: 4vw;
+}
+
+.answerText {
+  position: absolute;
   left: 0;
   top: 0;
-  opacity: 0;
-  transform: translateY(0);
-  z-index: 500;
-  pointer-events: none;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  text-align: center;
+  padding: 25vw 8vw 10vw;
+  line-height: 1.4em;
+  font-size: 3.5vw;
 }
 
-.feedbackImage {
-  width: 40vw;
-  height: 40vw;
-  background-size: contain;
-  background-position: center center;
-  background-repeat: no-repeat;
+.answerActions {
+  position: absolute;
+  left: 50%;
+  bottom: -8vw;
   transform: translate(-50%, -50%);
-}
-
-.feedbackTrue {
-  @extend .feedbackImage;
-  //background-image: url("../../media/trueSymbol.png");
-}
-
-.feedbackFalse {
-  @extend .feedbackImage;
-  //background-image: url("../../media/falseSymbol.png");
+  width: 70%;
+  display: flex;
+  justify-content: space-around;
 }

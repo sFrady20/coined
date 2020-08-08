@@ -107,7 +107,7 @@ const Collection = () => {
             {_.map(Quarters, (quarter, key: keyof typeof Quarters) => (
               <CollectionItem
                 key={key}
-                quarterKey={key}
+                category={key}
                 onClick={() => {
                   setSelectedQuarter(key);
                   //remove new label by tracking view
@@ -150,7 +150,7 @@ const Collection = () => {
         <AnimatePresence initial exitBeforeEnter>
           {selectedQuarter && (
             <CollectionDetail
-              quarterKey={selectedQuarter}
+              category={selectedQuarter}
               onClose={() => {
                 setSelectedQuarter(undefined);
               }}

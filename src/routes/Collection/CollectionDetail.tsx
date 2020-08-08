@@ -9,13 +9,13 @@ import _ from "lodash";
 import Button from "../../components/Button";
 
 const CollectionDetail = memo(
-  (props: { quarterKey: keyof typeof Quarters; onClose?: () => void }) => {
-    const { quarterKey, onClose } = props;
-    const quarter = Quarters[quarterKey];
+  (props: { category: keyof typeof Quarters; onClose?: () => void }) => {
+    const { category, onClose } = props;
+    const quarter = Quarters[category];
     const { images } = useContext(AssetContext);
     const { gameState, updateSessionState } = useContext(SessionContext);
     const { collection } = gameState;
-    const isCollected = _.includes(collection, quarterKey);
+    const isCollected = _.includes(collection, category);
 
     const CardComponent = quarter.card;
 
@@ -50,12 +50,12 @@ const CollectionDetail = memo(
                 <img
                   className={styles.back}
                   src={images[quarter.imgBack]}
-                  alt={quarterKey}
+                  alt={category}
                 />
                 <img
                   className={styles.front}
                   src={images[quarter.imgFront]}
-                  alt={quarterKey}
+                  alt={category}
                 />
               </div>
               <div className={styles.content}>
@@ -81,7 +81,7 @@ const CollectionDetail = memo(
               <img
                 className={styles.quarter}
                 src={images[quarter.imgFront]}
-                alt={quarterKey}
+                alt={category}
               />
               <div className={styles.cardClose} onClick={onClose}>
                 <CloseSvg />
@@ -107,7 +107,7 @@ const CollectionDetail = memo(
                 type="primary"
                 onClick={() => {
                   updateSessionState((s) => {
-                    s.selectedCategory = quarter.questionDataId;
+                    s.selectedCategory = category;
                     s.phase = "play";
                     s.isCollectionCollapsed = true;
                   });

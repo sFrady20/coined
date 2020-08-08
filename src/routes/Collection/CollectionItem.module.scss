@@ -18,6 +18,12 @@
 
 .quarterHole {
   position: relative;
+  transition: transform 0.2s ease-out;
+  transform: scale(1);
+
+  &:active {
+    transform: scale(0.9);
+  }
 
   svg {
     width: 100%;

@@ -1,4 +1,4 @@
-import React, { memo, useContext } from "react";
+import React, { memo, useContext, useMemo } from "react";
 import styles from "./CollectionItem.module.scss";
 import { motion } from "framer-motion";
 import _ from "lodash";
@@ -7,20 +7,22 @@ import { ReactComponent as QuarterHoleSvg } from "../../media/quarterHole.svg";
 import { AssetContext } from "../../components/AssetLoader";
 import Quarters from "./Quarters";
 import Button from "../../components/Button";
+import { QUESTION_GOAL } from "../Gameplay";
 
 const CollectionItem = memo(
-  (props: {
-    quarterKey: keyof typeof Quarters;
-    onClick?: (isCollected: boolean) => void;
-  }) => {
-    const { quarterKey, onClick } = props;
+  (props: { category: keyof typeof Quarters; onClick?: () => void }) => {
+    const { category, onClick } = props;
     const { images } = useContext(AssetContext);
     const { gameState } = useContext(SessionContext);
     const { collection, visited } = gameState;
-    const isCollected = _.includes(collection, quarterKey);
-    const isNew = isCollected && !_.includes(visited, quarterKey);
+    const isCollected = _.includes(collection, category);
+    const isNew = isCollected && !_.includes(visited, category);
+    const answeredQuestions = useMemo(
+      () => gameState.answeredQuestions[category] || [],
+      [gameState, category]
+    );
 
-    const BannerComponent = Quarters[quarterKey].banner;
+    const BannerComponent = Quarters[category].banner;
 
     return (
       <motion.div
@@ -41,22 +43,28 @@ const CollectionItem = memo(
         >
           <BannerComponent />
         </motion.div>
-        <div className={styles.quarterHole} key={quarterKey}>
+        <div
+          className={styles.quarterHole}
+          key={category}
+          onClick={() => onClick && setTimeout(onClick, 200)}
+        >
           <QuarterHoleSvg />
-          <div className={styles.count}>0/10</div>
+          <div className={styles.count}>
+            {answeredQuestions.length}/{QUESTION_GOAL}
+          </div>
           {isCollected && (
             <img
               className={styles.quarter}
-              src={images[Quarters[quarterKey].imgFront]}
-              alt={quarterKey}
+              src={images[Quarters[category].imgFront]}
+              alt={category}
             />
           )}
         </div>
         <div className={styles.action}>
           <Button
             type="primary"
-            onClick={() => onClick && onClick(isCollected)}
-            text="Collect"
+            onClick={onClick}
+            text={isCollected ? "View Coin" : "Collect"}
           />
         </div>
       </motion.div>
