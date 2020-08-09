@@ -42,6 +42,7 @@
   width: 70%;
   display: flex;
   justify-content: space-around;
+  font-size: 4.5vw;
 }
 
 .answer {
@@ -90,4 +91,14 @@
   width: 70%;
   display: flex;
   justify-content: space-around;
+  font-size: 4.5vw;
+}
+
+.feedback {
+  position: absolute;
+  left: 50%;
+  bottom: 20vw;
+  width: 40vw;
+  transform: translate(-50%, -50%);
+  z-index: 30;
 }

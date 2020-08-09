@@ -18,6 +18,7 @@ import Welcome from "../../routes/Welcome";
 import Gameplay from "../../routes/Gameplay";
 import { SessionContext } from "../../components/Session";
 import { AnimatePresence } from "framer-motion";
+import { Wrong } from "../../routes/Gameplay/Feedback";
 
 export const SCAN_SCREEN = "/";
 export const WELCOME_SCREEN = "/welcome";
@@ -65,6 +66,19 @@ const Router = memo(() => {
           <Suspense fallback="Loading">
             <EffectTest />
           </Suspense>
+        </Route>
+        <Route exact path="/feedback">
+          <div
+            style={{
+              position: "absolute",
+              left: "50%",
+              top: "50%",
+              transform: "translate(-50%, -50%)",
+              width: "60vw",
+            }}
+          >
+            <Wrong />
+          </div>
         </Route>
 
         <Route path="/">

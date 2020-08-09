@@ -5,9 +5,10 @@ import { ReactComponent as QuestionCardBgSvg } from "../../media/questionCardBg.
 import { ReactComponent as TrueAnswerBgSvg } from "../../media/trueAnswerCard.svg";
 import { ReactComponent as FalseAnswerBgSvg } from "../../media/falseAnswerCard.svg";
 import Button from "../../components/Button";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { AssetContext } from "../../components/AssetLoader";
 import { SessionContext } from "../../components/Session";
+import { Wrong, Right } from "./Feedback";
 
 const Question = (props: {
   question: QuestionDefinition;
@@ -99,6 +100,16 @@ const Question = (props: {
         animate={answer === undefined ? "default" : "flipped"}
         exit={"flipped"}
       >
+        <div className={styles.feedback}>
+          <AnimatePresence>
+            {answer === undefined ? undefined : question.answer === answer ? (
+              <Right />
+            ) : (
+              <Wrong />
+            )}
+          </AnimatePresence>
+        </div>
+
         <div className={styles.answerBg}>
           {question.answer ? <TrueAnswerBgSvg /> : <FalseAnswerBgSvg />}
         </div>

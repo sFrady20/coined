@@ -64,7 +64,7 @@ const CollectionDetail = memo(
                   translateX: "-50%",
                   translateY: "-50%",
                   transition: {
-                    delay: 0.4,
+                    delay: 0.2,
                     duration: 0.4,
                   },
                 },
@@ -87,7 +87,7 @@ const CollectionDetail = memo(
                   translateX: "-50%",
                   translateY: "-50%",
                   transition: {
-                    delay: 0.4,
+                    delay: 0.2,
                     duration: 0.4,
                   },
                 },
