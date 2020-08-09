@@ -10,7 +10,7 @@
   text-transform: uppercase;
   border-radius: 0.25em;
   transition: all 0.05s ease-out;
-  box-shadow: 0 0.25em 0.5em rgba(0, 0, 0, 0.6);
+  box-shadow: 0 0.25em 0.5em rgba(0, 0, 0, 0.3);
   pointer-events: all;
   white-space: nowrap;
 
@@ -26,23 +26,11 @@
 
   &:active {
     transform: translateY(3px);
-    box-shadow: 0 1vw 2vw rgba(0, 0, 0, 0.7);
+    box-shadow: 0 0.7vw 2vw rgba(0, 0, 0, 0.5);
 
     &:before {
       border-color: rgba(255, 255, 255, 0.4);
     }
-  }
-
-  &:before {
-    content: " ";
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    position: absolute;
-    left: 1vw;
-    top: 1vw;
-    bottom: 1vw;
-    right: 1vw;
-    border-radius: 1vw;
-    transition: all 0.05s ease-out;
   }
 }
 
@@ -58,11 +46,24 @@
 
 .primary {
   @extend .button;
+
+  &:before {
+    content: " ";
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    position: absolute;
+    left: 1vw;
+    top: 1vw;
+    bottom: 1vw;
+    right: 1vw;
+    border-radius: 1vw;
+    transition: all 0.05s ease-out;
+  }
 }
 
 .secondary {
   @extend .button;
   background: rgb(23, 29, 41);
+  border: 0.6vw solid white;
   background: linear-gradient(
     125deg,
     rgba(23, 29, 41, 1) 0%,

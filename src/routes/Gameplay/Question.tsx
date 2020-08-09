@@ -1,6 +1,5 @@
 import React, { memo, useState, useEffect, useContext } from "react";
 import styles from "./Question.module.scss";
-import _ from "lodash";
 import { QuestionDefinition } from ".";
 import { ReactComponent as QuestionCardBgSvg } from "../../media/questionCardBg.svg";
 import { ReactComponent as TrueAnswerBgSvg } from "../../media/trueAnswerCard.svg";
@@ -8,6 +7,7 @@ import { ReactComponent as FalseAnswerBgSvg } from "../../media/falseAnswerCard.
 import Button from "../../components/Button";
 import { motion } from "framer-motion";
 import { AssetContext } from "../../components/AssetLoader";
+import { SessionContext } from "../../components/Session";
 
 const Question = (props: {
   question: QuestionDefinition;
@@ -20,9 +20,11 @@ const Question = (props: {
   const { question, onAnswered, onComplete } = props;
   const [answer, setAnswer] = useState<boolean>();
   const { sfx } = useContext(AssetContext);
+  const { sessionState } = useContext(SessionContext);
+  const { isCollectionCollapsed } = sessionState;
 
   useEffect(() => {
-    if (answer === undefined) {
+    if (answer === undefined && isCollectionCollapsed) {
       const timerSfx = sfx.timer[0];
       timerSfx.volume(0);
       timerSfx.play();
@@ -43,7 +45,7 @@ const Question = (props: {
         clearInterval(interval);
       };
     }
-  }, [sfx, answer, onAnswered, setAnswer]);
+  }, [sfx, answer, onAnswered, setAnswer, isCollectionCollapsed]);
 
   return (
     <motion.div

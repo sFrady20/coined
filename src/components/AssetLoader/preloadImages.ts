@@ -5,6 +5,7 @@ import historyQuarter from "../../media/quarters/QUARTER_CATEGORY_HISTORY.png";
 import scienceQuarter from "../../media/quarters/QUARTER_CATEGORY_SCIENCE&NATURE.png";
 import statesQuarter from "../../media/quarters/QUARTER_CATEGORY_STATES&TERRITORIES.png";
 import wildlifeQuarter from "../../media/quarters/QUARTER_CATEGORY_WILDLIFE.png";
+import quarterFront from "../../media/quarters/FRONT.png";
 
 const preloadImages = async (onProgress: (pct: number) => void) => {
   const container = document.createElement("div");
@@ -17,6 +18,7 @@ const preloadImages = async (onProgress: (pct: number) => void) => {
     scienceQuarter,
     statesQuarter,
     wildlifeQuarter,
+    quarterFront,
   };
   var current = 0;
 

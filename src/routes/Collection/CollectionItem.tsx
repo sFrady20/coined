@@ -49,13 +49,17 @@ const CollectionItem = memo(
           onClick={() => onClick && setTimeout(onClick, 200)}
         >
           <QuarterHoleSvg />
-          <div className={styles.count}>
+          <div
+            className={
+              answeredQuestions.length > 0 ? styles.count : styles.countEmpty
+            }
+          >
             {answeredQuestions.length}/{QUESTION_GOAL}
           </div>
           {isCollected && (
             <img
               className={styles.quarter}
-              src={images[Quarters[category].imgFront]}
+              src={images[Quarters[category].imgBack]}
               alt={category}
             />
           )}

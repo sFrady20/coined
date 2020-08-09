@@ -98,11 +98,7 @@ const Gameplay = (props: { category: keyof typeof Quarters }) => {
     //play end sfx
     arController.george.say(sfx["gwEnd"]);
 
-    const itemToCollect = _(Quarters)
-      .keys()
-      .filter((q) => !_.includes(collection, q))
-      .sortBy((i) => Math.random())
-      .first();
+    const itemToCollect = category;
     if (itemToCollect) {
       updateGameState((gs) => {
         gs.collection = _(gs.collection).push(itemToCollect).uniq().value();
@@ -118,6 +114,7 @@ const Gameplay = (props: { category: keyof typeof Quarters }) => {
 
     gameFinished.current = true;
   }, [
+    category,
     collection,
     updateSessionState,
     updateGameState,

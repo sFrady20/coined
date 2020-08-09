@@ -45,7 +45,7 @@ export type Quarter = {
 
 const Quarters = {
   science: {
-    imgFront: "scienceQuarter",
+    imgFront: "quarterFront",
     imgBack: "scienceQuarter",
     questionDataId: "SCIENCE & NATURE",
     title: "Science Quarter",
@@ -58,7 +58,7 @@ const Quarters = {
   } as Quarter,
 
   culture: {
-    imgFront: "cultureQuarter",
+    imgFront: "quarterFront",
     imgBack: "cultureQuarter",
     questionDataId: "CULTURE",
     title: "Culture Quarter",
@@ -71,7 +71,7 @@ const Quarters = {
   } as Quarter,
 
   history: {
-    imgFront: "historyQuarter",
+    imgFront: "quarterFront",
     imgBack: "historyQuarter",
     questionDataId: "HISTORY",
     title: "History Quarter",
@@ -84,7 +84,7 @@ const Quarters = {
   } as Quarter,
 
   states: {
-    imgFront: "statesQuarter",
+    imgFront: "quarterFront",
     imgBack: "statesQuarter",
     questionDataId: "STATES & TERRITORIES",
     title: "National Park of American Samoa Quarter",
@@ -97,7 +97,7 @@ const Quarters = {
   } as Quarter,
 
   wildlife: {
-    imgFront: "wildlifeQuarter",
+    imgFront: "quarterFront",
     imgBack: "wildlifeQuarter",
     questionDataId: "WILDLIFE",
     title: "Wildlife Quarter",

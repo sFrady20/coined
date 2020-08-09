@@ -27,6 +27,7 @@ const Collection = () => {
     updateGameState((gs) => {
       gs.collection = [];
       gs.visited = [];
+      gs.answeredQuestions = {};
     });
   });
 

@@ -18,6 +18,7 @@ const CollectionDetail = memo(
     const isCollected = _.includes(collection, category);
 
     const CardComponent = quarter.card;
+    const DetailBgComponent = quarter.detailBg;
 
     return (
       <motion.div
@@ -39,33 +40,66 @@ const CollectionDetail = memo(
         />
         {isCollected ? (
           <motion.div
-            className={styles.panelWrapper}
+            className={styles.detail}
             variants={{
               hidden: { translateX: "-50%", translateY: "100%" },
               visible: { translateX: "-50%", translateY: "-50%" },
             }}
           >
-            <div className={styles.panel}>
-              <div className={styles.sidebar}>
-                <img
-                  className={styles.back}
-                  src={images[quarter.imgBack]}
-                  alt={category}
-                />
-                <img
-                  className={styles.front}
-                  src={images[quarter.imgFront]}
-                  alt={category}
-                />
-              </div>
-              <div className={styles.content}>
-                <h3>{quarter.title}</h3>
-                <p>{quarter.description}</p>
-                <div className={styles.callToAction}>VISIT USMINT.GOV</div>
-              </div>
-              <div className={styles.close} onClick={onClose}>
-                <CloseSvg />
-              </div>
+            <DetailBgComponent />
+            <motion.img
+              className={styles.back}
+              src={images[quarter.imgBack]}
+              alt={category}
+              variants={{
+                hidden: {
+                  opacity: 0,
+                  rotateZ: "-60deg",
+                  translateX: "-60%",
+                  translateY: "-50%",
+                },
+                visible: {
+                  opacity: 1,
+                  rotateZ: 0,
+                  translateX: "-50%",
+                  translateY: "-50%",
+                  transition: {
+                    delay: 0.4,
+                    duration: 0.4,
+                  },
+                },
+              }}
+            />
+            <motion.img
+              className={styles.front}
+              src={images[quarter.imgFront]}
+              alt={category}
+              variants={{
+                hidden: {
+                  opacity: 0,
+                  rotateZ: "60deg",
+                  translateX: "-40%",
+                  translateY: "-50%",
+                },
+                visible: {
+                  opacity: 1,
+                  rotateZ: 0,
+                  translateX: "-50%",
+                  translateY: "-50%",
+                  transition: {
+                    delay: 0.4,
+                    duration: 0.4,
+                  },
+                },
+              }}
+            />
+            <div className={styles.detailContent}>
+              <h3>{quarter.title}</h3>
+              <p>{quarter.description}</p>
+              <div className={styles.callToAction}>VISIT USMINT.GOV</div>
+            </div>
+            <div className={styles.close} onClick={onClose}>
+              <CloseSvg />
             </div>
           </motion.div>
         ) : (
@@ -80,7 +114,7 @@ const CollectionDetail = memo(
               <CardComponent />
               <img
                 className={styles.quarter}
-                src={images[quarter.imgFront]}
+                src={images[quarter.imgBack]}
                 alt={category}
               />
               <div className={styles.cardClose} onClick={onClose}>

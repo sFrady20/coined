@@ -48,6 +48,11 @@
   font-family: "Carters";
 }
 
+.countEmpty {
+  @extend .count;
+  color: #ccc;
+}
+
 .action {
   position: absolute;
   left: 50%;
