@@ -42,7 +42,21 @@ const CollectionDetail = memo(
               visible: { translateX: "-50%", translateY: "-50%" },
             }}
           >
-            <QuarterDetail category={category} onClose={onClose} />
+            <QuarterDetail category={category} onClose={onClose}>
+              <div className={styles.playAgain}>
+                <Button
+                  type="primary"
+                  text="PLAY AGAIN"
+                  onClick={() => {
+                    updateSessionState((state) => {
+                      state.isCollectionCollapsed = true;
+                      state.selectedCategory = category;
+                      state.phase = "play";
+                    });
+                  }}
+                />
+              </div>
+            </QuarterDetail>
           </motion.div>
         ) : (
           <>

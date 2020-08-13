@@ -106,6 +106,7 @@ const Gameplay = (props: { category: keyof typeof Quarters }) => {
     const itemToCollect = category;
     if (itemToCollect) {
       updateGameState((gs) => {
+        gs.answeredQuestions = {};
         gs.collection = _(gs.collection).push(itemToCollect).uniq().value();
       });
     }

@@ -19,76 +19,9 @@
   z-index: 100;
 }
 
-.detailContent {
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 100%;
-  padding: 12vw 4vw 4vw 42vw;
-  font-size: 3.2vw;
-
-  h3 {
-    font-family: "Carters";
-    font-weight: normal;
-    margin-bottom: 6vw;
-    font-size: 4vw;
-  }
-
-  p {
-    margin-bottom: 7vw;
-  }
-}
-
-.front {
-  position: absolute;
-  border-radius: 50%;
-  left: 21%;
-  top: 64%;
-  box-shadow: 0 0 5vw rgba(0, 0, 0, 0.3);
-  transform: translate(-50%, -50%);
-  width: 37vw;
-  z-index: 2;
-}
-
-.back {
-  position: absolute;
-  border-radius: 50%;
-  left: 21%;
-  top: 29%;
-  box-shadow: 0 0 5vw rgba(0, 0, 0, 0.3);
-  transform: translate(-50%, -50%);
-  width: 37vw;
-  z-index: 5;
-}
-
-.content {
-  border-top: 1vw solid #c2b7a1;
-  margin-top: 1vw;
-  flex: 1;
-
-  h3 {
-    font-family: "Carters";
-    font-size: 5vw;
-    margin: 3vw 0;
-    font-weight: normal;
-  }
-
-  p {
-    font-size: 4vw;
-    line-height: 1.3em;
-    margin: 3vw 0;
-  }
-}
-
-.callToAction {
-  color: #9c6826;
-  font-family: "Carters";
-  border-top: 0.3vw solid #9c6826;
-  border-bottom: 0.3vw solid #9c6826;
-  padding: 2vw 0;
-  font-size: 5vw;
-  text-align: center;
+.playAgain {
+  margin-top: 5vw;
+  font-size: 4vw;
 }
 
 .close {
