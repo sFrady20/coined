@@ -15,6 +15,7 @@ import ARController from "./ARController";
 import _ from "lodash";
 import { Howl } from "howler";
 import yRotTowards from "../../util/yRotTowards";
+import { GEORGE_SNAP_THRESHOLD } from "../../config";
 
 export const lookAt = (eye: Object3D, target: Object3D) => {
   eye.updateWorldMatrix(true, false);
@@ -43,12 +44,13 @@ class GeorgeCharacter {
   public mixer: AnimationMixer;
   public mesh: SkinnedMesh;
   public nodes: { [s: string]: Object3D };
+  public floatLocked = false;
   private lastUpdate = Date.now();
   private idleAnimation!: AnimationClip;
 
   private currentAnimation?: AnimationAction;
   private currentSfx?: Howl;
-  private _isFloating = false;
+  private _isFloating = true;
 
   get isFloating() {
     return this._isFloating;
@@ -134,11 +136,12 @@ class GeorgeCharacter {
 
     if (this._isFloating) {
       if (
+        !this.floatLocked &&
         this.context.detectState &&
-        (this.context.detectState.avgDetectScore || 0) > 0.3
+        (this.context.detectState.avgDetectScore || 0) > GEORGE_SNAP_THRESHOLD
       ) {
         //if quarter detected land on quarter
-        this.model.position.lerp(this.context.quarterPosition, 5 * delta);
+        this.model.position.lerp(this.context.quarterPosition, 20 * delta);
         this.model.quaternion.slerp(this.context.quarterRotation, 5 * delta);
       } else {
         //no quarter so free to float
@@ -157,9 +160,9 @@ class GeorgeCharacter {
     } else {
       if (
         this.context.detectState &&
-        (this.context.detectState.avgDetectScore || 0) > 0.3
+        (this.context.detectState.avgDetectScore || 0) > GEORGE_SNAP_THRESHOLD
       ) {
-        this.model.position.lerp(this.context.quarterPosition, 15 * delta);
+        this.model.position.lerp(this.context.quarterPosition, 20 * delta);
         this.model.quaternion.slerp(this.context.quarterRotation, 5 * delta);
       }
     }
@@ -171,8 +174,6 @@ class GeorgeCharacter {
   };
   public snapToQuarter = () => {
     if (!this._isFloating) return;
-    this.model.position.copy(this.context.quarterPosition);
-    this.model.quaternion.copy(this.context.quarterRotation);
     this._isFloating = false;
   };
 
@@ -230,6 +231,9 @@ class GeorgeCharacter {
     });
     sfx.play();
     this.currentSfx = sfx;
+  };
+  public shutup = () => {
+    if (this.currentSfx) this.currentSfx.stop();
   };
 }
 

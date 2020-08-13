@@ -2,7 +2,6 @@ import React, { Suspense, memo, useContext } from "react";
 import { BrowserRouter } from "react-router-dom";
 import { Route, Switch } from "react-router";
 import styles from "./index.module.scss";
-import Transitioner from "./Transitioner";
 import SessionContextProvider from "../Session";
 import TempPassword from "../TempPassword";
 import AnimationTest from "../../routes/AnimationTest";
@@ -18,13 +17,9 @@ import Welcome from "../../routes/Welcome";
 import Gameplay from "../../routes/Gameplay";
 import { SessionContext } from "../../components/Session";
 import { AnimatePresence } from "framer-motion";
-import { Wrong } from "../../routes/Gameplay/Feedback";
-
-export const SCAN_SCREEN = "/";
-export const WELCOME_SCREEN = "/welcome";
-export const CATEGORY_SELECT_SCREEN = "/category";
-export const GAMEPLAY_SCREEN = "/play";
-export const COLLECTION_SCREEN = "/collection";
+import { Win } from "../../components/Feedback";
+import Reward from "../../routes/Reward";
+import CategorySelect from "../../routes/CategorySelect";
 
 const MainRoute = memo(() => {
   const { sessionState } = useContext(SessionContext);
@@ -32,19 +27,24 @@ const MainRoute = memo(() => {
   const { selectedCategory } = sessionState;
 
   return (
-    <Transitioner pageKey={phase}>
+    <AnimatePresence exitBeforeEnter>
       {phase === "scan" ? (
-        <Scan />
+        <Scan key="scan" />
       ) : phase === "intro" ? (
-        <Welcome />
+        <Welcome key="intro" />
       ) : phase === "home" ? (
-        ""
+        <CategorySelect key={"home"} />
       ) : phase === "play" && selectedCategory ? (
-        <AnimatePresence exitBeforeEnter>
-          <Gameplay key={selectedCategory} category={selectedCategory} />
-        </AnimatePresence>
-      ) : null}
-    </Transitioner>
+        <Gameplay
+          key={"gameplay-" + selectedCategory}
+          category={selectedCategory}
+        />
+      ) : phase === "reward" && selectedCategory ? (
+        <Reward key={"reward"} />
+      ) : (
+        "Something is wrong"
+      )}
+    </AnimatePresence>
   );
 });
 
@@ -77,7 +77,7 @@ const Router = memo(() => {
               width: "60vw",
             }}
           >
-            <Wrong />
+            <Win />
           </div>
         </Route>
 
@@ -90,13 +90,11 @@ const Router = memo(() => {
                     <div className={styles.page}>
                       <Header />
                       <div className={styles.content}>
-                        <Transitioner pageKey={location.pathname}>
-                          <Switch location={location}>
-                            <Route path={"/"}>
-                              <MainRoute />
-                            </Route>
-                          </Switch>
-                        </Transitioner>
+                        <Switch location={location}>
+                          <Route path={"/"}>
+                            <MainRoute />
+                          </Route>
+                        </Switch>
                         <Collection />
                       </div>
                       <Footer />

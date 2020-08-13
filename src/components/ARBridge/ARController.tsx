@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { DeviceOrientationControls } from "three/examples/jsm/controls/DeviceOrientationControls";
+import { DeviceOrientationControls } from "./DeviceOrientationControls";
 import {
   GridHelper,
   EventDispatcher,
@@ -9,9 +9,15 @@ import {
   Vector3,
   Quaternion,
   Clock,
+  Euler,
 } from "three";
-import { DEVELOPMENT_MODE, AUTO_FOV } from "../../config";
-import NN from "./models/NN_USQUARTER_3.json";
+import {
+  DEVELOPMENT_MODE,
+  AUTO_FOV,
+  NN_THRESHOLD,
+  NN_AVG_POOL,
+} from "../../config";
+import NN from "./models/NN_USQUARTER_5.json";
 import { AssetContextType } from "../AssetLoader";
 import GeorgeCharacter from "./GeorgeCharacter";
 import { MouseEvent } from "react";
@@ -31,6 +37,8 @@ window.THREE = THREE;
 
 var v2 = new THREE.Vector2();
 var raycaster = new THREE.Raycaster();
+
+type DeviceOrientationControls = any;
 
 class ARController {
   public stream!: MediaStream;
@@ -57,6 +65,8 @@ class ARController {
   private isInited = false;
   private isCoinDetectionStarted = false;
   private prevCoinDetection: string | false = false;
+  private isInBackground = false;
+  private curY = 0;
 
   public init = async (assets: AssetContextType) => {
     //only run once
@@ -76,6 +86,26 @@ class ARController {
     ) as HTMLCanvasElement;
 
     //init stream
+    await this.initWebcam();
+
+    this.initThreeScene();
+    this.initCoinDetection();
+
+    requestAnimationFrame(this.update);
+
+    window.document.addEventListener("visibilitychange", (e) => {
+      if (window.document.visibilityState) {
+        this.isInBackground = false;
+        this.initWebcam();
+      } else {
+        this.isInBackground = true;
+        this.stopWebcam();
+      }
+    });
+  };
+
+  private initWebcam = async () => {
+    //init stream
     this.stream = await navigator.mediaDevices.getUserMedia({
       video: {
         width: { min: 640, max: 1920, ideal: 1280 },
@@ -88,11 +118,11 @@ class ARController {
       this.video.addEventListener("play", resolve);
       this.video.srcObject = this.stream;
     });
-
-    this.initThreeScene();
-    this.initCoinDetection();
-
-    requestAnimationFrame(this.update);
+  };
+  private stopWebcam = () => {
+    this.stream.getTracks().forEach((track) => track.stop());
+    this.video.pause();
+    this.video.srcObject = null;
   };
 
   private initThreeScene = () => {
@@ -155,7 +185,7 @@ class ARController {
             notHereFactor: 0.0,
             paramsPerLabel: {
               USQUARTER: {
-                thresholdDetect: 0.4,
+                thresholdDetect: NN_THRESHOLD,
               },
             },
           }
@@ -165,59 +195,62 @@ class ARController {
   };
 
   private update = () => {
-    const delta = this.clock.getDelta();
+    if (!this.isInBackground) {
+      const delta = this.clock.getDelta();
 
-    this.updateCoinDetection(delta);
+      this.updateCoinDetection(delta);
 
-    this.orientation.update();
+      this.orientation.update();
 
-    this.george.update(delta);
-    //this.glow.update(delta);
+      this.george.update(delta);
+      //this.glow.update(delta);
 
-    // compute vertical field of view:
-    if (AUTO_FOV) {
-      // compute aspectRatio:
-      const canvasElement = this.renderer.getContext().canvas;
-      const cvw = canvasElement.width;
-      const cvh = canvasElement.height;
-      const canvasAspectRatio = cvw / cvh;
+      // compute vertical field of view:
+      if (AUTO_FOV) {
+        // compute aspectRatio:
+        const canvasElement = this.renderer.getContext().canvas;
+        const cvw = canvasElement.width;
+        const cvh = canvasElement.height;
+        const canvasAspectRatio = cvw / cvh;
 
-      const vw = 720;
-      const vh = 1080;
-      const videoAspectRatio = vw / vh;
-      const fovFactor = vh > vw ? 1.0 / videoAspectRatio : 1.0;
-      const fov = 35 * fovFactor;
+        const vw = 720;
+        const vh = 1080;
+        const videoAspectRatio = vw / vh;
+        const fovFactor = vh > vw ? 1.0 / videoAspectRatio : 1.0;
+        const fov = 35 * fovFactor;
 
-      // compute X and Y offsets in pixels:
-      let scale = 1.0;
-      if (canvasAspectRatio > videoAspectRatio) {
-        // the canvas is more in landscape format than the video, so we crop top and bottom margins:
-        scale = cvw / vw;
-      } else {
-        // the canvas is more in portrait format than the video, so we crop right and left margins:
-        scale = cvh / vh;
+        // compute X and Y offsets in pixels:
+        let scale = 1.0;
+        if (canvasAspectRatio > videoAspectRatio) {
+          // the canvas is more in landscape format than the video, so we crop top and bottom margins:
+          scale = cvw / vw;
+        } else {
+          // the canvas is more in portrait format than the video, so we crop right and left margins:
+          scale = cvh / vh;
+        }
+        const cvws = vw * scale,
+          cvhs = vh * scale;
+        const offsetX = (cvws - cvw) / 2.0;
+        const offsetY = (cvhs - cvh) / 2.0;
+        //const _scaleW = cvw / cvws;
+
+        // apply parameters:
+        this.camera.aspect = canvasAspectRatio;
+        this.camera.fov = fov;
+        this.camera.setViewOffset(cvws, cvhs, offsetX, offsetY, cvw, cvh);
+        this.camera.updateProjectionMatrix();
       }
-      const cvws = vw * scale,
-        cvhs = vh * scale;
-      const offsetX = (cvws - cvw) / 2.0;
-      const offsetY = (cvhs - cvh) / 2.0;
-      //const _scaleW = cvw / cvws;
 
-      // apply parameters:
-      this.camera.aspect = canvasAspectRatio;
-      this.camera.fov = fov;
-      this.camera.setViewOffset(cvws, cvhs, offsetX, offsetY, cvw, cvh);
-      this.camera.updateProjectionMatrix();
+      this.composer.render(delta);
+      this.renderer.render(this.scene, this.camera);
     }
-
-    this.composer.render(delta);
-    this.renderer.render(this.scene, this.camera);
     requestAnimationFrame(this.update);
   };
 
   private updateCoinDetection = (delta: number) => {
     if (!this.isCoinDetectionStarted) return;
     if (!this.isCoinDetectionEnabled) return;
+    if (this.george.isFloating && this.george.floatLocked) return;
 
     this.detectState = WebARRocksObject.detect(0, null, {
       isKeepTracking: true,
@@ -232,31 +265,15 @@ class ARController {
       this.detectState.scoreHistory = this.detectState?.scoreHistory
         ? _.take(
             [this.detectState.detectScore, ...this.detectState.scoreHistory],
-            30
+            NN_AVG_POOL
           )
         : [this.detectState?.detectScore];
       this.detectState.avgDetectScore = _.mean(this.detectState.scoreHistory);
 
-      //calculate quarter position
-      this.quarterPosition
-        .set(
-          this.detectState.positionScale[0] * 2 - 1,
-          this.detectState.positionScale[1] * 2 - 1,
-          0.96 + (1 - this.detectState.positionScale[2]) * 0.035
-        )
-        .unproject(this.camera);
-
-      if ((this.detectState.avgDetectScore || 0) > 0.3) {
+      if ((this.detectState.avgDetectScore || 0) > 0.1) {
         if (this.prevCoinDetection !== this.detectState.label) {
           //calculate quarter rotation (towards camera)
-          this.quarterRotation.copy(
-            yRotTowards(
-              this.quarterPosition,
-              this.camera.getWorldPosition(new Vector3(0, 0, 0)),
-              -90
-            )
-          );
-
+          this.curY = this.detectState.yaw - Math.PI / 2;
           this.events.dispatchEvent({
             type: "onDetectStart",
             state: this.detectState,
@@ -272,6 +289,24 @@ class ARController {
           this.prevCoinDetection = false;
         }
       }
+
+      //calculate quarter position
+      this.quarterPosition
+        .set(
+          this.detectState.positionScale[0] * 2 - 1,
+          this.detectState.positionScale[1] * 2 - 1,
+          0.96 + (1 - this.detectState.positionScale[2]) * 0.035
+        )
+        .unproject(this.camera);
+
+      this.quarterRotation.setFromEuler(
+        new Euler(
+          -(this.detectState.pitch - Math.PI / 2),
+          this.detectState.yaw - Math.PI / 2 - this.curY,
+          -this.detectState.roll
+        )
+      );
+      //.multiply(this.camera.getWorldQuaternion(new Quaternion()));
     }
   };
 

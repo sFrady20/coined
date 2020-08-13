@@ -3,35 +3,25 @@ import styles from "./index.module.scss";
 import Button from "../../components/Button";
 import { SessionContext } from "../../components/Session";
 import { motion } from "framer-motion";
-import { AssetContext } from "../../components/AssetLoader";
 import { ARContext } from "../../components/ARBridge";
 
 const Welcome = memo(() => {
   const { arController } = useContext(ARContext);
   const { updateSessionState } = useContext(SessionContext);
-  const { sfx } = useContext(AssetContext);
-
-  useEffect(() => {
-    arController.george.snapToQuarter();
-  }, [arController]);
 
   const next = useCallback(() => {
-    arController.george.float();
     updateSessionState((s) => {
       s.phase = "home";
     });
   }, [updateSessionState, arController]);
 
   useEffect(() => {
-    const sound = sfx["intro"][0];
-    sound.once("end", () => {
-      next();
-    });
-    arController.george.say(sound);
+    arController.george.floatLocked = false;
     return () => {
-      sound.stop();
+      arController.george.floatLocked = true;
+      arController.george.shutup();
     };
-  }, [sfx, next, arController]);
+  }, [arController]);
 
   return (
     <motion.div

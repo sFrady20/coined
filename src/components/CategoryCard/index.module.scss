@@ -1,0 +1,12 @@
+.card {
+  border-radius: 3vw;
+  position: relative;
+}
+
+.quarter {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  left: 50%;
+  top: 50%;
+  width: 65%;
+}

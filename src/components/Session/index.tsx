@@ -30,14 +30,14 @@ const defaultGameState: GameState = {
 };
 
 export type SessionState = {
-  phase: "scan" | "intro" | "home" | "play";
+  phase: "scan" | "intro" | "home" | "play" | "reward";
   selectedCategory?: keyof typeof Quarters;
   isCollectionCollapsed: boolean;
 };
 const defaultSessionState: SessionState = {
   phase: "scan",
   selectedCategory: undefined,
-  isCollectionCollapsed: false,
+  isCollectionCollapsed: true,
 };
 
 export type SessionContextType = {

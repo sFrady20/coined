@@ -1,4 +1,4 @@
-import React, { memo, useContext, useEffect, useRef } from "react";
+import React, { memo, useContext, useEffect, useRef, useCallback } from "react";
 import styles from "./index.module.scss";
 import { ARContext } from "../../components/ARBridge";
 import { SessionContext } from "../../components/Session";
@@ -12,8 +12,19 @@ import { AssetContext } from "../../components/AssetLoader";
 const Scan = memo(() => {
   const { updateSessionState } = useContext(SessionContext);
   const { arController } = useContext(ARContext);
-  const { models } = useContext(AssetContext);
+  const { models, sfx } = useContext(AssetContext);
   const hasScanned = useRef(false);
+
+  const next = useCallback(() => {
+    arController.george.say(sfx.intro);
+
+    arController.george.model.visible = true;
+    arController.george.playAnimation(models["appear"].animations[0]);
+
+    updateSessionState((s) => {
+      s.phase = "intro";
+    });
+  }, [arController]);
 
   useEffect(() => {
     if (arController) {
@@ -22,14 +33,7 @@ const Scan = memo(() => {
       const listener = () => {
         if (hasScanned.current) return;
         hasScanned.current = true;
-
-        arController.george.model.visible = true;
-        arController.george.playAnimation(models["appear"].animations[0]);
-        arController.george.snapToQuarter();
-
-        updateSessionState((s) => {
-          s.phase = "intro";
-        });
+        next();
       };
 
       arController.events.addEventListener("onDetectStart", listener);
@@ -41,9 +45,7 @@ const Scan = memo(() => {
 
   //skip scanning for quick debugging
   useKeyPress("q", () => {
-    updateSessionState((s) => {
-      s.phase = "intro";
-    });
+    next();
   });
 
   return (

@@ -1,0 +1,28 @@
+.root {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  margin-bottom: 15%;
+  display: flex;
+  align-items: flex-end;
+}
+
+.detail {
+  position: relative;
+  margin: 4vw;
+  width: 92vw;
+}
+
+.feedback {
+  position: absolute;
+  width: 60vw;
+  z-index: 10;
+  transform: translate(-50%, -50%);
+  left: 50%;
+  top: -10vw;
+}
+
+.actions {
+  margin-top: 5vw;
+  font-size: 3.7vw;
+}

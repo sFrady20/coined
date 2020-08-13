@@ -46,7 +46,7 @@ const Gameplay = (props: { category: keyof typeof Quarters }) => {
   const { events, updateSessionState, gameState, updateGameState } = useContext(
     SessionContext
   );
-  const { questions, sfx } = useContext(AssetContext);
+  const { questions, sfx, models } = useContext(AssetContext);
   const { arController } = useContext(ARContext);
   const { collection } = gameState;
   const gameFinished = useRef(false);
@@ -79,6 +79,11 @@ const Gameplay = (props: { category: keyof typeof Quarters }) => {
     shuffleQuestions();
   }, []);
 
+  //lock george to floating mode
+  useEffect(() => {
+    arController.george.floatLocked = true;
+  }, [arController]);
+
   const limitedEffect = useMemo(
     () =>
       _.throttle(
@@ -109,7 +114,7 @@ const Gameplay = (props: { category: keyof typeof Quarters }) => {
     events.dispatchEvent({ type: "endGame" });
 
     updateSessionState((s) => {
-      s.phase = "home";
+      s.phase = "reward";
     });
 
     gameFinished.current = true;
@@ -187,6 +192,10 @@ const Gameplay = (props: { category: keyof typeof Quarters }) => {
                       .first()
                       ?.play();
 
+                    arController.george.playAnimation(
+                      models.applause.animations[0]
+                    );
+
                     limitedEffect(() => {
                       arController.george.say(sfx["gwCorrect"]);
                     });
@@ -196,6 +205,10 @@ const Gameplay = (props: { category: keyof typeof Quarters }) => {
                       .orderBy(() => Math.random())
                       .first()
                       ?.play();
+
+                    arController.george.playAnimation(
+                      models.laugh.animations[0]
+                    );
 
                     limitedEffect(() => {
                       arController.george.say(sfx["gwWrong"]);

@@ -8,7 +8,7 @@ import Button from "../../components/Button";
 import { motion, AnimatePresence } from "framer-motion";
 import { AssetContext } from "../../components/AssetLoader";
 import { SessionContext } from "../../components/Session";
-import { Wrong, Right } from "./Feedback";
+import { Right, Wrong } from "../../components/Feedback";
 
 const Question = (props: {
   question: QuestionDefinition;
@@ -46,7 +46,7 @@ const Question = (props: {
         clearInterval(interval);
       };
     }
-  }, [sfx, answer, onAnswered, setAnswer, isCollectionCollapsed]);
+  }, [sfx, answer, onAnswered, setAnswer, isCollectionCollapsed, question]);
 
   return (
     <motion.div

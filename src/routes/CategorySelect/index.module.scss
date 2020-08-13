@@ -1,0 +1,63 @@
+.root {
+  position: relative;
+  pointer-events: all;
+  width: 100%;
+  padding: 0 0 5vw;
+  margin: 0 0 15%;
+}
+
+.header {
+  position: absolute;
+  left: 50%;
+  top: 22px;
+  width: 165px;
+  transform: translate(-50%, -100%);
+  height: auto;
+  z-index: 10;
+}
+
+.slide {
+  width: auto;
+}
+
+.card {
+  background: none white center center no-repeat;
+  border-radius: 8px;
+  width: 75vw !important;
+  height: 83vw !important;
+}
+
+.button {
+  position: absolute;
+  left: 50%;
+  bottom: 20px;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  font-size: 5vw;
+}
+
+.next {
+  pointer-events: all;
+  position: absolute;
+  right: 3.5vw;
+  top: calc(50% - 2.5vw);
+  width: 0;
+  height: 0;
+  z-index: 100;
+  border-left: 5vw solid white;
+  border-top: 5vw solid transparent;
+  border-bottom: 5vw solid transparent;
+}
+
+.prev {
+  pointer-events: all;
+  position: absolute;
+  left: 3.5vw;
+  top: calc(50% - 2.5vw);
+  width: 0;
+  height: 0;
+  z-index: 100;
+  border-right: 5vw solid white;
+  border-top: 5vw solid transparent;
+  border-bottom: 5vw solid transparent;
+}

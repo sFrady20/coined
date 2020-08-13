@@ -61,36 +61,30 @@ const Preloader = memo((props: { children: ReactNode }) => {
 
   //TODO: if loading and model or questions arent present should throw error
   return (
-    <>
-      <Logo />
-      <AnimatePresence>
-        <motion.div
-          initial={{
-            opacity: 0,
-          }}
-          animate={{
-            opacity: 1,
-            transition: { when: "beforeChildren" },
-          }}
-          exit={{
-            opacity: 0,
-            transition: { when: "afterChildren" },
-          }}
-          key={isStarted ? "started" : "loading"}
-        >
-          {!isStarted || !images || !questions || !models || !sfx ? (
-            <LoadingScreen
-              progress={progress}
-              onStart={() => setStarted(true)}
-            />
-          ) : (
-            <AssetContext.Provider value={{ images, questions, models, sfx }}>
-              {children}
-            </AssetContext.Provider>
-          )}
-        </motion.div>
-      </AnimatePresence>
-    </>
+    <AnimatePresence>
+      <motion.div
+        initial={{
+          opacity: 0,
+        }}
+        animate={{
+          opacity: 1,
+          transition: { when: "beforeChildren" },
+        }}
+        exit={{
+          opacity: 0,
+          transition: { when: "afterChildren" },
+        }}
+        key={isStarted ? "started" : "loading"}
+      >
+        {!isStarted || !images || !questions || !models || !sfx ? (
+          <LoadingScreen progress={progress} onStart={() => setStarted(true)} />
+        ) : (
+          <AssetContext.Provider value={{ images, questions, models, sfx }}>
+            {children}
+          </AssetContext.Provider>
+        )}
+      </motion.div>
+    </AnimatePresence>
   );
 });
 

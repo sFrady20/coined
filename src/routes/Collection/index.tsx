@@ -20,7 +20,7 @@ const Collection = () => {
     keyof typeof Quarters
   >();
   const { phase, isCollectionCollapsed } = sessionState;
-  const isHidden = phase === "scan" || phase === "intro";
+  const isHidden = phase === "scan";
 
   //clear collection for debugging
   useKeyPress("r", () => {
@@ -88,7 +88,7 @@ const Collection = () => {
         </motion.div>
         <CollectionBgSvg />
         <div className={styles.content}>
-          <p>Coin collection yadda yadda</p>
+          <p></p>
           <motion.div
             className={styles.items}
             variants={{

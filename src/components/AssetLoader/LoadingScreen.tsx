@@ -2,6 +2,7 @@ import React, { memo } from "react";
 import styles from "./LoadingScreen.module.scss";
 import { ReactComponent as ScreenArt } from "../../media/loadingArt.svg";
 import { motion, Variants } from "framer-motion";
+import Logo from "./Logo";
 
 const variants: { [s: string]: Variants } = {
   parent: {
@@ -41,6 +42,8 @@ const LoadingScreen = memo(
 
     return (
       <div className={styles.root}>
+        <Logo />
+
         <div className={styles.art}>
           <ScreenArt />
         </div>
