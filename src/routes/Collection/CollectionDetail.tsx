@@ -55,7 +55,7 @@ const CollectionDetail = memo(
                       if (state.selectedCategory !== category) {
                         updateGameState((gs) => {
                           if (_.includes(gs.collection, category)) {
-                            gs.answeredQuestions = {};
+                            gs.answeredQuestions[category] = [];
                           }
                         });
                       }
