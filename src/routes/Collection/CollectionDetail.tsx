@@ -8,11 +8,14 @@ import _ from "lodash";
 import Button from "../../components/Button";
 import QuarterDetail from "../../components/QuarterDetail";
 import CategoryCard from "../../components/CategoryCard";
+import { QUESTION_GOAL } from "../Gameplay";
 
 const CollectionDetail = memo(
   (props: { category: keyof typeof Quarters; onClose?: () => void }) => {
     const { category, onClose } = props;
-    const { gameState, updateSessionState } = useContext(SessionContext);
+    const { gameState, updateGameState, updateSessionState } = useContext(
+      SessionContext
+    );
     const { collection } = gameState;
     const isCollected = _.includes(collection, category);
 
@@ -49,9 +52,17 @@ const CollectionDetail = memo(
                   text="PLAY AGAIN"
                   onClick={() => {
                     updateSessionState((state) => {
+                      if (state.selectedCategory !== category) {
+                        updateGameState((gs) => {
+                          if (_.includes(gs.collection, category)) {
+                            gs.answeredQuestions = {};
+                          }
+                        });
+                      }
                       state.isCollectionCollapsed = true;
                       state.selectedCategory = category;
                       state.phase = "play";
+                      onClose && onClose();
                     });
                   }}
                 />
@@ -92,9 +103,9 @@ const CollectionDetail = memo(
                 type="primary"
                 onClick={() => {
                   updateSessionState((s) => {
+                    s.isCollectionCollapsed = true;
                     s.selectedCategory = category;
                     s.phase = "play";
-                    s.isCollectionCollapsed = true;
                   });
                   onClose && onClose();
                 }}

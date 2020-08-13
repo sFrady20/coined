@@ -11,7 +11,7 @@ import Quarters from "../Collection/Quarters";
 import CategoryCard from "../../components/CategoryCard";
 
 const CategorySelect = memo(() => {
-  const { updateSessionState } = useContext(SessionContext);
+  const { updateGameState, updateSessionState } = useContext(SessionContext);
   const [swiper, setSwiper] = useState<Swiper | null>(null);
 
   return (
@@ -58,9 +58,17 @@ const CategorySelect = memo(() => {
           type="primary"
           onClick={() => {
             updateSessionState((s) => {
-              s.selectedCategory = _.keys(Quarters)[
+              const category = _.keys(Quarters)[
                 swiper?.activeIndex || 0
               ] as keyof typeof Quarters;
+              if (s.selectedCategory !== category) {
+                updateGameState((gs) => {
+                  if (_.includes(gs.collection, category)) {
+                    gs.answeredQuestions = {};
+                  }
+                });
+              }
+              s.selectedCategory = category;
               s.phase = "play";
             });
           }}

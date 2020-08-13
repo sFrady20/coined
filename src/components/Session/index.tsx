@@ -18,7 +18,7 @@ export type GameState = {
   answeredQuestions: {
     [s: string]: QuestionDefinition[];
   };
-  collection: string[];
+  collection: (keyof typeof Quarters)[];
   visited: string[];
 };
 const defaultGameState: GameState = {
