@@ -8,7 +8,6 @@ import _ from "lodash";
 import Button from "../../components/Button";
 import QuarterDetail from "../../components/QuarterDetail";
 import CategoryCard from "../../components/CategoryCard";
-import { QUESTION_GOAL } from "../Gameplay";
 
 const CollectionDetail = memo(
   (props: { category: keyof typeof Quarters; onClose?: () => void }) => {

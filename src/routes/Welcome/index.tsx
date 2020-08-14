@@ -13,7 +13,7 @@ const Welcome = memo(() => {
     updateSessionState((s) => {
       s.phase = "home";
     });
-  }, [updateSessionState, arController]);
+  }, [updateSessionState]);
 
   useEffect(() => {
     arController.george.floatLocked = false;

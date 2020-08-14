@@ -7,7 +7,6 @@ import React, {
 } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import LoadingScreen from "./LoadingScreen";
-import Logo from "./Logo";
 import preloadImages from "./preloadImages";
 import preloadAudio from "./preloadAudio";
 import preloadQuestions from "./preloadQuestions";

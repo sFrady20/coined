@@ -7,7 +7,17 @@ import { SessionContext } from "../../components/Session";
 import { motion } from "framer-motion";
 
 const Reward = memo(() => {
-  const { updateSessionState } = useContext(SessionContext);
+  const {
+    sessionState: { selectedCategory },
+    updateSessionState,
+  } = useContext(SessionContext);
+
+  if (!selectedCategory) {
+    updateSessionState((s) => {
+      s.phase = "home";
+    });
+    return null;
+  }
 
   return (
     <motion.div
@@ -20,7 +30,7 @@ const Reward = memo(() => {
         <div className={styles.feedback}>
           <Win />
         </div>
-        <QuarterDetail category={"culture"}>
+        <QuarterDetail category={selectedCategory}>
           <div className={styles.actions}>
             <Button
               type="primary"

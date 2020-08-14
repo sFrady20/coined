@@ -24,7 +24,7 @@ const Scan = memo(() => {
     updateSessionState((s) => {
       s.phase = "intro";
     });
-  }, [arController]);
+  }, [arController, updateSessionState, sfx, models]);
 
   useEffect(() => {
     if (arController) {
@@ -41,7 +41,7 @@ const Scan = memo(() => {
         arController.events.removeEventListener("onDetectStart", listener);
       };
     }
-  }, [arController, updateSessionState, hasScanned, models]);
+  }, [arController, updateSessionState, hasScanned, models, next]);
 
   //skip scanning for quick debugging
   useKeyPress("q", () => {

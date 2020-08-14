@@ -28,7 +28,6 @@ import {
   //@ts-ignore
 } from "postprocessing";
 import GlowEffect from "./GlowEffect";
-import yRotTowards from "../../util/yRotTowards";
 
 //@ts-ignore
 const WebARRocksObject = window.WEBARROCKSOBJECT;

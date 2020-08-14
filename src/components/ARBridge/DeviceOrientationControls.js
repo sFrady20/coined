@@ -58,7 +58,7 @@ var DeviceOrientationControls = function (object) {
     ) {
       window.DeviceOrientationEvent.requestPermission()
         .then(function (response) {
-          if (response == "granted") {
+          if (response === "granted") {
             window.addEventListener(
               "orientationchange",
               onScreenOrientationChangeEvent,
