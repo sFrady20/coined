@@ -151,8 +151,8 @@ class GeorgeCharacter {
       (this.context.detectState.avgDetectScore || 0) > GEORGE_SNAP_THRESHOLD
     ) {
       //if quarter detected land on quarter
-      this.root.position.lerp(this.context.quarterPosition, 10 * delta);
-      this.root.quaternion.slerp(this.context.quarterRotation, 5 * delta);
+      this.root.position.lerp(this.context.quarterPosition, 20 * delta);
+      this.root.quaternion.slerp(this.context.quarterRotation, 7 * delta);
     } else {
       //no quarter so free to float
       const calc =
