@@ -11,23 +11,12 @@ import {
   Clock,
   Euler,
 } from "three";
-import {
-  DEVELOPMENT_MODE,
-  AUTO_FOV,
-  NN_THRESHOLD,
-  NN_AVG_POOL,
-} from "../../config";
+import { DEVELOPMENT_MODE, NN_THRESHOLD, NN_AVG_POOL } from "../../config";
 import NN from "./models/NN_USQUARTER_5.json";
 import { AssetContextType } from "../AssetLoader";
 import GeorgeCharacter from "./GeorgeCharacter";
 import { MouseEvent } from "react";
 import _ from "lodash";
-import {
-  EffectComposer,
-  RenderPass,
-  //@ts-ignore
-} from "postprocessing";
-import GlowEffect from "./GlowEffect";
 
 //@ts-ignore
 const WebARRocksObject = window.WEBARROCKSOBJECT;
@@ -54,7 +43,6 @@ class ARController {
   public camera!: PerspectiveCamera;
   public renderer!: WebGLRenderer;
   public george!: GeorgeCharacter;
-  public glow!: GlowEffect;
   public composer!: any;
 
   public readonly quarterPosition = new Vector3();
@@ -137,9 +125,6 @@ class ARController {
       alpha: true,
     });
 
-    this.composer = new EffectComposer(this.renderer);
-    this.composer.addPass(new RenderPass(this.scene, this.camera));
-
     this.camera.position.set(0, 3, 0);
 
     this.scene.add(new THREE.AmbientLight(0x404040, 0.5));
@@ -198,49 +183,43 @@ class ARController {
       const delta = this.clock.getDelta();
 
       this.updateCoinDetection(delta);
-
       this.orientation.update();
-
       this.george.update(delta);
-      //this.glow.update(delta);
 
       // compute vertical field of view:
-      if (AUTO_FOV) {
-        // compute aspectRatio:
-        const canvasElement = this.renderer.getContext().canvas;
-        const cvw = canvasElement.width;
-        const cvh = canvasElement.height;
-        const canvasAspectRatio = cvw / cvh;
+      // compute aspectRatio:
+      const canvasElement = this.renderer.getContext().canvas;
+      const cvw = canvasElement.width;
+      const cvh = canvasElement.height;
+      const canvasAspectRatio = cvw / cvh;
 
-        const vw = 720;
-        const vh = 1080;
-        const videoAspectRatio = vw / vh;
-        const fovFactor = vh > vw ? 1.0 / videoAspectRatio : 1.0;
-        const fov = 35 * fovFactor;
+      const vw = 720;
+      const vh = 1080;
+      const videoAspectRatio = vw / vh;
+      const fovFactor = vh > vw ? 1.0 / videoAspectRatio : 1.0;
+      const fov = 35 * fovFactor;
 
-        // compute X and Y offsets in pixels:
-        let scale = 1.0;
-        if (canvasAspectRatio > videoAspectRatio) {
-          // the canvas is more in landscape format than the video, so we crop top and bottom margins:
-          scale = cvw / vw;
-        } else {
-          // the canvas is more in portrait format than the video, so we crop right and left margins:
-          scale = cvh / vh;
-        }
-        const cvws = vw * scale,
-          cvhs = vh * scale;
-        const offsetX = (cvws - cvw) / 2.0;
-        const offsetY = (cvhs - cvh) / 2.0;
-        //const _scaleW = cvw / cvws;
-
-        // apply parameters:
-        this.camera.aspect = canvasAspectRatio;
-        this.camera.fov = fov;
-        this.camera.setViewOffset(cvws, cvhs, offsetX, offsetY, cvw, cvh);
-        this.camera.updateProjectionMatrix();
+      // compute X and Y offsets in pixels:
+      let scale = 1.0;
+      if (canvasAspectRatio > videoAspectRatio) {
+        // the canvas is more in landscape format than the video, so we crop top and bottom margins:
+        scale = cvw / vw;
+      } else {
+        // the canvas is more in portrait format than the video, so we crop right and left margins:
+        scale = cvh / vh;
       }
+      const cvws = vw * scale,
+        cvhs = vh * scale;
+      const offsetX = (cvws - cvw) / 2.0;
+      const offsetY = (cvhs - cvh) / 2.0;
+      //const _scaleW = cvw / cvws;
 
-      this.composer.render(delta);
+      // apply parameters:
+      this.camera.aspect = canvasAspectRatio;
+      this.camera.fov = fov;
+      this.camera.setViewOffset(cvws, cvhs, offsetX, offsetY, cvw, cvh);
+      this.camera.updateProjectionMatrix();
+
       this.renderer.render(this.scene, this.camera);
     }
     requestAnimationFrame(this.update);
@@ -249,7 +228,7 @@ class ARController {
   private updateCoinDetection = (delta: number) => {
     if (!this.isCoinDetectionStarted) return;
     if (!this.isCoinDetectionEnabled) return;
-    if (this.george.isFloating && this.george.floatLocked) return;
+    if (this.george.floatLocked) return;
 
     this.detectState = WebARRocksObject.detect(0, null, {
       isKeepTracking: true,

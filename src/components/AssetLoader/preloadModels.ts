@@ -15,8 +15,9 @@ const preloadModels = async (onProgress: (pct: number) => void) => {
   gltfLoader.setDRACOLoader(new DRACOLoader());
 
   const modelPaths = {
+    base: "/models/GW_Idle_05.fbx",
     idle: "/models/GW_Idle_05.fbx",
-    appear: "/models/GW_Appear_09.fbx",
+    appear: "/models/GW_R2_Seq_02.fbx",
     applause: "/models/GW_Applause_01.fbx",
     laugh: "/models/GW_Laughing_01.fbx",
     easterEgg: "/models/GW_EasterEgg_01.fbx",

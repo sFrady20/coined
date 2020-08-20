@@ -17,8 +17,10 @@ const Welcome = memo(() => {
 
   useEffect(() => {
     arController.george.floatLocked = false;
+    arController.george.isCentered = true;
     return () => {
       arController.george.floatLocked = true;
+      arController.george.isCentered = false;
       arController.george.shutup();
     };
   }, [arController]);

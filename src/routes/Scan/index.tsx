@@ -16,11 +16,12 @@ const Scan = memo(() => {
   const hasScanned = useRef(false);
 
   const next = useCallback(() => {
-    arController.george.say(sfx.intro);
-
+    arController.george.snapToQuarter();
+    setTimeout(() => {
+      arController.george.say(sfx.intro);
+    }, 5000);
     arController.george.model.visible = true;
     arController.george.playAnimation(models["appear"].animations[0]);
-
     updateSessionState((s) => {
       s.phase = "intro";
     });
@@ -29,13 +30,11 @@ const Scan = memo(() => {
   useEffect(() => {
     if (arController) {
       arController.isCoinDetectionEnabled = true;
-
       const listener = () => {
         if (hasScanned.current) return;
         hasScanned.current = true;
         next();
       };
-
       arController.events.addEventListener("onDetectStart", listener);
       return () => {
         arController.events.removeEventListener("onDetectStart", listener);

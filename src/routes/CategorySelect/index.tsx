@@ -1,4 +1,4 @@
-import React, { useState, useContext, memo } from "react";
+import React, { useState, useContext, memo, useEffect } from "react";
 import styles from "./index.module.scss";
 import _ from "lodash";
 import { SessionContext } from "../../components/Session";
@@ -9,10 +9,19 @@ import { motion } from "framer-motion";
 import { ReactComponent as HeaderSvg } from "../../media/categoryHeader.svg";
 import Quarters from "../Collection/Quarters";
 import CategoryCard from "../../components/CategoryCard";
+import { ARContext } from "../../components/ARBridge";
 
 const CategorySelect = memo(() => {
   const { updateGameState, updateSessionState } = useContext(SessionContext);
   const [swiper, setSwiper] = useState<Swiper | null>(null);
+  const { arController } = useContext(ARContext);
+
+  useEffect(() => {
+    arController.george.isCentered = true;
+    return () => {
+      arController.george.isCentered = false;
+    };
+  }, [arController]);
 
   return (
     <motion.div
