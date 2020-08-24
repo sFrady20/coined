@@ -17,9 +17,12 @@ const CategorySelect = memo(() => {
   const { arController } = useContext(ARContext);
 
   useEffect(() => {
+    arController.george.floatLocked = false;
     arController.george.isCentered = true;
     return () => {
+      arController.george.floatLocked = true;
       arController.george.isCentered = false;
+      arController.george.shutup();
     };
   }, [arController]);
 

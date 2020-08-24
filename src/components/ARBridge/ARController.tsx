@@ -130,7 +130,6 @@ class ARController {
     this.scene.add(new THREE.AmbientLight(0x404040, 0.5));
 
     this.george = new GeorgeCharacter(this);
-    //this.glow = new GlowEffect(this);
 
     this.orientation = new DeviceOrientationControls(this.camera);
     this.orientation.connect();

@@ -1,8 +1,8 @@
 .root {
   position: absolute;
   z-index: 10;
-  width: 88vw;
-  left: 6vw;
+  width: 90vw;
+  left: 5vw;
   bottom: 10vw;
   perspective: 150vw;
 }
@@ -63,9 +63,9 @@
   font-weight: bold;
   position: absolute;
   left: 50%;
-  top: 19vw;
+  top: 20vw;
   transform: translate(-50%, -50%);
-  font-size: 4vw;
+  font-size: 4.7vw;
 }
 
 .answerText {
@@ -78,9 +78,9 @@
   align-items: flex-start;
   justify-content: center;
   text-align: center;
-  padding: 25vw 8vw 10vw;
-  line-height: 1.4em;
-  font-size: 3.5vw;
+  padding: 26vw 8vw 10vw;
+  line-height: 1.3em;
+  font-size: 3.6vw;
 }
 
 .answerActions {
@@ -97,7 +97,7 @@
 .feedback {
   position: absolute;
   left: 50%;
-  bottom: 20vw;
+  bottom: 21vw;
   width: 40vw;
   transform: translate(-50%, -50%);
   z-index: 30;

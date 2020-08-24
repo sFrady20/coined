@@ -37,6 +37,7 @@ const Scan = memo(() => {
       };
       arController.events.addEventListener("onDetectStart", listener);
       return () => {
+        arController.isCoinDetectionEnabled = false;
         arController.events.removeEventListener("onDetectStart", listener);
       };
     }

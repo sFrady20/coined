@@ -17,6 +17,7 @@
     "immer": "^6.0.3",
     "popmotion": "^8.7.3",
     "postprocessing": "^6.16.0",
+    "raw-loader": "^4.0.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-id-swiper": "^3.0.0",

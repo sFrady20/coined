@@ -15,9 +15,9 @@ import { SessionContext } from "../Session";
 const ARRenderer = memo((props: { children?: ReactNode }) => {
   const { children } = props;
   const [rootRef, setRootRef] = useState<HTMLDivElement>();
-  const arController = useMemo(() => new ARController(), []);
   const { events } = useContext(SessionContext);
   const assets = useContext(AssetContext);
+  const arController = useMemo(() => new ARController(), []);
 
   const size = useMemo(() => {
     if (rootRef) {
