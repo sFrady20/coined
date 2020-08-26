@@ -8,7 +8,7 @@ precision mediump float;
 
 // glslsandbox uniforms
 uniform float time;
-uniform vec2 resolution;
+uniform float glow;
 
 varying mediump vec3 vPos;
 varying mediump vec3 vNormal;
@@ -22,10 +22,9 @@ varying mediump vec3 vNormal;
 
 void main(void)
 {
-  vec4 col;
-  float tb=1.-step((1.-dot(vNormal,vec3(0.,1.,0.)))*(1.-dot(vNormal,vec3(0.,-1.,0.))),.1);
-  //float r=atan(vNormal.z,vNormal.x)*.5+.5;
-  float y=1.-smoothstep(-1.,1.,vPos.y);
-  col=vec4(y,y,y,y*tb);
-  gl_FragColor=col;
+  vec3 tint=vec3(.953,.895,.776);
+  
+  float d=pow(1.-length(vPos.xy),.2)*4.*(1.-glow);
+  
+  gl_FragColor=vec4(vec3(d)*tint,d);
 }

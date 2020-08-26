@@ -53,6 +53,7 @@ class GeorgeCharacter {
   public mixer: AnimationMixer;
   public mesh: SkinnedMesh;
   public nodes: { [s: string]: Object3D };
+  public waitTimeout?: NodeJS.Timeout; //bad
   public floatLocked = false;
   public isCentered = true;
   private lastUpdate = Date.now();
@@ -170,7 +171,7 @@ class GeorgeCharacter {
       );
 
       this.root.position.lerp(targetPos, 3 * delta);
-      this.root.quaternion.slerp(targetRot, 5 * delta);
+      this.root.quaternion.slerp(targetRot, 3 * delta);
     }
   };
 
@@ -235,7 +236,9 @@ class GeorgeCharacter {
     this.currentSfx = sfx;
   };
   public shutup = () => {
+    if (this.waitTimeout) clearTimeout(this.waitTimeout);
     if (this.currentSfx) this.currentSfx.stop();
+    if (this.currentAnimation) this.returnToIdle();
   };
 }
 

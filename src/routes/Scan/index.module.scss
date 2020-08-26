@@ -22,3 +22,18 @@
   top: 0;
   width: 100%;
 }
+
+.skip {
+  position: absolute;
+  right: 3vw;
+  bottom: 3vw;
+  padding: 2vw 3vw;
+  font-size: 3vw;
+  font-family: "Carters";
+  color: #fff;
+  border-radius: 2vw;
+
+  &:active {
+    background: rgba(0, 0, 0, 0.3);
+  }
+}

@@ -16,7 +16,7 @@ import Quarters from "../Collection/Quarters";
 import { motion, AnimatePresence } from "framer-motion";
 import { AssetContext } from "../../components/AssetLoader";
 import useKeyPress from "../../hooks/useKeyPress";
-import { ARContext } from "../../components/ARBridge";
+import { ARContext, useArSettings } from "../../components/ARBridge";
 import shortid from "shortid";
 import Progress from "./Progress";
 
@@ -64,6 +64,18 @@ const Gameplay = (props: { category: keyof typeof Quarters }) => {
     [gameState, category]
   );
 
+  useEffect(() => {
+    if (sfx) {
+      const music = sfx.timer[0];
+      music.volume(0.3);
+      music.loop(true);
+      music.play();
+      return () => {
+        music.stop();
+      };
+    }
+  }, [sfx]);
+
   const shuffleQuestions = useCallback(() => {
     batch.current = shortid();
     setShuffledQuestions(
@@ -80,9 +92,10 @@ const Gameplay = (props: { category: keyof typeof Quarters }) => {
   }, []);
 
   //lock george to floating mode
-  useEffect(() => {
-    arController.george.floatLocked = true;
-  }, [arController]);
+  useArSettings({
+    isGeorgeFloatLocked: true,
+    isGeorgeCentered: false,
+  });
 
   const limitedEffect = useMemo(
     () =>
@@ -137,7 +150,7 @@ const Gameplay = (props: { category: keyof typeof Quarters }) => {
 
   useEffect(() => {
     if (answeredQuestions.length >= QUESTION_GOAL) finishGame();
-  }, [answeredQuestions, category, finishGame]);
+  }, [answeredQuestions, finishGame]);
 
   if (!quarter) return null;
   const PanelComponent = quarter.panel;

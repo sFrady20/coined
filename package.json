@@ -15,7 +15,7 @@
     "crypto-js": "^4.0.0",
     "howler": "^2.2.0",
     "immer": "^6.0.3",
-    "popmotion": "^8.7.3",
+    "popmotion": "9.0.0-beta-8",
     "postprocessing": "^6.16.0",
     "raw-loader": "^4.0.1",
     "react": "^16.13.1",

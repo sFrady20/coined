@@ -11,6 +11,8 @@ import ARController from "./ARController";
 import { ARContext } from ".";
 import { AssetContext } from "../AssetLoader";
 import { SessionContext } from "../Session";
+import { motion } from "framer-motion";
+import { ReactComponent as SpinnerSvg } from "../../media/spinner.svg";
 
 const ARRenderer = memo((props: { children?: ReactNode }) => {
   const { children } = props;
@@ -18,6 +20,7 @@ const ARRenderer = memo((props: { children?: ReactNode }) => {
   const { events } = useContext(SessionContext);
   const assets = useContext(AssetContext);
   const arController = useMemo(() => new ARController(), []);
+  const [isControllerInited, setControllerInited] = useState(false);
 
   const size = useMemo(() => {
     if (rootRef) {
@@ -28,8 +31,11 @@ const ARRenderer = memo((props: { children?: ReactNode }) => {
   }, [rootRef]);
 
   useEffect(() => {
-    arController.init(assets);
-  }, [arController, assets]);
+    (async () => {
+      await arController.init(assets);
+      setControllerInited(true);
+    })();
+  }, [arController, assets, setControllerInited]);
 
   //session animation events
   useEffect(() => {
@@ -55,25 +61,43 @@ const ARRenderer = memo((props: { children?: ReactNode }) => {
   return (
     <div className={styles.root}>
       <div className={styles.renderer} ref={(r) => setRootRef(r || undefined)}>
-        <video
+        <motion.video
           className={styles.video}
           id={"cameraFeed"}
           autoPlay
           playsInline
           muted
+          initial={{ opacity: 0 }}
+          animate={isControllerInited ? { opacity: 1 } : { opacity: 0 }}
+          exit={{ opacity: 0 }}
         />
         <canvas className={styles.debugCanvas} id={"debugCanvas"} />
-        <canvas
+        <motion.canvas
           className={styles.mainCanvas}
           id={"mainCanvas"}
           width={size[0]}
           height={size[1]}
           onClick={arController.handleClick}
+          initial={{ opacity: 0 }}
+          animate={isControllerInited ? { opacity: 1 } : { opacity: 0 }}
+          exit={{ opacity: 0 }}
         />
       </div>
-      <ARContext.Provider value={{ arController }}>
-        <div className={styles.content}>{children}</div>
-      </ARContext.Provider>
+      {isControllerInited ? (
+        <ARContext.Provider value={{ arController }}>
+          <div className={styles.content}>{children}</div>
+        </ARContext.Provider>
+      ) : (
+        <motion.div
+          className={styles.spinnerContainer}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <SpinnerSvg className={styles.spinner} />
+          <div className={styles.spinnerText}>Initializing Camera...</div>
+        </motion.div>
+      )}
     </div>
   );
 });

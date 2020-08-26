@@ -5,6 +5,12 @@
   width: 100%;
   height: 100%;
   z-index: 0;
+  background: rgb(39, 131, 160);
+  background: linear-gradient(
+    180deg,
+    rgba(39, 131, 160, 1) 0%,
+    rgba(120, 209, 241, 1) 100%
+  );
 }
 
 .video {
@@ -46,4 +52,44 @@
   flex-direction: column;
   pointer-events: all;
   overflow: hidden;
+}
+
+.spinnerContainer {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  pointer-events: all;
+  overflow: hidden;
+}
+
+.spinner {
+  width: 8vw;
+  height: 8vw;
+  margin: 6vw;
+  animation-name: spin;
+  animation-duration: 2500ms;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  color: white;
+}
+
+.spinnerText {
+  color: white;
+  font-size: 3vw;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }

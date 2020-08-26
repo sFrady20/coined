@@ -26,6 +26,7 @@ const Question = (props: {
 
   useEffect(() => {
     if (answer === undefined && isCollectionCollapsed) {
+      /*
       const timerSfx = sfx.timer[0];
       timerSfx.volume(0);
       timerSfx.play();
@@ -45,15 +46,25 @@ const Question = (props: {
         timerSfx.stop();
         clearInterval(interval);
       };
+      */
+
+      const timeout = setTimeout(() => {
+        setAnswer(!question.answer);
+        onAnswered && onAnswered(!question.answer);
+      }, 20 * 1000);
+
+      return () => {
+        clearTimeout(timeout);
+      };
     }
   }, [sfx, answer, onAnswered, setAnswer, isCollectionCollapsed, question]);
 
   return (
     <motion.div
       className={styles.root}
-      initial={{ translateY: "50vh" }}
-      animate={{ translateY: 0 }}
-      exit={{ translateY: "50vh" }}
+      initial={{ translateY: "50vh", opacity: 1 }}
+      animate={{ translateY: 0, opacity: 1 }}
+      exit={{ translateY: "50vh", opacity: 0 }}
     >
       <motion.div
         className={styles.question}

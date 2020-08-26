@@ -1,6 +1,11 @@
 import React, { memo, useContext, useEffect, useRef, useCallback } from "react";
 import styles from "./index.module.scss";
-import { ARContext } from "../../components/ARBridge";
+import {
+  ARContext,
+  useArSettings,
+  DETECT_START_EVENT,
+  WEBCAM_ERROR_EVENT,
+} from "../../components/ARBridge";
 import { SessionContext } from "../../components/Session";
 import { ReactComponent as ScannerSvg } from "../../media/scanner.svg";
 import { ReactComponent as ScanPromptSvg } from "../../media/scanPrompt.svg";
@@ -15,12 +20,17 @@ const Scan = memo(() => {
   const { models, sfx } = useContext(AssetContext);
   const hasScanned = useRef(false);
 
+  useArSettings({
+    isGeorgeFloatLocked: false,
+    isGeorgeCentered: true,
+    isCoinDetectionEnabled: true,
+  });
+
   const next = useCallback(() => {
-    arController.george.snapToQuarter();
-    setTimeout(() => {
+    arController.george.model.visible = true;
+    arController.george.waitTimeout = setTimeout(() => {
       arController.george.say(sfx.intro);
     }, 5000);
-    arController.george.model.visible = true;
     arController.george.playAnimation(models["appear"].animations[0]);
     updateSessionState((s) => {
       s.phase = "intro";
@@ -28,17 +38,27 @@ const Scan = memo(() => {
   }, [arController, updateSessionState, sfx, models]);
 
   useEffect(() => {
-    if (arController) {
-      arController.isCoinDetectionEnabled = true;
+    if (arController.webcamError) {
+      next();
+    } else {
       const listener = () => {
         if (hasScanned.current) return;
         hasScanned.current = true;
+        arController.george.snapToQuarter();
+        arController.triggerGlow();
         next();
       };
-      arController.events.addEventListener("onDetectStart", listener);
+      arController.events.addEventListener(DETECT_START_EVENT, listener);
+
+      const errorListener = () => {
+        console.log("error");
+        next();
+      };
+
+      arController.events.addEventListener(WEBCAM_ERROR_EVENT, errorListener);
       return () => {
-        arController.isCoinDetectionEnabled = false;
-        arController.events.removeEventListener("onDetectStart", listener);
+        arController.events.removeEventListener(DETECT_START_EVENT, listener);
+        arController.events.removeEventListener(WEBCAM_ERROR_EVENT, listener);
       };
     }
   }, [arController, updateSessionState, hasScanned, models, next]);
@@ -101,6 +121,9 @@ const Scan = memo(() => {
       >
         <ScanPromptSvg />
       </motion.div>
+      <div className={styles.skip} onClick={() => next()}>
+        Skip
+      </div>
     </>
   );
 });

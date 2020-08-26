@@ -17,6 +17,14 @@ import { AssetContextType } from "../AssetLoader";
 import GeorgeCharacter from "./GeorgeCharacter";
 import { MouseEvent } from "react";
 import _ from "lodash";
+import makeGlowEffect from "../../3d/glowEffect";
+import tween from "../../util/tween";
+
+export const DETECT_START_EVENT = "onDetectStart";
+export const DETECT_END_EVENT = "onDetectEnd";
+export const WEBCAM_STARTED_EVENT = "webcamStart";
+export const WEBCAM_STOPPED_EVENT = "webcamStop";
+export const WEBCAM_ERROR_EVENT = "webcamError";
 
 //@ts-ignore
 const WebARRocksObject = window.WEBARROCKSOBJECT;
@@ -49,11 +57,17 @@ class ARController {
   public readonly quarterRotation = new Quaternion();
   public isCoinDetectionEnabled = true;
 
+  private glowEffect!: ReturnType<typeof makeGlowEffect>;
   private isInited = false;
   private isCoinDetectionStarted = false;
   private prevCoinDetection: string | false = false;
   private isInBackground = false;
   private curY = 0;
+  private _webcamError?: Error;
+
+  public get webcamError() {
+    return this._webcamError;
+  }
 
   public init = async (assets: AssetContextType) => {
     //only run once
@@ -93,23 +107,33 @@ class ARController {
 
   private initWebcam = async () => {
     //init stream
-    this.stream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        width: { min: 640, max: 1920, ideal: 1280 },
-        height: { min: 640, max: 1920, ideal: 720 },
-        facingMode: "environment",
-      },
-      audio: false,
-    });
-    await new Promise((resolve) => {
-      this.video.addEventListener("play", resolve);
-      this.video.srcObject = this.stream;
-    });
+    try {
+      this.stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          width: { min: 640, max: 1920, ideal: 1280 },
+          height: { min: 640, max: 1920, ideal: 720 },
+          facingMode: "environment",
+        },
+        audio: false,
+      });
+      await new Promise((resolve) => {
+        this.video.addEventListener("play", resolve);
+        this.video.srcObject = this.stream;
+      });
+      this.events.dispatchEvent({ type: WEBCAM_STARTED_EVENT });
+    } catch (err) {
+      this.stopWebcam();
+      this._webcamError = err;
+      this.events.dispatchEvent({ type: WEBCAM_ERROR_EVENT, error: err });
+    }
   };
   private stopWebcam = () => {
-    this.stream.getTracks().forEach((track) => track.stop());
-    this.video.pause();
-    this.video.srcObject = null;
+    if (this.stream) this.stream.getTracks().forEach((track) => track.stop());
+    if (this.video) {
+      this.video.pause();
+      this.video.srcObject = null;
+    }
+    this.events.dispatchEvent({ type: WEBCAM_STOPPED_EVENT });
   };
 
   private initThreeScene = () => {
@@ -130,6 +154,10 @@ class ARController {
     this.scene.add(new THREE.AmbientLight(0x404040, 0.5));
 
     this.george = new GeorgeCharacter(this);
+
+    this.glowEffect = makeGlowEffect(this.scene);
+    this.glowEffect.group.scale.set(1.2, 1.2, 1.2);
+    this.scene.add(this.glowEffect.group);
 
     this.orientation = new DeviceOrientationControls(this.camera);
     this.orientation.connect();
@@ -182,8 +210,22 @@ class ARController {
       const delta = this.clock.getDelta();
 
       this.updateCoinDetection(delta);
+
       this.orientation.update();
       this.george.update(delta);
+
+      this.glowEffect.uniforms["time"].value = this.clock.elapsedTime;
+      this.glowEffect.group.position.lerp(this.quarterPosition, 10 * delta);
+      this.glowEffect.group.quaternion.slerp(this.quarterRotation, 10 * delta);
+      if (
+        !this.george.floatLocked &&
+        (this.detectState?.avgDetectScore || 0) > 0.1
+      ) {
+        this.glowEffect.group.visible = true;
+        this.glowEffect.update();
+      } else {
+        this.glowEffect.group.visible = false;
+      }
 
       // compute vertical field of view:
       // compute aspectRatio:
@@ -252,7 +294,7 @@ class ARController {
           //calculate quarter rotation (towards camera)
           this.curY = this.detectState.yaw - Math.PI / 2;
           this.events.dispatchEvent({
-            type: "onDetectStart",
+            type: DETECT_START_EVENT,
             state: this.detectState,
           });
           this.prevCoinDetection = this.detectState.label;
@@ -260,7 +302,7 @@ class ARController {
       } else {
         if (this.prevCoinDetection !== false) {
           this.events.dispatchEvent({
-            type: "onDetectEnd",
+            type: DETECT_END_EVENT,
             state: this.detectState,
           });
           this.prevCoinDetection = false;
@@ -299,6 +341,28 @@ class ARController {
       this.george.playAnimation(this.assets.models.easterEgg.animations[0]);
       this.george.say(this.assets.sfx["huzzah"]);
     }
+  };
+
+  public triggerGlow = async () => {
+    this.glowEffect.group.position.copy(this.quarterPosition);
+    this.glowEffect.group.quaternion.copy(this.quarterRotation);
+    const update = (v: number) => (this.glowEffect.uniforms["glow"].value = v);
+    await tween(
+      {
+        from: 1,
+        to: 0,
+        duration: 1000,
+      },
+      update
+    );
+    await tween(
+      {
+        from: 0,
+        to: 1,
+        duration: 2400,
+      },
+      update
+    );
   };
 }
 

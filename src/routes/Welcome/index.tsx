@@ -1,12 +1,11 @@
-import React, { memo, useContext, useEffect, useCallback } from "react";
+import React, { memo, useContext, useCallback } from "react";
 import styles from "./index.module.scss";
 import Button from "../../components/Button";
 import { SessionContext } from "../../components/Session";
 import { motion } from "framer-motion";
-import { ARContext } from "../../components/ARBridge";
+import { useArSettings } from "../../components/ARBridge";
 
 const Welcome = memo(() => {
-  const { arController } = useContext(ARContext);
   const { updateSessionState } = useContext(SessionContext);
 
   const next = useCallback(() => {
@@ -15,15 +14,12 @@ const Welcome = memo(() => {
     });
   }, [updateSessionState]);
 
-  useEffect(() => {
-    arController.george.floatLocked = false;
-    arController.george.isCentered = true;
-    return () => {
-      arController.george.floatLocked = true;
-      arController.george.isCentered = false;
-      arController.george.shutup();
-    };
-  }, [arController]);
+  useArSettings({
+    isGeorgeCentered: true,
+    isGeorgeFloatLocked: false,
+    isCoinDetectionEnabled: true,
+    shouldGeorgeStopTalking: true,
+  });
 
   return (
     <motion.div

@@ -5,7 +5,7 @@ const preloadAudio = async (onProgress: (pct: number) => void) => {
   const files = {
     correct: "/sfx/correct.mp3",
     wrong: "/sfx/wrong.mp3",
-    timer: "/sfx/timer.mp3",
+    timer: "/sfx/theme.mp3",
     intro: "/sfx/GW_intro.mp3",
     huzzah: "/sfx/GW_huzzah.mp3",
     gwCorrect: _.times(10, (i) => `/sfx/GW_right_${i + 1}.mp3`),
