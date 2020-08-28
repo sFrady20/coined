@@ -1,6 +1,6 @@
 import React, { memo, useContext, ReactNode } from "react";
 import styles from "./index.module.scss";
-import Quarters from "../../routes/Collection/Quarters";
+import Quarters from "../Collection/Quarters";
 import { ReactComponent as CloseSvg } from "../../media/close.svg";
 import { AssetContext } from "../../components/AssetLoader";
 import { motion } from "framer-motion";

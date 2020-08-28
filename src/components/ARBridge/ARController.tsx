@@ -12,7 +12,7 @@ import {
   Euler,
 } from "three";
 import { DEVELOPMENT_MODE, NN_THRESHOLD, NN_AVG_POOL } from "../../config";
-import NN from "./models/NN_USQUARTER_5.json";
+import NN from "./models/NN_USQUARTER_7.json";
 import { AssetContextType } from "../AssetLoader";
 import GeorgeCharacter from "./GeorgeCharacter";
 import { MouseEvent } from "react";

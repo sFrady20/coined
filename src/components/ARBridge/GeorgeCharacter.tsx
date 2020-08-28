@@ -53,7 +53,7 @@ class GeorgeCharacter {
   public mixer: AnimationMixer;
   public mesh: SkinnedMesh;
   public nodes: { [s: string]: Object3D };
-  public waitTimeout?: NodeJS.Timeout; //bad
+  public waitTimeout?: NodeJS.Timeout; //ad
   public floatLocked = false;
   public isCentered = true;
   private lastUpdate = Date.now();

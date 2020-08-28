@@ -1,4 +1,11 @@
-import React, { memo, useContext, useEffect, useRef, useCallback } from "react";
+import React, {
+  memo,
+  useContext,
+  useEffect,
+  useRef,
+  useCallback,
+  useState,
+} from "react";
 import styles from "./index.module.scss";
 import {
   ARContext,
@@ -18,7 +25,7 @@ const Scan = memo(() => {
   const { updateSessionState } = useContext(SessionContext);
   const { arController } = useContext(ARContext);
   const { models, sfx } = useContext(AssetContext);
-  const hasScanned = useRef(false);
+  const [hasScanned, setScanned] = useState(false);
 
   useArSettings({
     isGeorgeFloatLocked: false,
@@ -28,6 +35,7 @@ const Scan = memo(() => {
 
   const next = useCallback(() => {
     arController.george.model.visible = true;
+    sfx.scan[0].play();
     arController.george.waitTimeout = setTimeout(() => {
       arController.george.say(sfx.intro);
     }, 5000);
@@ -41,24 +49,26 @@ const Scan = memo(() => {
     if (arController.webcamError) {
       next();
     } else {
+      if (hasScanned) return;
+
       const listener = () => {
-        if (hasScanned.current) return;
-        hasScanned.current = true;
         arController.george.snapToQuarter();
         arController.triggerGlow();
-        next();
+        setScanned(true);
       };
       arController.events.addEventListener(DETECT_START_EVENT, listener);
 
       const errorListener = () => {
-        console.log("error");
-        next();
+        setScanned(true);
       };
 
       arController.events.addEventListener(WEBCAM_ERROR_EVENT, errorListener);
       return () => {
         arController.events.removeEventListener(DETECT_START_EVENT, listener);
-        arController.events.removeEventListener(WEBCAM_ERROR_EVENT, listener);
+        arController.events.removeEventListener(
+          WEBCAM_ERROR_EVENT,
+          errorListener
+        );
       };
     }
   }, [arController, updateSessionState, hasScanned, models, next]);

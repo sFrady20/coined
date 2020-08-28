@@ -4,22 +4,23 @@ import { Route, Switch } from "react-router";
 import styles from "./index.module.scss";
 import SessionContextProvider from "../Session";
 import TempPassword from "../TempPassword";
-import AnimationTest from "../../routes/AnimationTest";
+import AnimationTest from "../../tests/AnimationTest";
 import AssetLoader from "../AssetLoader";
 import ARRenderer from "../ARBridge/ARRenderer";
-import EffectTest from "../../routes/EffectTest";
-import Test2 from "../../routes/AnimationTest/Test2";
+import EffectTest from "../../tests/EffectTest";
+import Test2 from "../../tests/AnimationTest/Test2";
 import Header from "../Header";
 import Footer from "../Footer";
-import Collection from "../../routes/Collection";
-import Scan from "../../routes/Scan";
-import Welcome from "../../routes/Welcome";
-import Gameplay from "../../routes/Gameplay";
-import { SessionContext } from "../../components/Session";
+import Collection from "../Collection";
+import Scan from "../Scan";
+import Welcome from "../Welcome";
+import Gameplay from "../Gameplay";
+import { SessionContext } from "../Session";
 import { AnimatePresence } from "framer-motion";
-import { Win } from "../../components/Feedback";
-import Reward from "../../routes/Reward";
-import CategorySelect from "../../routes/CategorySelect";
+import { Win } from "../Feedback";
+import Reward from "../Reward";
+import CategorySelect from "../CategorySelect";
+import NnTest from "../../tests/NnTest";
 
 const MainRoute = memo(() => {
   const { sessionState } = useContext(SessionContext);
@@ -65,6 +66,11 @@ const Router = memo(() => {
         <Route exact path="/testEffects">
           <Suspense fallback="Loading">
             <EffectTest />
+          </Suspense>
+        </Route>
+        <Route exact path="/nnTest">
+          <Suspense fallback="Loading">
+            <NnTest />
           </Suspense>
         </Route>
         <Route exact path="/feedback">

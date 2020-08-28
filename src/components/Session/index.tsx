@@ -5,8 +5,8 @@ import { Draft } from "immer";
 import { useImmer } from "use-immer";
 import crypto from "crypto-js";
 import shortid from "shortid";
-import Quarters from "../../routes/Collection/Quarters";
-import { QuestionDefinition } from "../../routes/Gameplay";
+import Quarters from "../Collection/Quarters";
+import { QuestionDefinition } from "../Gameplay";
 
 const LOCAL_STORAGE_KEY = "coined_data_2";
 const ENCRYPTION_KEY = "dcub2308cybe31y0";

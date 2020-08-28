@@ -1,0 +1,42 @@
+.renderer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  background: rgb(39, 131, 160);
+  background: linear-gradient(
+    180deg,
+    rgba(39, 131, 160, 1) 0%,
+    rgba(120, 209, 241, 1) 100%
+  );
+}
+
+.video {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mainCanvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: all;
+}
+
+.debugCanvas {
+  position: absolute;
+  right: 0px;
+  bottom: 0px;
+  width: 108px;
+  height: 108px;
+  z-index: 1000;
+  pointer-events: none;
+}

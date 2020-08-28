@@ -1,6 +1,6 @@
 import React, { memo, useContext } from "react";
 import styles from "./index.module.scss";
-import Quarters from "../../routes/Collection/Quarters";
+import Quarters from "../Collection/Quarters";
 import { AssetContext } from "../../components/AssetLoader";
 
 const CategoryCard = memo((props: { category: keyof typeof Quarters }) => {

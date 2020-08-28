@@ -1,5 +1,4 @@
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
-//import { FBXLoader as ScuffLoader } from "./FBXLoader";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
 import _ from "lodash";
@@ -8,7 +7,6 @@ import { Group } from "three";
 const preloadModels = async (onProgress: (pct: number) => void) => {
   const loader = new FBXLoader();
   const gltfLoader = new GLTFLoader();
-  //const scuffLoader = new (ScuffLoader as any)();
   var progress = 0;
 
   gltfLoader.setResourcePath("/models/");
