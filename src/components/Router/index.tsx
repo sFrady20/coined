@@ -1,6 +1,6 @@
 import React, { Suspense, memo, useContext } from "react";
 import { BrowserRouter } from "react-router-dom";
-import { Route, Switch } from "react-router";
+import { Route, Switch, Redirect } from "react-router";
 import styles from "./index.module.scss";
 import SessionContextProvider from "../Session";
 import TempPassword from "../TempPassword";
@@ -21,6 +21,10 @@ import { Win } from "../Feedback";
 import Reward from "../Reward";
 import CategorySelect from "../CategorySelect";
 import NnTest from "../../tests/NnTest";
+import QrCode from "../QrCode";
+import isMobile from "is-mobile";
+
+const IS_MOBILE = isMobile();
 
 const MainRoute = memo(() => {
   const { sessionState } = useContext(SessionContext);
@@ -87,28 +91,34 @@ const Router = memo(() => {
           </div>
         </Route>
 
+        <Route path="/qr">{IS_MOBILE ? <Redirect to="/" /> : <QrCode />}</Route>
+
         <Route path="/">
-          {({ location }) => (
-            <SessionContextProvider>
-              <TempPassword password="HUZZAH!">
-                <AssetLoader>
-                  <ARRenderer>
-                    <div className={styles.page}>
-                      <Header />
-                      <div className={styles.content}>
-                        <Switch location={location}>
-                          <Route path={"/"}>
-                            <MainRoute />
-                          </Route>
-                        </Switch>
-                        <Collection />
+          {IS_MOBILE ? (
+            ({ location }) => (
+              <SessionContextProvider>
+                <TempPassword password="HUZZAH!">
+                  <AssetLoader>
+                    <ARRenderer>
+                      <div className={styles.page}>
+                        <Header />
+                        <div className={styles.content}>
+                          <Switch location={location}>
+                            <Route path={"/"}>
+                              <MainRoute />
+                            </Route>
+                          </Switch>
+                          <Collection />
+                        </div>
+                        <Footer />
                       </div>
-                      <Footer />
-                    </div>
-                  </ARRenderer>
-                </AssetLoader>
-              </TempPassword>
-            </SessionContextProvider>
+                    </ARRenderer>
+                  </AssetLoader>
+                </TempPassword>
+              </SessionContextProvider>
+            )
+          ) : (
+            <Redirect to="/qr" />
           )}
         </Route>
       </Switch>

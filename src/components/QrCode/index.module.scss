@@ -1,0 +1,54 @@
+.root {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  background: rgb(39, 131, 160);
+  background: linear-gradient(
+    180deg,
+    rgba(39, 131, 160, 1) 0%,
+    rgba(120, 209, 241, 1) 100%
+  );
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: auto;
+}
+
+.container {
+  width: 500px;
+  text-align: center;
+  max-width: 100%;
+  margin: auto;
+}
+
+.title {
+  color: white;
+  margin: -50px;
+  width: 500px;
+  text-transform: uppercase;
+}
+
+.info {
+  margin-top: 0px;
+  padding: 20px;
+  color: white;
+  font-size: 22px;
+  line-height: 1.4em;
+}
+
+.instructions {
+  padding: 20px;
+  color: white;
+  font-size: 14px;
+  line-height: 1.4em;
+}
+
+.qrCode {
+  overflow: hidden;
+  border-radius: 12px;
+  width: 350px;
+  max-width: 100%;
+}

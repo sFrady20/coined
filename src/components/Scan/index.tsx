@@ -1,31 +1,24 @@
-import React, {
-  memo,
-  useContext,
-  useEffect,
-  useRef,
-  useCallback,
-  useState,
-} from "react";
+import React, { memo, useContext, useEffect, useRef, useCallback } from "react";
 import styles from "./index.module.scss";
 import {
   ARContext,
   useArSettings,
   DETECT_START_EVENT,
   WEBCAM_ERROR_EVENT,
-} from "../../components/ARBridge";
-import { SessionContext } from "../../components/Session";
+} from "../ARBridge";
+import { SessionContext } from "../Session";
 import { ReactComponent as ScannerSvg } from "../../media/scanner.svg";
 import { ReactComponent as ScanPromptSvg } from "../../media/scanPrompt.svg";
 import { ReactComponent as ScanFadeSvg } from "../../media/scanFade.svg";
 import { motion } from "framer-motion";
 import useKeyPress from "../../hooks/useKeyPress";
-import { AssetContext } from "../../components/AssetLoader";
+import { AssetContext } from "../AssetLoader";
 
 const Scan = memo(() => {
   const { updateSessionState } = useContext(SessionContext);
   const { arController } = useContext(ARContext);
   const { models, sfx } = useContext(AssetContext);
-  const [hasScanned, setScanned] = useState(false);
+  const hasScanned = useRef(false);
 
   useArSettings({
     isGeorgeFloatLocked: false,
@@ -35,7 +28,8 @@ const Scan = memo(() => {
 
   const next = useCallback(() => {
     arController.george.model.visible = true;
-    sfx.scan[0].play();
+    arController.music = sfx.scan[0];
+    arController.music.play();
     arController.george.waitTimeout = setTimeout(() => {
       arController.george.say(sfx.intro);
     }, 5000);
@@ -49,17 +43,18 @@ const Scan = memo(() => {
     if (arController.webcamError) {
       next();
     } else {
-      if (hasScanned) return;
-
       const listener = () => {
+        if (hasScanned.current) return;
+        hasScanned.current = true;
         arController.george.snapToQuarter();
         arController.triggerGlow();
-        setScanned(true);
+        next();
       };
       arController.events.addEventListener(DETECT_START_EVENT, listener);
 
       const errorListener = () => {
-        setScanned(true);
+        console.log("error");
+        next();
       };
 
       arController.events.addEventListener(WEBCAM_ERROR_EVENT, errorListener);

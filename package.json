@@ -17,6 +17,7 @@
     "dat.gui": "^0.7.7",
     "howler": "^2.2.0",
     "immer": "^6.0.3",
+    "is-mobile": "^2.2.2",
     "popmotion": "9.0.0-beta-8",
     "postprocessing": "^6.16.0",
     "raw-loader": "^4.0.1",

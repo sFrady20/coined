@@ -34,7 +34,10 @@ const useArSettings = (settings?: {
       arController.george.floatLocked = true;
       arController.george.isCentered = false;
       arController.isCoinDetectionEnabled = false;
-      if (shouldGeorgeStopTalking) arController.george.shutup();
+      if (shouldGeorgeStopTalking) {
+        arController.george.shutup();
+        if (arController.music) arController.music.stop();
+      }
     };
   }, [
     arController,

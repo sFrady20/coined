@@ -19,6 +19,7 @@ import { MouseEvent } from "react";
 import _ from "lodash";
 import makeGlowEffect from "../../3d/glowEffect";
 import tween from "../../util/tween";
+import { Howl } from "howler";
 
 export const DETECT_START_EVENT = "onDetectStart";
 export const DETECT_END_EVENT = "onDetectEnd";
@@ -56,6 +57,7 @@ class ARController {
   public readonly quarterPosition = new Vector3();
   public readonly quarterRotation = new Quaternion();
   public isCoinDetectionEnabled = true;
+  public music?: Howl;
 
   private glowEffect!: ReturnType<typeof makeGlowEffect>;
   private isInited = false;
@@ -351,7 +353,7 @@ class ARController {
       {
         from: 1,
         to: 0,
-        duration: 1000,
+        duration: 200,
       },
       update
     );
@@ -359,7 +361,7 @@ class ARController {
       {
         from: 0,
         to: 1,
-        duration: 2400,
+        duration: 2800,
       },
       update
     );
