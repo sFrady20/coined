@@ -40,13 +40,13 @@ const ARRenderer = memo((props: { children?: ReactNode }) => {
   //session animation events
   useEffect(() => {
     const handleCorrect = () => {
-      arController.george.playAnimation(assets.models.applause.animations[0]);
+      arController.george.playAnimation(assets.models.applause?.animations[0]);
     };
     const handleIncorrect = () => {
-      arController.george.playAnimation(assets.models.laugh.animations[0]);
+      arController.george.playAnimation(assets.models.laugh?.animations[0]);
     };
     const handleGameEnd = () => {
-      arController.george.playAnimation(assets.models.endGame.animations[0]);
+      arController.george.playAnimation(assets.models.endGame?.animations[0]);
     };
     events.addEventListener("correct", handleCorrect);
     events.addEventListener("incorrect", handleIncorrect);

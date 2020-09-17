@@ -340,7 +340,7 @@ class ARController {
     const intersects = raycaster.intersectObject(this.george.model, true);
 
     if (intersects.length > 0 && this.george.model.visible) {
-      this.george.playAnimation(this.assets.models.easterEgg.animations[0]);
+      this.george.playAnimation(this.assets.models.easterEgg?.animations[0]);
       this.george.say(this.assets.sfx["huzzah"]);
     }
   };

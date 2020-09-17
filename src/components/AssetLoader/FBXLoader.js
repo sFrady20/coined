@@ -149,7 +149,7 @@ var FBXLoader = (function () {
     parse: function () {
       connections = this.parseConnections();
 
-      var images = this.parseImages();
+      var images = {};
       var textures = this.parseTextures(images);
       var materials = this.parseMaterials(textures);
       var deformers = this.parseDeformers();

@@ -180,7 +180,14 @@ class GeorgeCharacter {
     this.root.quaternion.copy(this.context.quarterRotation);
   };
 
-  public playAnimation = (animation: AnimationClip) => {
+  public playAnimation = (animation?: AnimationClip | AnimationClip[]) => {
+    if (Array.isArray(animation)) {
+      animation = _(animation)
+        .orderBy(() => Math.random())
+        .first();
+    }
+    if (!animation) return;
+
     //remove tracked bones from animation
     _.remove(animation.tracks, (t: any) => DISABLED_BONES.includes(t.name));
 

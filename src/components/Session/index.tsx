@@ -15,6 +15,7 @@ export type GameState = {
   clientId: string;
   password?: string;
   name: string;
+  isMusicMuted?: boolean;
   answeredQuestions: {
     [s: string]: QuestionDefinition[];
   };
@@ -24,6 +25,7 @@ export type GameState = {
 const defaultGameState: GameState = {
   clientId: shortid(),
   name: "",
+  isMusicMuted: false,
   answeredQuestions: {},
   collection: [],
   visited: [],

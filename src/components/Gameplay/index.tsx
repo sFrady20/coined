@@ -19,6 +19,7 @@ import useKeyPress from "../../hooks/useKeyPress";
 import { ARContext, useArSettings } from "../../components/ARBridge";
 import shortid from "shortid";
 import Progress from "./Progress";
+import MusicToggle from "./MusicToggle";
 
 export type QuestionDefinition = {
   category: string;
@@ -48,7 +49,7 @@ const Gameplay = (props: { category: keyof typeof Quarters }) => {
   );
   const { questions, sfx, models } = useContext(AssetContext);
   const { arController } = useContext(ARContext);
-  const { collection } = gameState;
+  const { collection, isMusicMuted } = gameState;
   const gameFinished = useRef(false);
   const batch = useRef(shortid());
   const quarter = useMemo(() => category && Quarters[category], [category]);
@@ -65,7 +66,7 @@ const Gameplay = (props: { category: keyof typeof Quarters }) => {
   );
 
   useEffect(() => {
-    if (sfx) {
+    if (sfx && !isMusicMuted) {
       const music = sfx.timer[0];
       music.volume(0.3);
       music.loop(true);
@@ -74,7 +75,7 @@ const Gameplay = (props: { category: keyof typeof Quarters }) => {
         music.stop();
       };
     }
-  }, [sfx]);
+  }, [sfx, isMusicMuted]);
 
   const shuffleQuestions = useCallback(() => {
     batch.current = shortid();
@@ -166,6 +167,15 @@ const Gameplay = (props: { category: keyof typeof Quarters }) => {
         <PanelComponent />
       </motion.div>
 
+      <MusicToggle
+        isMuted={isMusicMuted}
+        onMutedChanged={(m) =>
+          updateGameState((s) => {
+            s.isMusicMuted = m;
+          })
+        }
+      />
+
       <div className={styles.progress}>
         <Progress current={answeredQuestions.length} max={QUESTION_GOAL} />
       </div>
@@ -206,9 +216,11 @@ const Gameplay = (props: { category: keyof typeof Quarters }) => {
                       .first()
                       ?.play();
 
-                    arController.george.playAnimation(
-                      models.applause.animations[0]
-                    );
+                    arController.george.playAnimation([
+                      models.applause?.animations[0],
+                      //models.throwsCane.animations[0],
+                      //models.welcome.animations[0],
+                    ]);
 
                     limitedEffect(() => {
                       arController.george.say(sfx["gwCorrect"]);
@@ -220,9 +232,12 @@ const Gameplay = (props: { category: keyof typeof Quarters }) => {
                       .first()
                       ?.play();
 
-                    arController.george.playAnimation(
-                      models.laugh.animations[0]
-                    );
+                    console.log(models);
+                    arController.george.playAnimation([
+                      models.laugh?.animations[0],
+                      //models.challenging.animations[0],
+                      //models.shrug.animations[0],
+                    ]);
 
                     limitedEffect(() => {
                       arController.george.say(sfx["gwWrong"]);

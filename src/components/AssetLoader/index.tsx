@@ -10,7 +10,7 @@ import LoadingScreen from "./LoadingScreen";
 import preloadImages from "./preloadImages";
 import preloadAudio from "./preloadAudio";
 import preloadQuestions from "./preloadQuestions";
-import preloadModels from "./preloadModels";
+import preloadModels, { loadOptionalModels } from "./preloadModels";
 import waitForSeconds from "../../util/waitForSeconds";
 
 type PromiseResolvedType<T> = T extends Promise<infer R> ? R : never;
@@ -48,13 +48,16 @@ const Preloader = memo((props: { children: ReactNode }) => {
         await preloadImages((pct) => setProgress((step + pct) / totalSteps))
       );
       step++;
-      setModels(
-        await preloadModels((pct) => setProgress((step + pct) / totalSteps))
+      const newModels = await preloadModels((pct) =>
+        setProgress((step + pct) / totalSteps)
       );
+      setModels(newModels);
       step++;
       setSfx(
         await preloadAudio((pct) => setProgress((step + pct) / totalSteps))
       );
+
+      loadOptionalModels(newModels);
     })();
   }, [setProgress]);
 

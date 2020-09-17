@@ -1,0 +1,30 @@
+.root {
+  position: absolute;
+  right: 7vw;
+  top: 7vw;
+  padding: 2vw;
+  border-radius: 50%;
+  z-index: 10;
+  transform: translate(50%, -50%);
+
+  &:active {
+    background: rgba(0, 0, 0, 0.1);
+  }
+
+  svg {
+    display: block;
+    transition: all 0.4s ease-out;
+  }
+}
+
+.music {
+  width: 4vw;
+  height: 4vw;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.mute {
+  width: 5vw;
+  height: 5vw;
+  color: rgba(255, 255, 255, 0.4);
+}
