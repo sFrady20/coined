@@ -12,7 +12,7 @@ import {
   Euler,
 } from "three";
 import { DEVELOPMENT_MODE, NN_THRESHOLD, NN_AVG_POOL } from "../../config";
-import NN from "./models/NN_USQUARTER_7.json";
+import NN from "./models/NN_USQUARTER_10.json";
 import { AssetContextType } from "../AssetLoader";
 import GeorgeCharacter from "./GeorgeCharacter";
 import { MouseEvent } from "react";
@@ -36,6 +36,20 @@ var v2 = new THREE.Vector2();
 var raycaster = new THREE.Raycaster();
 
 type DeviceOrientationControls = any;
+
+const getGetUserMedia = () =>
+  navigator.mediaDevices?.getUserMedia
+    ? navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices)
+    : (constraints: MediaStreamConstraints) =>
+        new Promise<MediaStream>((resolve, reject) =>
+          (
+            navigator.getUserMedia ||
+            //@ts-ignore
+            navigator.webkitGetUserMedia ||
+            //@ts-ignore
+            navigator.mozGetUserMedia
+          ).bind(navigator)(constraints, resolve, reject)
+        );
 
 class ARController {
   public stream!: MediaStream;
@@ -110,7 +124,7 @@ class ARController {
   private initWebcam = async () => {
     //init stream
     try {
-      this.stream = await navigator.mediaDevices.getUserMedia({
+      this.stream = await getGetUserMedia()({
         video: {
           width: { min: 640, max: 1920, ideal: 1280 },
           height: { min: 640, max: 1920, ideal: 720 },
@@ -125,6 +139,7 @@ class ARController {
       this.events.dispatchEvent({ type: WEBCAM_STARTED_EVENT });
     } catch (err) {
       this.stopWebcam();
+      console.error(err);
       this._webcamError = err;
       this.events.dispatchEvent({ type: WEBCAM_ERROR_EVENT, error: err });
     }

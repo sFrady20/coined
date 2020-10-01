@@ -7,8 +7,6 @@ const baseModel = "/models/GW_Idle_05.fbx";
 const modelPaths = {
   idle: "/models/GW_Idle_05.fbx",
   appear: "/models/GW_R2_Seq_02.fbx",
-};
-const optionalModels = {
   applause: "/models/GW_Applause_01.fbx",
   laugh: "/models/GW_Laughing_01.fbx",
   easterEgg: "/models/GW_EasterEgg_01.fbx",
@@ -18,6 +16,7 @@ const optionalModels = {
   throwsCane: "/models/GW_R2_ThrowsCane.fbx",
   welcome: "/models/GW_R2_WELCOME_01.fbx",
 };
+const optionalModels = {};
 
 const loader = new FBXLoader();
 //@ts-ignore
