@@ -94,7 +94,7 @@ const Gameplay = (props: { category: keyof typeof Quarters }) => {
 
   //lock george to floating mode
   useArSettings({
-    isGeorgeFloatLocked: true,
+    isGeorgeFloatLocked: false,
     isGeorgeCentered: false,
   });
 
@@ -218,8 +218,8 @@ const Gameplay = (props: { category: keyof typeof Quarters }) => {
 
                     arController.george.playAnimation([
                       models.applause?.animations[0],
-                      //models.throwsCane.animations[0],
-                      //models.welcome.animations[0],
+                      models.throwsCane.animations[0],
+                      models.welcome.animations[0],
                     ]);
 
                     limitedEffect(() => {
@@ -232,11 +232,10 @@ const Gameplay = (props: { category: keyof typeof Quarters }) => {
                       .first()
                       ?.play();
 
-                    console.log(models);
                     arController.george.playAnimation([
                       models.laugh?.animations[0],
-                      //models.challenging.animations[0],
-                      //models.shrug.animations[0],
+                      models.challenging.animations[0],
+                      models.shrug.animations[0],
                     ]);
 
                     limitedEffect(() => {

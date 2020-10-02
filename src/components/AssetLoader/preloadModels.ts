@@ -3,7 +3,7 @@ import _ from "lodash";
 import { Group } from "three";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 
-const baseModel = "/models/GW_Idle_05.fbx";
+const baseModel = "/models/GW_R2_Challenging.fbx";
 const modelPaths = {
   idle: "/models/GW_Idle_05.fbx",
   appear: "/models/GW_R2_Seq_02.fbx",

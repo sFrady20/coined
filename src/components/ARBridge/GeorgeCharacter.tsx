@@ -72,9 +72,13 @@ class GeorgeCharacter {
     this.model = context.assets.models["base"];
     this.model.visible = false;
     this.root.add(this.model);
+    //hide disc mesh
+    _.forEach(this.model.children, (c) => {
+      if (c.name === "Disc") c.visible = false;
+    });
 
     //@ts-ignore
-    this.idleAnimation = this.model.animations[0];
+    this.idleAnimation = context.assets.models["idle"].animations[0];
 
     this.nodes = {};
     this.model.traverse((d: Object3D) => (this.nodes[d.name] = d));

@@ -16,7 +16,7 @@ const CategorySelect = memo(() => {
   const [swiper, setSwiper] = useState<Swiper | null>(null);
 
   useArSettings({
-    isGeorgeFloatLocked: true,
+    isGeorgeFloatLocked: false,
     isGeorgeCentered: false,
   });
 

@@ -33,7 +33,7 @@ const useArSettings = (settings?: {
       //reset to default settings
       arController.george.floatLocked = true;
       arController.george.isCentered = false;
-      arController.isCoinDetectionEnabled = false;
+      arController.isCoinDetectionEnabled = true;
       if (shouldGeorgeStopTalking) {
         arController.george.shutup();
         if (arController.music) arController.music.stop();
