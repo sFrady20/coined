@@ -234,7 +234,7 @@ const Gameplay = (props: { category: keyof typeof Quarters }) => {
 
                     arController.george.playAnimation([
                       models.laugh?.animations[0],
-                      models.challenging.animations[0],
+                      //models.challenging.animations[0],
                       models.shrug.animations[0],
                     ]);
 

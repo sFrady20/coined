@@ -35,9 +35,9 @@ const w = window as any;
 w.calc = ASPECT_REFERENCE;
 
 const DISABLED_BONES = [
-  "cane_targetr.position", //moves root for some reason
-  "cane_targetr.quaternion", //moves root for some reason
-  "cane_targetr.scale",
+  //"cane_targetr.position", //moves root for some reason
+  //"cane_targetr.quaternion", //moves root for some reason
+  //"cane_targetr.scale",
   "mixamorig_Head.quaternion",
   "EYE_LEFT.quaternion",
   "EYE_RIGHT.quaternion",
