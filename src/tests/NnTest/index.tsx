@@ -2,7 +2,6 @@ import React, { memo, useState, useMemo, useCallback, useEffect } from "react";
 import styles from "./index.module.scss";
 import { GUI } from "dat.gui";
 import Stats from "three/examples/jsm/libs/stats.module";
-import shortid from "shortid";
 import _ from "lodash";
 import {
   Vector3,
@@ -15,7 +14,6 @@ import {
   PerspectiveCamera,
   Scene,
   Mesh,
-  BoxBufferGeometry,
   MeshPhongMaterial,
   CylinderBufferGeometry,
 } from "three";
@@ -26,7 +24,9 @@ import NN3 from "../../components/ARBridge/models/NN_USQUARTER_3.json";
 import NN5 from "../../components/ARBridge/models/NN_USQUARTER_5.json";
 import NN6 from "../../components/ARBridge/models/NN_USQUARTER_6.json";
 import NN7 from "../../components/ARBridge/models/NN_USQUARTER_7.json";
-const Nets = { NN1, NN2, NN3, NN5, NN6, NN7 };
+import NN8 from "../../components/ARBridge/models/NN_USQUARTER_8.json";
+import NN10 from "../../components/ARBridge/models/NN_USQUARTER_10.json";
+const Nets = { NN1, NN2, NN3, NN5, NN6, NN7, NN8, NN10 };
 
 //@ts-ignore
 const WebARRocksObject = window.WEBARROCKSOBJECT;

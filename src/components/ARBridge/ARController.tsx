@@ -37,6 +37,7 @@ var raycaster = new THREE.Raycaster();
 
 type DeviceOrientationControls = any;
 
+//for old browsers (tried to get chrome and firefox to work on IOS but still doesn't work)
 const getGetUserMedia = () =>
   navigator.mediaDevices?.getUserMedia
     ? navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices)
