@@ -236,6 +236,7 @@ const Gameplay = (props: { category: keyof typeof Quarters }) => {
                       models.laugh?.animations[0],
                       //models.challenging.animations[0],
                       models.shrug.animations[0],
+                      models.moonWalk.animations[0],
                     ]);
 
                     limitedEffect(() => {
