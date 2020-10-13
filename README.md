@@ -1,5 +1,11 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Publishing Instructions
+
+Clone this project onto your local machine using `git clone ` + the git url of the project. Some files that are added using git-lfs may not be available initially after cloning, you will need to run `git lfs fetch --all` to download these large file assets before building.
+
+To build the project into a production-ready package, run `yarn build`. After building there will be a /build folder that can be uploaded to the server as a static html page.
+
 ## Available Scripts
 
 In the project directory, you can run:

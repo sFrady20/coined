@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { DeviceOrientationControls } from "./DeviceOrientationControls";
 import {
   GridHelper,
   EventDispatcher,
@@ -35,8 +34,6 @@ window.THREE = THREE;
 var v2 = new THREE.Vector2();
 var raycaster = new THREE.Raycaster();
 
-type DeviceOrientationControls = any;
-
 //for old browsers (tried to get chrome and firefox to work on IOS but still doesn't work)
 const getGetUserMedia = () =>
   navigator.mediaDevices?.getUserMedia
@@ -60,7 +57,6 @@ class ARController {
   public assets!: AssetContextType;
   public events = new EventDispatcher();
   public detectState?: WebARRocksDetectState;
-  public orientation!: DeviceOrientationControls;
   public clock = new Clock();
 
   public scene!: Scene;
@@ -177,9 +173,6 @@ class ARController {
     this.glowEffect.group.scale.set(1.2, 1.2, 1.2);
     this.scene.add(this.glowEffect.group);
 
-    this.orientation = new DeviceOrientationControls(this.camera);
-    this.orientation.connect();
-
     if (DEVELOPMENT_MODE) {
       var grid = new GridHelper(2000, 20, 0x000000, 0x000000);
       this.scene.add(grid);
@@ -229,7 +222,6 @@ class ARController {
 
       this.updateCoinDetection(delta);
 
-      this.orientation.update();
       this.george.update(delta);
 
       this.glowEffect.uniforms["time"].value = this.clock.elapsedTime;
