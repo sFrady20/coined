@@ -50,7 +50,7 @@ const Quarters = {
     questionDataId: "SCIENCE & NATURE",
     title: "Science Quarter",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur congue tellus vitae erat dictum, sed bibendum nunc accumsan.",
+      "The design depicts a young girl completing the planting of a Norway spruce seedling near an established tree, continuing the life cycle of the forest.",
     banner: ScienceBanner,
     card: ScienceCard,
     panel: SciencePanel,
@@ -63,7 +63,7 @@ const Quarters = {
     questionDataId: "CULTURE",
     title: "Culture Quarter",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur congue tellus vitae erat dictum, sed bibendum nunc accumsan.",
+      "The design portrays an artist, wearing a painter’s smock, painting outside Julian Alden Weir’s studio at Weir Farm.",
     banner: CultureBanner,
     card: CultureCard,
     panel: CulturePanel,
@@ -76,7 +76,7 @@ const Quarters = {
     questionDataId: "HISTORY",
     title: "History Quarter",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur congue tellus vitae erat dictum, sed bibendum nunc accumsan.",
+      "The design depicts U.S. forces coming ashore at Asan Bay, strengthening the number of troops on the island in the fight for Guam and its eventual liberation.",
     banner: HistoryBanner,
     card: HistoryCard,
     panel: HistoryPanel,
@@ -89,7 +89,7 @@ const Quarters = {
     questionDataId: "STATES & TERRITORIES",
     title: "National Park of American Samoa Quarter",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur congue tellus vitae erat dictum, sed bibendum nunc accumsan.",
+      "The design highlights an outline of Texas with a star superimposed on the outline and the inscription, The Lone Star State.",
     banner: StatesBanner,
     card: StatesCard,
     panel: StatesPanel,
@@ -102,7 +102,7 @@ const Quarters = {
     questionDataId: "WILDLIFE",
     title: "Wildlife Quarter",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur congue tellus vitae erat dictum, sed bibendum nunc accumsan.",
+      "The design depicts a Samoan fruit bat mother hanging in a tree with her pup and aims to promote awareness to the species’ threatened status. ",
     banner: WildlifeBanner,
     card: WildlifeCard,
     panel: WildlifePanel,
