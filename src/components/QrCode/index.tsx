@@ -1,8 +1,8 @@
 import React, { memo } from "react";
-import QrCodeImg from "../../media/qr.png";
 import styles from "./index.module.scss";
 import { ReactComponent as CoinedLogo } from "../../media/logo.svg";
 import { motion } from "framer-motion";
+import QR from "qrcode.react";
 
 const QrCode = memo(() => {
   return (
@@ -43,14 +43,22 @@ const QrCode = memo(() => {
           what it takes to win? This is [NAME TBD], a game of fact vs. fiction,
           of you vs. George.
         </motion.p>
-        <motion.img
+        <motion.div
           variants={{
             showing: { opacity: 1, scale: 1 },
             hidden: { opacity: 0, scale: 0.9 },
           }}
           className={styles.qrCode}
-          src={QrCodeImg}
-        />
+        >
+          <QR
+            renderAs="svg"
+            fgColor="black"
+            bgColor="white"
+            includeMargin
+            size={350}
+            value={window.location.href.replace(/\/qr$/i, "")}
+          />
+        </motion.div>
         <motion.p
           variants={{
             showing: { opacity: 1, scale: 1 },

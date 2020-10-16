@@ -1,4 +1,4 @@
-import React, { useContext, memo, useState } from "react";
+import React, { useContext, memo, useState, useMemo } from "react";
 import styles from "./index.module.scss";
 import _ from "lodash";
 import { motion, AnimatePresence } from "framer-motion";
@@ -13,14 +13,24 @@ import CollectionDetail from "./CollectionDetail";
 import { ReactComponent as CollapseSvg } from "../../media/collapse.svg";
 
 const Collection = () => {
-  const { sessionState, updateSessionState, updateGameState } = useContext(
-    SessionContext
-  );
+  const {
+    sessionState,
+    gameState,
+    updateSessionState,
+    updateGameState,
+  } = useContext(SessionContext);
   const [selectedQuarter, setSelectedQuarter] = useState<
     keyof typeof Quarters
   >();
   const { phase, isCollectionCollapsed } = sessionState;
   const isHidden = phase === "scan";
+  const isAllCollected = useMemo(
+    () =>
+      _.every(_.keys(Quarters), (category) =>
+        _.includes(gameState.collection, category)
+      ),
+    [gameState.collection]
+  );
 
   //clear collection for debugging
   useKeyPress("r", () => {
@@ -88,7 +98,11 @@ const Collection = () => {
         </motion.div>
         <CollectionBgSvg />
         <div className={styles.content}>
-          <p></p>
+          <p>
+            {isAllCollected
+              ? "Huzzah! You’ve collected all five of George’s quarters. We have a new Coined champion. Well done."
+              : "To win, you have to collect all five of George’s quarters. Select a category below to challenge Washington to a round of True or False trivia"}
+          </p>
           <motion.div
             className={styles.items}
             variants={{
@@ -129,22 +143,22 @@ const Collection = () => {
               onClick={() => {
                 share({
                   url: window.location.href,
-                  title: "title",
-                  text: "text",
+                  text:
+                    "Do you have what it takes to win George Washington’s quarter collection? Play Coined and test your knowledge.",
                 });
               }}
             />
-            <Button
-              type="secondary"
-              text="VISIT USMINT.GOV"
-              onClick={() => {
-                share({
-                  url: window.location.href,
-                  title: "title",
-                  text: "text",
-                });
-              }}
-            />
+            <a
+              href="https://www.usmint.gov"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button
+                type="secondary"
+                text="VISIT USMINT.GOV"
+                onClick={() => {}}
+              />
+            </a>
           </div>
         </div>
 

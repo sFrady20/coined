@@ -58,10 +58,10 @@ const LoadingScreen = memo(
           <div className={styles.panelInner}>
             <h2>Greetings!</h2>
             <p>
-              <span>Catch George Washington in a</span>
-              <span>lie during this classic trivia game.</span>
-              <span>Think you're up to the challenge?</span>
-              <span>George is waiting.</span>
+              <span>
+                Greetings! Think you can outwit Washington and win his coin
+                collection? You’ll need a quarter to begin. George is waiting.
+              </span>
             </p>
             <div className={styles.loadingBar}>
               <div

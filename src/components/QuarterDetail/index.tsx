@@ -69,7 +69,13 @@ const QuarterDetail = memo(
         <div className={styles.detailContent}>
           <h3>{quarter.title}</h3>
           <p>{quarter.description}</p>
-          <div className={styles.callToAction}>VISIT USMINT.GOV</div>
+          <a
+            href="https://www.usmint.gov"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <div className={styles.callToAction}>VISIT USMINT.GOV</div>
+          </a>
           {children}
         </div>
         {onClose && (

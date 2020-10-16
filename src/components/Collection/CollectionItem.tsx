@@ -16,7 +16,6 @@ const CollectionItem = memo(
     const { gameState } = useContext(SessionContext);
     const { collection, visited } = gameState;
     const isCollected = _.includes(collection, category);
-    const isNew = isCollected && !_.includes(visited, category);
     const answeredQuestions = useMemo(
       () => gameState.answeredQuestions[category] || [],
       [gameState, category]
