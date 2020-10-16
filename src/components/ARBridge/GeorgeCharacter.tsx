@@ -51,7 +51,7 @@ class GeorgeCharacter {
   public root: Object3D;
   public model: Object3D;
   public mixer: AnimationMixer;
-  public mesh: SkinnedMesh;
+  public mesh?: SkinnedMesh;
   public nodes: { [s: string]: Object3D };
   public waitTimeout?: NodeJS.Timeout; //ad
   public floatLocked = false;
@@ -83,10 +83,14 @@ class GeorgeCharacter {
     this.nodes = {};
     this.model.traverse((d: Object3D) => (this.nodes[d.name] = d));
 
-    this.mesh = _.find(
-      this.model.children,
-      (c) => (c as SkinnedMesh).morphTargetInfluences
-    ) as SkinnedMesh;
+    //find skinned mesh
+    this.model.traverse((m) => {
+      if (
+        !!(m as SkinnedMesh).morphTargetInfluences ||
+        m.name == "GW_RIGGED4_2"
+      )
+        this.mesh = m as SkinnedMesh;
+    });
 
     this.mixer = new AnimationMixer(this.model);
     this.mixer.addEventListener("finished", this.returnToIdle); //auto reset to idle

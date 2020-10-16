@@ -16,6 +16,7 @@ const modelPaths = {
   throwsCane: "/models/GW_R2_ThrowsCane.fbx",
   welcome: "/models/GW_R2_WELCOME_01.fbx",
   moonWalk: "/models/GW_MoonWalking_0522.fbx",
+  dance: "/models/GW_R2_ThrowsCane.fbx",
 };
 const optionalModels = {};
 
