@@ -30,7 +30,7 @@
     "react-three-fiber": "^4.0.27",
     "shortid": "^2.2.15",
     "swiper": "^5.4.5",
-    "three": "^0.117.1",
+    "three": "^0.125.0",
     "use-immer": "^0.4.0",
     "xlsx": "^0.16.2"
   },
